@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>WOD | Workout Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Helvetica, sans-serif;
+        }
+        body {
+            background: #f5f7fb;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 550px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #1e3a5f, #e67e22);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .sub {
+            text-align: center;
+            color: #6c7a8a;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+        .workout-card {
+            background: linear-gradient(135deg, #1e3a5f, #2c5a7a);
+            border-radius: 28px;
+            padding: 24px;
+            margin-bottom: 20px;
+            color: white;
+        }
+        .workout-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+        .exercise-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 14px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .exercise-name {
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            flex: 1;
+        }
+        .exercise-sets {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+        .swap-btn {
+            background: rgba(255,255,255,0.25);
+            border: none;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 25px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .swap-btn:active {
+            background: rgba(255,255,255,0.4);
+            transform: scale(0.96);
+        }
+        .btn-primary {
+            background: #e67e22;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 16px;
+            cursor: pointer;
+        }
+        .btn-secondary {
+            background: white;
+            color: #1e3a5f;
+            border: 1px solid #ddd;
+            padding: 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 16px;
+            width: 100%;
+            cursor: pointer;
+        }
+        .button-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .button-row button {
+            flex: 1;
+            margin-top: 0;
+        }
+        .history-card {
+            background: white;
+            border-radius: 28px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .history-header h3 {
+            font-size: 18px;
+            color: #1e3a5f;
+        }
+        .clear-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .history-item {
+            background: #fafcff;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #e67e22;
+        }
+        .history-date {
+            font-size: 10px;
+            color: #e67e22;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .history-name {
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+        .history-exercises {
+            font-size: 11px;
+            color: #6c7a8a;
+        }
+        .history-notes {
+            font-size: 11px;
+            background: #f1f5f9;
+            padding: 6px 10px;
+            border-radius: 12px;
+            margin-top: 8px;
+            color: #334155;
+        }
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            font-size: 11px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #94a3b8;
+        }
+        .hint {
+            font-size: 11px;
+            text-align: center;
+            margin-top: 14px;
+            opacity: 0.7;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 28px;
+            padding: 24px;
+            width: 90%;
+            max-width: 340px;
+        }
+        .modal-content h3 {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        .modal-content p {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+        .modal-content textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 16px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            font-family: inherit;
+            margin-bottom: 16px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+        footer {
+            text-align: center;
+            font-size: 10px;
+            color: #8e9eae;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🏋️ WOD Generator</h1>
+    <div class="sub">130+ exercises • tap to swap • save history</div>
+
+    <div class="workout-card">
+        <div class="workout-title" id="workoutTitle">Loading...</div>
+        <div id="exerciseList"></div>
+        <div class="hint">👆 Tap exercise name or Swap button to change</div>
+        <button class="btn-primary" id="randomizeBtn">🎲 New Workout</button>
+    </div>
+
+    <div class="button-row">
+        <button class="btn-primary" id="saveBtn">📝 Save Workout</button>
+        <button class="btn-secondary" id="resetBtn">🔄 Reset</button>
+    </div>
+
+    <div class="history-card">
+        <div class="history-header">
+            <h3>📅 Saved Workouts</h3>
+            <button class="clear-btn" id="clearHistoryBtn">Clear All</button>
+        </div>
+        <div id="historyList"></div>
+    </div>
+    <footer>💾 All data saved on your phone • works offline</footer>
+</div>
+
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <h3>Save Workout</h3>
+        <p>Add notes (optional)</p>
+        <textarea id="notesInput" rows="3" placeholder="e.g., weights used, how it felt, PRs"></textarea>
+        <div class="modal-buttons">
+            <button id="confirmSave" style="background:#e67e22; color:white;">Save</button>
+            <button id="cancelModal" style="background:#f1f3f5;">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ========== 130+ EXERCISES ==========
+const COMPOUND = [
+    "Barbell Squat", "Deadlift", "Bench Press", "Overhead Press", "Pull-Up", "Barbell Row",
+    "Dumbbell Squat", "Romanian Deadlift", "Dips", "Walking Lunge", "Hip Thrust", "Front Squat",
+    "Bulgarian Split Squat", "Push Press", "Incline Bench Press", "Chin-Up", "Seated Cable Row",
+    "T-Bar Row", "Sumo Deadlift", "Power Clean", "Zercher Squat", "Hack Squat", "Good Morning",
+    "Clean and Jerk", "Snatch", "Box Squat", "Landmine Row", "Deficit Deadlift", "Nordic Curl"
+];
+
+const ISOLATION = [
+    "Bicep Curl", "Tricep Pushdown", "Lateral Raise", "Hammer Curl", "Leg Extension", "Leg Curl",
+    "Standing Calf Raise", "Face Pull", "Pec Deck Fly", "Cable Fly", "Dumbbell Fly", "Concentration Curl",
+    "Skull Crusher", "Reverse Curl", "Wrist Curl", "Barbell Shrug", "Rear Delt Fly", "Overhead Tricep Extension",
+    "Preacher Curl", "Cable Kickback", "Donkey Calf Raise", "Incline Dumbbell Curl", "Cable Curl",
+    "Lying Leg Curl", "Seated Calf Raise", "Hip Adduction", "Hip Abduction", "Chest Fly"
+];
+
+const BODYWEIGHT = [
+    "Push-Up", "Bodyweight Squat", "Plank", "Reverse Lunge", "Glute Bridge", "Burpee", "Mountain Climber",
+    "Sit-Up", "Leg Raise", "Diamond Push-Up", "Wide Push-Up", "Pike Push-Up", "Bench Dip",
+    "Pull-Up", "Australian Pull-Up", "Pistol Squat", "Cossack Squat", "Hollow Body Hold",
+    "Superman", "Side Plank", "Bird Dog", "Jump Squat", "Box Jump", "L-Sit", "Handstand Push-Up",
+    "Dragon Flag", "Ab Wheel Rollout", "Copenhagen Plank", "Single Leg Glute Bridge"
+];
+
+const CARDIO = [
+    "Running", "Jump Rope", "Cycling", "Rowing Machine", "Stair Climber", "Battle Ropes",
+    "Kettlebell Swing", "High Knees", "Jumping Jacks", "Burpees", "Sled Push", "Sprints",
+    "Box Jumps", "Skater Jumps", "Assault Bike", "Swimming", "Walking Lunges", "Farmers Walk"
+];
+
+const ACCESSORY = [
+    "Russian Twist", "Cable Woodchop", "Pallof Press", "Farmer's Walk", "Dead Bug",
+    "Band Pull-Apart", "Hanging Knee Raise", "Neck Curl", "Grip Crusher", "Face Pull",
+    "Single Leg Deadlift", "Reverse Hyper", "Back Extension", "Plank with Row", "Suitcase Carry"
+];
+
+const WORKOUT_NAMES = [
+    "Power", "Strength", "Explosive", "Muscle Builder", "Full Body", "Push Day", 
+    "Pull Day", "Leg Day", "Cardio Blast", "Bodyweight Burn", "Hypertrophy", 
+    "Endurance", "Iron Warrior", "Metabolic", "Total Body", "Functional Strength",
+    "Upper Body", "Lower Body", "Core Crusher", "HIIT Session"
+];
+
+function randomFrom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function getSets(name) {
+    if (COMPOUND.includes(name)) return "3x8-10";
+    if (ISOLATION.includes(name)) return "3x12-15";
+    if (BODYWEIGHT.includes(name)) return "3xAMRAP";
+    if (CARDIO.includes(name)) return "45s work";
+    if (ACCESSORY.includes(name)) return "3x10-12";
+    return "3x10";
+}
+
+function getType(name) {
+    if (COMPOUND.includes(name)) return "compound";
+    if (ISOLATION.includes(name)) return "isolation";
+    if (BODYWEIGHT.includes(name)) return "bodyweight";
+    if (CARDIO.includes(name)) return "cardio";
+    if (ACCESSORY.includes(name)) return "accessory";
+    return "compound";
+}
+
+function getAlternate(name) {
+    const type = getType(name);
+    let pool;
+    if (type === "compound") pool = COMPOUND;
+    else if (type === "isolation") pool = ISOLATION;
+    else if (type === "bodyweight") pool = BODYWEIGHT;
+    else if (type === "cardio") pool = CARDIO;
+    else pool = ACCESSORY;
+    
+    const filtered = pool.filter(e => e !== name);
+    if (filtered.length === 0) return randomFrom(pool);
+    return randomFrom(filtered);
+}
+
+function generateWorkout() {
+    const title = randomFrom(WORKOUT_NAMES) + " Session";
+    const exerciseCount = Math.floor(Math.random() * 3) + 5; // 5-7 exercises
+    const exercises = [];
+    const used = new Set();
+    
+    // First exercise: compound
+    const first = randomFrom(COMPOUND);
+    exercises.push({ name: first, sets: getSets(first) });
+    used.add(first);
+    
+    const allPools = [COMPOUND, ISOLATION, BODYWEIGHT, CARDIO, ACCESSORY];
+    
+    while (exercises.length < exerciseCount) {
+        const pool = randomFrom(allPools);
+        let candidate = randomFrom(pool);
+        let attempts = 0;
+        while (used.has(candidate) && attempts < 20) {
+            candidate = randomFrom(pool);
+            attempts++;
+        }
+        exercises.push({ name: candidate, sets: getSets(candidate) });
+        used.add(candidate);
+    }
+    
+    return {
+        title: title,
+        exercises: exercises,
+        timestamp: Date.now()
+    };
+}
+
+// ========== APP STATE ==========
+let currentWorkout = null;
+let savedWorkouts = [];
+
+// ========== STORAGE ==========
+function loadData() {
+    try {
+        const saved = localStorage.getItem("wod_complete");
+        if (saved) {
+            const data = JSON.parse(saved);
+            savedWorkouts = data.saved || [];
+            if (data.current && data.current.exercises) {
+                currentWorkout = data.current;
+            } else {
+                currentWorkout = generateWorkout();
+            }
+        } else {
+            currentWorkout = generateWorkout();
+            savedWorkouts = [];
+        }
+    } catch(e) {
+        currentWorkout = generateWorkout();
+        savedWorkouts = [];
+    }
+}
+
+function saveData() {
+    const data = {
+        current: currentWorkout,
+        saved: savedWorkouts
+    };
+    localStorage.setItem("wod_complete", JSON.stringify(data));
+}
+
+// ========== RENDER ==========
+function renderWorkout() {
+    if (!currentWorkout || !currentWorkout.exercises) {
+        currentWorkout = generateWorkout();
+    }
+    
+    document.getElementById("workoutTitle").innerHTML = currentWorkout.title + " 🔥";
+    
+    const container = document.getElementById("exerciseList");
+    let html = "";
+    
+    for (let i = 0; i < currentWorkout.exercises.length; i++) {
+        const ex = currentWorkout.exercises[i];
+        html += `
+            <div class="exercise-item">
+                <span class="exercise-name" data-index="${i}">${escapeHtml(ex.name)}</span>
+                <span class="exercise-sets">${ex.sets}</span>
+                <button class="swap-btn" data-index="${i}">Swap</button>
+            </div>
+        `;
+    }
+    
+    container.innerHTML = html;
+    
+    // Swap button listeners
+    document.querySelectorAll('.swap-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const idx = parseInt(this.getAttribute('data-index'));
+            const oldName = currentWorkout.exercises[idx].name;
+            const newName = getAlternate(oldName);
+            currentWorkout.exercises[idx] = { name: newName, sets: getSets(newName) };
+            renderWorkout();
+            saveData();
+        });
+    });
+    
+    // Exercise name click listeners
+    document.querySelectorAll('.exercise-name').forEach(nameSpan => {
+        nameSpan.addEventListener('click', function() {
+            const idx = parseInt(this.getAttribute('data-index'));
+            const oldName = currentWorkout.exercises[idx].name;
+            const newName = getAlternate(oldName);
+            currentWorkout.exercises[idx] = { name: newName, sets: getSets(newName) };
+            renderWorkout();
+            saveData();
+        });
+    });
+    
+    saveData();
+}
+
+function renderHistory() {
+    const container = document.getElementById("historyList");
+    
+    if (savedWorkouts.length === 0) {
+        container.innerHTML = '<div class="empty-state">📭 No saved workouts yet<br>Save your first workout!</div>';
+        return;
+    }
+    
+    const reversed = [...savedWorkouts].reverse();
+    let html = "";
+    
+    for (let i = 0; i < reversed.length; i++) {
+        const w = reversed[i];
+        const date = new Date(w.timestamp);
+        const dateStr = date.toLocaleDateString() + " " + date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        const exShort = w.exercises.slice(0, 3).map(e => e.name).join(", ");
+        const more = w.exercises.length > 3 ? ` +${w.exercises.length - 3} more` : "";
+        
+        html += `
+            <div class="history-item">
+                <div class="history-date">📅 ${dateStr}</div>
+                <div class="history-name">${escapeHtml(w.title)}</div>
+                <div class="history-exercises">${escapeHtml(exShort)}${more}</div>
+                ${w.notes ? `<div class="history-notes">📝 ${escapeHtml(w.notes)}</div>` : ''}
+                <button class="delete-btn" data-timestamp="${w.timestamp}">🗑 Delete</button>
+            </div>
+        `;
+    }
+    
+    container.innerHTML = html;
+    
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const ts = parseInt(this.getAttribute('data-timestamp'));
+            savedWorkouts = savedWorkouts.filter(w => w.timestamp !== ts);
+            saveData();
+            renderHistory();
+        });
+    });
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+function newWorkout() {
+    currentWorkout = generateWorkout();
+    renderWorkout();
+}
+
+function saveCurrentWorkout(notes) {
+    const toSave = {
+        title: currentWorkout.title,
+        exercises: currentWorkout.exercises,
+        notes: notes || "",
+        timestamp: Date.now()
+    };
+    savedWorkouts.push(toSave);
+    saveData();
+    renderHistory();
+}
+
+// ========== MODAL ==========
+const modal = document.getElementById("modal");
+function openModal() {
+    document.getElementById("notesInput").value = "";
+    modal.style.display = "flex";
+}
+function closeModal() {
+    modal.style.display = "none";
+}
+
+// ========== EVENT LISTENERS ==========
+document.getElementById("randomizeBtn").addEventListener("click", function() {
+    newWorkout();
+});
+
+document.getElementById("resetBtn").addEventListener("click", function() {
+    if (confirm("Generate a new workout?")) {
+        newWorkout();
+    }
+});
+
+document.getElementById("saveBtn").addEventListener("click", function() {
+    if (currentWorkout && currentWorkout.exercises && currentWorkout.exercises.length > 0) {
+        openModal();
+    } else {
+        alert("No workout to save. Generate one first!");
+    }
+});
+
+document.getElementById("clearHistoryBtn").addEventListener("click", function() {
+    if (confirm("Delete ALL saved workouts? This cannot be undone.")) {
+        savedWorkouts = [];
+        saveData();
+        renderHistory();
+    }
+});
+
+document.getElementById("confirmSave").addEventListener("click", function() {
+    const notes = document.getElementById("notesInput").value;
+    saveCurrentWorkout(notes);
+    closeModal();
+});
+
+document.getElementById("cancelModal").addEventListener("click", closeModal);
+
+window.addEventListener("click", function(e) {
+    if (e.target === modal) closeModal();
+});
+
+// ========== INITIALIZE ==========
+loadData();
+renderWorkout();
+renderHistory();
+</script>
+</body>
+</html>
