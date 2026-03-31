@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Field+Iron"/>
+<meta name="theme-color" content="#0a0a0a"/>
+<title>Field+Iron</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#0a0a0a;overscroll-behavior:none;-webkit-overflow-scrolling:touch}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:rgba(255,255,255,0.87);padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+input,button,select{font-family:inherit}
+button:active{transform:scale(0.96);opacity:0.8}
+::-webkit-scrollbar{display:none}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+input::placeholder{color:rgba(255,255,255,0.2)}
+.hidden{display:none!important}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fadeUp{animation:fadeUp 0.25s ease}
+#header{position:sticky;top:0;z-index:20;background:rgba(10,10,10,0.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06);padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between}
+#logo{font-size:22px;font-weight:800;letter-spacing:0.5px}
+#logo span.plus{color:#f59e0b}
+#subtitle{font-size:10px;color:rgba(255,255,255,0.2);margin-top:2px}
+#nav{display:flex;gap:5px}
+.nav-btn{padding:6px 10px;font-size:9px;letter-spacing:1px;text-transform:uppercase;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:transparent;color:rgba(255,255,255,0.3);cursor:pointer;transition:all 0.2s}
+.nav-btn.active{background:var(--theme);color:#000;border-color:var(--theme)}
+.view{padding:18px 16px;display:none}
+.view.active{display:block}
+.card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:16px;margin-bottom:14px}
+.card-sm{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.stat-mini{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:9px 0;text-align:center;flex:1}
+.stat-mini .lbl{font-size:8px;color:rgba(255,255,255,0.25);letter-spacing:2px;margin-bottom:3px}
+.stat-mini .val{font-size:16px;font-weight:700}
+#week-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:22px}
+.day-cell{border-radius:12px;padding:9px 3px;cursor:pointer;text-align:center;border:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.02);transition:all 0.15s;position:relative}
+.day-cell .day-name{font-size:8px;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-bottom:4px}
+.day-cell .day-icon{font-size:14px}
+.day-cell .today-dot{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:3px;height:3px;border-radius:50%;background:var(--theme)}
+.day-cell.active-day{border-color:var(--theme)!important;background:rgba(255,255,255,0.06)}
+.pill-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.pill{padding:8px 14px;font-size:11px;font-weight:600;cursor:pointer;border-radius:10px;transition:all 0.15s;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4)}
+.pill.active{background:var(--theme);color:#000;border-color:var(--theme)}
+.ex-row{padding:13px 14px;border-bottom:1px solid rgba(255,255,255,0.05)}
+.ex-row:last-child{border-bottom:none}
+.tag-pill{font-size:9px;font-weight:600;padding:2px 8px;border-radius:20px;border:1px solid;display:inline-block;margin-bottom:5px}
+.ex-name{font-size:14px;font-weight:600;color:rgba(255,255,255,0.9);margin-bottom:8px}
+.srr-bar{display:flex;border:1px solid rgba(255,255,255,0.06);border-radius:10px;overflow:hidden;margin-bottom:8px;background:rgba(255,255,255,0.03)}
+.srr-cell{flex:1;padding:7px 8px;text-align:center;border-right:1px solid rgba(255,255,255,0.06)}
+.srr-cell:last-child{border-right:none;flex:2}
+.srr-label{font-size:8px;color:rgba(255,255,255,0.25);letter-spacing:2px;margin-bottom:3px}
+.srr-val{font-size:13px;font-weight:700;color:var(--theme)}
+.srr-val.rest{color:rgba(255,255,255,0.35);font-size:12px}
+.cue-toggle{font-size:10px;color:rgba(255,255,255,0.25);cursor:pointer;background:none;border:none;padding:0;display:flex;align-items:center;gap:4px;letter-spacing:0.5px}
+.cue-text{font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6;font-style:italic;padding-left:10px;border-left:2px solid var(--theme);margin-top:6px;margin-bottom:2px}
+.set-btn{width:44px;height:44px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.3);font-size:13px;cursor:pointer;transition:all 0.15s}
+.set-btn.done{background:var(--theme);color:#000;border-color:var(--theme);font-size:18px;font-weight:700}
+.set-btn.add-set{background:transparent;color:var(--theme);border:1px dashed;border-color:var(--theme-50);font-size:22px}
+.set-btn.rm-set{background:transparent;color:rgba(255,255,255,0.2);border:1px dashed rgba(255,255,255,0.15);font-size:22px}
+.weight-input{width:90px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.8);padding:6px 10px;font-size:12px;border-radius:8px;outline:none}
+.prog-bar{height:5px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;margin-top:6px}
+.prog-fill{height:100%;border-radius:99px;background:var(--theme);transition:width 0.3s}
+.btn-main{width:100%;padding:15px;font-size:13px;font-weight:700;border-radius:12px;border:none;cursor:pointer;transition:all 0.3s;letter-spacing:0.3px}
+.btn-outline{width:100%;padding:13px;font-size:12px;font-weight:600;border-radius:12px;background:transparent;border:1px dashed;cursor:pointer;margin-bottom:10px}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:50;display:none;align-items:flex-end;backdrop-filter:blur(4px)}
+#overlay.open{display:flex}
+#sheet{background:#161616;border-radius:20px 20px 0 0;width:100%;max-height:82vh;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,0.08);border-bottom:none}
+#sheet-header{padding:14px 16px 10px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+#sheet-title{font-size:18px;font-weight:700;letter-spacing:0.3px}
+#sheet-sub{font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:2px;margin-top:2px}
+#sheet-close{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:14px}
+#sheet-search-wrap{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0}
+#sheet-search{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.8);padding:9px 14px;font-size:13px;border-radius:12px;outline:none}
+#sheet-list{overflow-y:auto;flex:1}
+.sheet-item{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.sheet-item:active{background:rgba(255,255,255,0.04)}
+.sheet-item.current{background:rgba(255,255,255,0.04);cursor:default}
+.sheet-item .ex-nm{font-size:13px;font-weight:500;color:rgba(255,255,255,0.85);margin-bottom:3px}
+.sheet-item .ex-cue{font-size:10px;color:rgba(255,255,255,0.2);font-style:italic}
+.sheet-item .ex-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;margin-left:10px}
+.hist-card{background:rgba(255,255,255,0.03);border-radius:14px;margin-bottom:10px;border-left:3px solid;overflow:hidden}
+.hist-inner{padding:13px 14px}
+.hist-ex{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.25);padding:3px 0}
+.soccer-row{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.soccer-lbl{font-size:11px;font-weight:600;min-width:110px}
+.soccer-detail{font-size:11px;color:rgba(255,255,255,0.3)}
+.rest-tip{font-size:12px;color:rgba(255,255,255,0.2);padding:8px 16px;background:rgba(255,255,255,0.03);border-radius:10px;margin-bottom:6px;text-align:center}
+</style>
+</head>
+<body>
+<div id="header">
+  <div>
+    <div id="logo">Field<span class="plus">+</span>Iron</div>
+    <div id="subtitle">Athlete Training</div>
+  </div>
+  <div id="nav">
+    <button class="nav-btn active" onclick="showView('schedule')" id="nav-schedule">🗓 Schedule</button>
+    <button class="nav-btn" onclick="showView('history')" id="nav-history">📋 History</button>
+    <button class="nav-btn" onclick="showView('stats')" id="nav-stats">📊 Stats</button>
+  </div>
+</div>
+<div id="view-schedule" class="view active"></div>
+<div id="view-history" class="view"></div>
+<div id="view-stats" class="view"></div>
+<div id="view-workout" class="view"></div>
+<div id="overlay" onclick="closeSheet()">
+  <div id="sheet" onclick="event.stopPropagation()">
+    <div id="sheet-header">
+      <div><div id="sheet-title">Exercises</div><div id="sheet-sub">ALL EXERCISES · A–Z</div></div>
+      <button id="sheet-close" onclick="closeSheet()">✕</button>
+    </div>
+    <div id="sheet-search-wrap"><input id="sheet-search" type="text" placeholder="Search exercises…" oninput="filterSheet()"/></div>
+    <div id="sheet-list"></div>
+  </div>
+</div>
+<script>
+const DAY_TYPES={0:"rest",1:"soccer",2:"workout",3:"workout",4:"soccer",5:"soccer",6:"workout"};
+const DAY_NAMES=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const FULL_DAY_NAMES=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const THEMES=[{id:0,label:"Power & Explosiveness",short:"Power",emoji:"⚡",color:"#f59e0b",glow:"rgba(245,158,11,0.1)"},{id:1,label:"Strength & Pull",short:"Strength",emoji:"🏋️",color:"#3b82f6",glow:"rgba(59,130,246,0.1)"},{id:2,label:"Hypertrophy & Core",short:"Hypertrophy",emoji:"🔥",color:"#10b981",glow:"rgba(16,185,129,0.1)"},{id:3,label:"Full Mix",short:"Mix",emoji:"🔀",color:"#8b5cf6",glow:"rgba(139,92,246,0.1)"}];
+const USER_STATS={weight:81.75,bf:15.2,targetBf:12,muscleMass:65.89,bmr:1851,skeletalMuscle:54.8,visceralFat:7,protein:19.3};
+const EQ_TYPES=["All","Barbell","Dumbbell","Bodyweight"];
+const EQ_ICONS=["🔀","🏋️","💪","🤸"];
+const TAG_COLORS={power:"#f59e0b",olympic:"#f97316",strength:"#3b82f6",pull:"#06b6d4",push:"#8b5cf6",unilateral:"#ec4899",hamstring:"#84cc16",glute:"#f43f5e",core:"#10b981",quad:"#22d3ee",speed:"#fb923c",reactive:"#a78bfa",conditioning:"#f87171",carry:"#fbbf24",shoulder:"#38bdf8",triceps:"#fb923c",biceps:"#f472b6",chest:"#f87171",back:"#818cf8",calf:"#a3e635",forearm:"#fbbf24"};
+const EXERCISES=[
+{name:"Back Squat",sets:4,reps:"5",rest:"2min",cues:"Chest up, drive knees out, explode on concentric.",eq:"Barbell",tag:"power",pool:0},
+{name:"Power Clean",sets:4,reps:"3",rest:"2min",cues:"Triple extension, fast elbows, soft catch in rack.",eq:"Barbell",tag:"olympic",pool:0},
+{name:"Clean and Jerk",sets:3,reps:"3",rest:"3min",cues:"Pull, catch in rack, dip and drive overhead to lockout.",eq:"Barbell",tag:"olympic",pool:0},
+{name:"Hang Power Snatch",sets:4,reps:"3",rest:"2min",cues:"Aggressive pull, fast turnover, punch up to stable catch.",eq:"Barbell",tag:"olympic",pool:0},
+{name:"Barbell Thruster",sets:4,reps:"5",rest:"90s",cues:"Squat deep, leg drive into press, lockout fully overhead.",eq:"Barbell",tag:"power",pool:0},
+{name:"Push Press",sets:4,reps:"5",rest:"90s",cues:"Dip and drive, bar travels straight, lock out at top.",eq:"Barbell",tag:"power",pool:0},
+{name:"Trap Bar Deadlift",sets:4,reps:"5",rest:"2min",cues:"Sit into it, drive floor away, hips and shoulders rise together.",eq:"Barbell",tag:"strength",pool:0},
+{name:"Romanian Deadlift",sets:3,reps:"6",rest:"90s",cues:"Hinge deep, bar close to legs, feel hamstring stretch.",eq:"Barbell",tag:"hamstring",pool:0},
+{name:"Barbell Hip Thrust",sets:4,reps:"6",rest:"90s",cues:"Drive hips to ceiling, pause and squeeze glutes at top.",eq:"Barbell",tag:"glute",pool:0},
+{name:"DB Thruster",sets:4,reps:"6",rest:"90s",cues:"Squat deep, explode up, press at top to full lockout.",eq:"Dumbbell",tag:"power",pool:0},
+{name:"DB Snatch",sets:3,reps:"5",rest:"90s",cues:"Hip hinge, explosive pull, punch to lockout overhead.",eq:"Dumbbell",tag:"olympic",pool:0},
+{name:"DB Hang Clean",sets:3,reps:"5",rest:"90s",cues:"Explosive hip drive, fast elbows, soft catch at shoulders.",eq:"Dumbbell",tag:"olympic",pool:0},
+{name:"DB Push Press",sets:3,reps:"6",rest:"75s",cues:"Leg drive, neutral grip, lock arms overhead, control descent.",eq:"Dumbbell",tag:"power",pool:0},
+{name:"DB Jump Squat",sets:3,reps:"6",rest:"90s",cues:"Load hips, explode fully through toes, land softly.",eq:"Dumbbell",tag:"power",pool:0},
+{name:"DB Hip Thrust",sets:3,reps:"8",rest:"75s",cues:"Drive hips to ceiling, pause and squeeze at top.",eq:"Dumbbell",tag:"glute",pool:0},
+{name:"DB Romanian DL",sets:3,reps:"8",rest:"75s",cues:"Slow descent, feel hamstring stretch, squeeze up.",eq:"Dumbbell",tag:"hamstring",pool:0},
+{name:"Box Jump",sets:4,reps:"5",rest:"90s",cues:"Full hip extension, land soft with hips back, step down.",eq:"Bodyweight",tag:"power",pool:0},
+{name:"Broad Jump",sets:3,reps:"5",rest:"90s",cues:"Arm swing, full triple extension, stick the landing.",eq:"Bodyweight",tag:"power",pool:0},
+{name:"Jump Squat",sets:3,reps:"8",rest:"75s",cues:"Quarter squat, explode through toes, absorb landing softly.",eq:"Bodyweight",tag:"power",pool:0},
+{name:"Depth Jump",sets:3,reps:"5",rest:"90s",cues:"Step off box, minimal ground contact, explode immediately.",eq:"Bodyweight",tag:"reactive",pool:0},
+{name:"Explosive Push-Up",sets:3,reps:"8",rest:"60s",cues:"Explode off floor, hands leave ground, land soft.",eq:"Bodyweight",tag:"power",pool:0},
+{name:"Med Ball Slam",sets:3,reps:"8",rest:"60s",cues:"Full extension overhead, violent slam, reset each rep.",eq:"Bodyweight",tag:"power",pool:0},
+{name:"Sled Push",sets:4,reps:"30m",rest:"2min",cues:"Low hips, lean into sled, drive through heels aggressively.",eq:"Bodyweight",tag:"conditioning",pool:0},
+{name:"Sprint Bounds",sets:3,reps:"6",rest:"90s",cues:"Explosive triple extension each stride, max distance.",eq:"Bodyweight",tag:"speed",pool:0},
+{name:"Pogo Hops",sets:3,reps:"12",rest:"60s",cues:"Minimal ground contact, stiff ankle, energy through Achilles.",eq:"Bodyweight",tag:"reactive",pool:0},
+{name:"Conventional Deadlift",sets:4,reps:"5",rest:"3min",cues:"Bar over mid-foot, lat squeeze before pull, hip hinge not squat.",eq:"Barbell",tag:"strength",pool:1},
+{name:"Sumo Deadlift",sets:4,reps:"5",rest:"3min",cues:"Wide stance, toes out, chest tall, drive knees out on pull.",eq:"Barbell",tag:"strength",pool:1},
+{name:"Rack Pull",sets:4,reps:"5",rest:"3min",cues:"From knee height, max load, lock hips out fully at top.",eq:"Barbell",tag:"strength",pool:1},
+{name:"Barbell Row",sets:4,reps:"6",rest:"2min",cues:"Hinge 45°, pull bar to lower sternum, squeeze scapula at top.",eq:"Barbell",tag:"pull",pool:1},
+{name:"Pendlay Row",sets:4,reps:"5",rest:"2min",cues:"Full stop on floor each rep, explosive pull, flat back.",eq:"Barbell",tag:"pull",pool:1},
+{name:"Overhead Press",sets:4,reps:"5",rest:"2min",cues:"Glutes squeezed, ribs down, press straight overhead.",eq:"Barbell",tag:"push",pool:1},
+{name:"Bench Press",sets:4,reps:"5",rest:"2min",cues:"Retract scapulae, touch chest, drive bar up and back.",eq:"Barbell",tag:"push",pool:1},
+{name:"Bulgarian Split Squat",sets:3,reps:"6 ea",rest:"90s",cues:"Front shin vertical, torso tall, control eccentric 3s.",eq:"Barbell",tag:"unilateral",pool:1},
+{name:"Barbell RDL",sets:3,reps:"8",rest:"90s",cues:"Hinge at hip, bar close to legs, feel stretch, squeeze up.",eq:"Barbell",tag:"hamstring",pool:1},
+{name:"Weighted Pull-Up",sets:4,reps:"5",rest:"2min",cues:"Dead hang start, chin over bar, control the full descent.",eq:"Barbell",tag:"pull",pool:1},
+{name:"Weighted Dips",sets:3,reps:"8",rest:"90s",cues:"Lean forward slightly, full depth, lock out at top.",eq:"Barbell",tag:"push",pool:1},
+{name:"DB Row",sets:3,reps:"10 ea",rest:"60s",cues:"Elbow to hip not ceiling, full stretch at bottom.",eq:"Dumbbell",tag:"pull",pool:1},
+{name:"DB Overhead Press",sets:3,reps:"8",rest:"75s",cues:"Neutral grip, full lockout, ribs down.",eq:"Dumbbell",tag:"push",pool:1},
+{name:"DB Bulgarian Split",sets:3,reps:"8 ea",rest:"90s",cues:"Front shin vertical, torso upright, drive through front heel.",eq:"Dumbbell",tag:"unilateral",pool:1},
+{name:"DB Chest Press",sets:3,reps:"10",rest:"75s",cues:"Full stretch at bottom, arc path up, retract scapula.",eq:"Dumbbell",tag:"push",pool:1},
+{name:"DB Deadlift",sets:3,reps:"8",rest:"75s",cues:"Neutral spine, sit into it, drive floor away, hips through.",eq:"Dumbbell",tag:"strength",pool:1},
+{name:"Pull-Up",sets:4,reps:"6",rest:"2min",cues:"Dead hang to chin above bar, full descent each rep.",eq:"Bodyweight",tag:"pull",pool:1},
+{name:"Chin-Up",sets:4,reps:"6",rest:"2min",cues:"Supinated grip, full hang, drive elbows to hips.",eq:"Bodyweight",tag:"pull",pool:1},
+{name:"Inverted Row",sets:3,reps:"10",rest:"60s",cues:"Body rigid like a plank, pull chest to bar, pause at top.",eq:"Bodyweight",tag:"pull",pool:1},
+{name:"Dips",sets:3,reps:"10",rest:"75s",cues:"Lean forward slightly for chest, full dip, lockout at top.",eq:"Bodyweight",tag:"push",pool:1},
+{name:"Pike Push-Up",sets:3,reps:"10",rest:"60s",cues:"Hips high, head through at top, full range of motion.",eq:"Bodyweight",tag:"push",pool:1},
+{name:"Australian Row",sets:3,reps:"12",rest:"60s",cues:"Body rigid, pull sternum to bar, slow controlled descent.",eq:"Bodyweight",tag:"pull",pool:1},
+{name:"Archer Push-Up",sets:3,reps:"8 ea",rest:"75s",cues:"Shift weight to one arm, stay rigid through core.",eq:"Bodyweight",tag:"push",pool:1},
+{name:"Barbell Lunge",sets:3,reps:"10 ea",rest:"75s",cues:"Long stride, front shin vertical, upright torso.",eq:"Barbell",tag:"unilateral",pool:2},
+{name:"Landmine Press",sets:3,reps:"10 ea",rest:"60s",cues:"Single arm, slight torso rotation, full extension at top.",eq:"Barbell",tag:"push",pool:2},
+{name:"Landmine Row",sets:3,reps:"12",rest:"60s",cues:"Hinge, pull to hip, squeeze back hard at top.",eq:"Barbell",tag:"pull",pool:2},
+{name:"Goblet Squat",sets:4,reps:"12",rest:"60s",cues:"Elbows inside knees, sit deep, stay tall throughout.",eq:"Dumbbell",tag:"quad",pool:2},
+{name:"DB Walking Lunge",sets:3,reps:"12 ea",rest:"75s",cues:"Long stride, front shin vertical, upright torso.",eq:"Dumbbell",tag:"unilateral",pool:2},
+{name:"DB Reverse Lunge",sets:3,reps:"10 ea",rest:"75s",cues:"Step back, front shin vertical, drive through front heel.",eq:"Dumbbell",tag:"unilateral",pool:2},
+{name:"DB Lateral Lunge",sets:3,reps:"10 ea",rest:"75s",cues:"Push hips back, load outside heel, stay tall.",eq:"Dumbbell",tag:"unilateral",pool:2},
+{name:"DB Floor Press",sets:3,reps:"12",rest:"60s",cues:"Neutral grip, press to lockout, controlled descent.",eq:"Dumbbell",tag:"push",pool:2},
+{name:"Farmer's Carry",sets:3,reps:"40m",rest:"90s",cues:"Tall spine, shoulders packed, steady controlled pace.",eq:"Dumbbell",tag:"carry",pool:2},
+{name:"Single Leg RDL",sets:3,reps:"10 ea",rest:"75s",cues:"Hip hinge, back leg extends, feel hamstring, stay balanced.",eq:"Dumbbell",tag:"unilateral",pool:2},
+{name:"Incline DB Press",sets:3,reps:"10",rest:"75s",cues:"30-45 incline, full stretch at bottom, 3s eccentric.",eq:"Dumbbell",tag:"push",pool:2},
+{name:"Lateral Raise",sets:3,reps:"15",rest:"45s",cues:"Slight forward tilt, lead with elbows, light weight.",eq:"Dumbbell",tag:"shoulder",pool:2},
+{name:"Push-Up",sets:4,reps:"15",rest:"45s",cues:"Slow 3s eccentric, full range, stay rigid through core.",eq:"Bodyweight",tag:"push",pool:2},
+{name:"Ab Wheel Rollout",sets:3,reps:"10",rest:"60s",cues:"Hollow body, don't let lower back arch, control the return.",eq:"Bodyweight",tag:"core",pool:2},
+{name:"Pallof Press",sets:3,reps:"12 ea",rest:"45s",cues:"Resist rotation at all times, breathe out on press.",eq:"Bodyweight",tag:"core",pool:2},
+{name:"Copenhagen Plank",sets:3,reps:"20s ea",rest:"45s",cues:"Hip level, adductor squeeze throughout. Injury prevention.",eq:"Bodyweight",tag:"core",pool:2},
+{name:"Toes to Bar",sets:3,reps:"10",rest:"60s",cues:"Hollow body, posterior pelvic tilt at top, controlled descent.",eq:"Bodyweight",tag:"core",pool:2},
+{name:"Plank",sets:3,reps:"60s",rest:"45s",cues:"Hips level, squeeze glutes, breathe steady, don't sag.",eq:"Bodyweight",tag:"core",pool:2},
+{name:"RKC Plank",sets:3,reps:"30s",rest:"60s",cues:"Squeeze everything, posterior pelvic tilt, grind hard.",eq:"Bodyweight",tag:"core",pool:2},
+{name:"Dead Bug",sets:3,reps:"10 ea",rest:"45s",cues:"Lower back glued to floor, slow contralateral extension.",eq:"Bodyweight",tag:"core",pool:2},
+{name:"Hanging Leg Raise",sets:3,reps:"12",rest:"60s",cues:"No swing, posterior pelvic tilt at top, controlled descent.",eq:"Bodyweight",tag:"core",pool:2},
+{name:"Single Leg Glute Bridge",sets:3,reps:"15 ea",rest:"45s",cues:"Drive heel, squeeze glute hard, hold 1s at top.",eq:"Bodyweight",tag:"glute",pool:2},
+{name:"Bear Crawl",sets:3,reps:"20m",rest:"60s",cues:"Hips low, opposite hand/foot move together, stay tight.",eq:"Bodyweight",tag:"core",pool:2},
+{name:"Dragon Flag",sets:3,reps:"6",rest:"75s",cues:"Hollow body, controlled descent, full range of motion.",eq:"Bodyweight",tag:"core",pool:2},
+{name:"Triceps Pushdown",sets:3,reps:"15",rest:"45s",cues:"Elbows fixed at sides, full extension, squeeze at bottom.",eq:"Bodyweight",tag:"triceps",pool:3},
+{name:"Overhead Triceps Extension",sets:3,reps:"12",rest:"45s",cues:"Elbows narrow, full stretch overhead, squeeze at lockout.",eq:"Dumbbell",tag:"triceps",pool:3},
+{name:"Skull Crusher",sets:3,reps:"12",rest:"60s",cues:"Bar to forehead, elbows fixed, full extension, control descent.",eq:"Barbell",tag:"triceps",pool:3},
+{name:"Close-Grip Bench Press",sets:3,reps:"10",rest:"60s",cues:"Hands shoulder-width, tuck elbows, triceps drive.",eq:"Barbell",tag:"triceps",pool:3},
+{name:"Diamond Push-Up",sets:3,reps:"15",rest:"45s",cues:"Hands form diamond, elbows track back, full range.",eq:"Bodyweight",tag:"triceps",pool:3},
+{name:"Barbell Curl",sets:3,reps:"12",rest:"45s",cues:"No swinging, full ROM, squeeze at top, slow eccentric.",eq:"Barbell",tag:"biceps",pool:3},
+{name:"Dumbbell Curl",sets:3,reps:"12",rest:"45s",cues:"Supinate at top, control the descent, no body swing.",eq:"Dumbbell",tag:"biceps",pool:3},
+{name:"Hammer Curl",sets:3,reps:"12",rest:"45s",cues:"Neutral grip, no swinging, squeeze at top.",eq:"Dumbbell",tag:"biceps",pool:3},
+{name:"Incline Dumbbell Curl",sets:3,reps:"10",rest:"45s",cues:"Shoulder behind hips, maximises long-head stretch.",eq:"Dumbbell",tag:"biceps",pool:3},
+{name:"Concentration Curl",sets:3,reps:"12",rest:"45s",cues:"Elbow braced on inner thigh, peak contraction at top.",eq:"Dumbbell",tag:"biceps",pool:3},
+{name:"Front Raise",sets:3,reps:"12",rest:"45s",cues:"Arms parallel to floor, controlled, alternate or bilateral.",eq:"Dumbbell",tag:"shoulder",pool:3},
+{name:"Rear Delt Fly",sets:3,reps:"15",rest:"45s",cues:"Hinge at hips, lead with elbows, squeeze rear delts at top.",eq:"Dumbbell",tag:"shoulder",pool:3},
+{name:"Face Pull",sets:3,reps:"15",rest:"45s",cues:"Thumbs to ears, external rotation at end range.",eq:"Bodyweight",tag:"shoulder",pool:3},
+{name:"Dumbbell Fly",sets:3,reps:"12",rest:"45s",cues:"Slight bend in elbow, lower until stretch, squeeze up.",eq:"Dumbbell",tag:"chest",pool:3},
+{name:"Cable Fly",sets:3,reps:"12",rest:"45s",cues:"Slight forward lean, squeeze pecs at centre, don't lock elbows.",eq:"Bodyweight",tag:"chest",pool:3},
+{name:"Straight-Arm Pulldown",sets:3,reps:"15",rest:"45s",cues:"Arms straight, lat squeeze through full arc.",eq:"Bodyweight",tag:"back",pool:3},
+{name:"Seated Cable Row",sets:3,reps:"12",rest:"60s",cues:"Chest tall to pad, elbows tight, squeeze at end range.",eq:"Bodyweight",tag:"back",pool:3},
+{name:"Single-Arm Cable Row",sets:3,reps:"12 ea",rest:"45s",cues:"Full stretch at start, rotate slightly, pull to hip.",eq:"Bodyweight",tag:"back",pool:3},
+{name:"Standing Calf Raise",sets:4,reps:"15",rest:"45s",cues:"Full ROM, pause at top and bottom, both legs.",eq:"Bodyweight",tag:"calf",pool:3},
+{name:"Seated Calf Raise",sets:3,reps:"15",rest:"45s",cues:"Knees at 90, full stretch at bottom, hold peak.",eq:"Dumbbell",tag:"calf",pool:3},
+{name:"Wrist Curl",sets:3,reps:"15",rest:"30s",cues:"Forearms on bench, full ROM, slow and controlled.",eq:"Barbell",tag:"forearm",pool:3},
+{name:"Glute Kickback",sets:3,reps:"15 ea",rest:"45s",cues:"Hip hinge, drive heel back and up, squeeze at top.",eq:"Bodyweight",tag:"glute",pool:3}
+];
+let store=loadStore(),activeDay=new Date().getDay(),themeIdx=getThemeIndex(getDateKey(0)),eqFilter="All",themeOverride=null,restOverride=false,activeWorkout=null,completedSets={},weights={},extraSets={},sheetMode=null,swapExIdx=null,sheetAllItems=[];
+function loadStore(){try{const r=localStorage.getItem("fieldiron_v3");if(r)return JSON.parse(r);const o=localStorage.getItem("fieldiron_store");if(o){const d=JSON.parse(o);localStorage.setItem("fieldiron_v3",JSON.stringify(d));return d;}return{};}catch{return{};}}
+function saveStore(){try{localStorage.setItem("fieldiron_v3",JSON.stringify(store));}catch{}}
+function getDateKey(offset=0){const d=new Date();d.setDate(d.getDate()+offset);return d.toISOString().split("T")[0];}
+function getThemeIndex(dateKey){const epoch=new Date("2025-01-07"),current=new Date(dateKey);let count=0;for(let i=0;i<=Math.floor((current-epoch)/86400000);i++){const d=new Date(epoch);d.setDate(epoch.getDate()+i);if(DAY_TYPES[d.getDay()]==="workout")count++;}return Math.max(0,count-1)%3;}
+function seededRandom(seed){let s=seed;return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646;};}
+function hashStr(str){let h=0;for(let i=0;i<str.length;i++)h=((h<<5)-h)+str.charCodeAt(i);return Math.abs(h);}
+function getTheme(idx){return THEMES[idx!==null&&idx!==undefined?idx:themeIdx];}
+function generateWorkout(tIdx,dateKey,regenCount,recentNames,eqFilter){
+  const seed=hashStr(dateKey+regenCount+eqFilter+tIdx),rand=seededRandom(seed);
+  let pool;
+  if(tIdx===3){const p0=EXERCISES.filter(e=>e.pool===0),p1=EXERCISES.filter(e=>e.pool===1),p2=EXERCISES.filter(e=>e.pool===2);[p0,p1,p2].forEach(p=>{for(let i=p.length-1;i>0;i--){const j=Math.floor(rand()*(i+1));[p[i],p[j]]=[p[j],p[i]];}});const picks=[[2,2,1],[2,1,2],[1,2,2]][regenCount%3];pool=[...p0.slice(0,picks[0]+3),...p1.slice(0,picks[1]+3),...p2.slice(0,picks[2]+3)];}
+  else pool=EXERCISES.filter(e=>e.pool===tIdx);
+  if(eqFilter!=="All")pool=pool.filter(e=>e.eq===eqFilter);
+  if(pool.length<5)pool=tIdx===3?EXERCISES.filter(e=>e.pool<3):EXERCISES.filter(e=>e.pool===tIdx);
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(rand()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  const fresh=pool.filter(e=>!recentNames.includes(e.name)),stale=pool.filter(e=>recentNames.includes(e.name)),ordered=[...fresh,...stale];
+  let isoPool=EXERCISES.filter(e=>e.pool===3);
+  if(eqFilter!=="All"){const fi=isoPool.filter(e=>e.eq===eqFilter);if(fi.length>=2)isoPool=fi;}
+  for(let i=isoPool.length-1;i>0;i--){const j=Math.floor(rand()*(i+1));[isoPool[i],isoPool[j]]=[isoPool[j],isoPool[i]];}
+  const freshIso=isoPool.filter(e=>!recentNames.includes(e.name)),isoEx=(freshIso.length>0?freshIso:isoPool)[0];
+  const taglines=[["Ignite The Engine","Explosive Power Day","Speed Meets Strength","Fire Every Fibre"],["Pull. Hinge. Dominate.","Built To Last","Tension & Control","Earn Every Rep"],["Volume Builds Armour","Chase The Pump","Work Capacity Day","Shape & Strengthen"],["Hit Everything","No Stone Unturned","Total Body Attack","All Systems Go"]];
+  return{tIdx,tagline:taglines[tIdx][Math.floor(rand()*taglines[tIdx].length)],exercises:[...ordered.slice(0,5),isoEx],eqFilter};
+}
+function getOrGenWorkout(){
+  const dateKey=getDateKey(activeDay-new Date().getDay()),cached=store.workouts&&store.workouts[dateKey],ti=themeOverride!==null?themeOverride:themeIdx;
+  if(cached&&cached.tIdx===ti&&cached.eqFilter===eqFilter)return cached;
+  const recentNames=Object.entries(store.log||{}).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,2).flatMap(([,e])=>e.exercises?e.exercises.map(x=>x.name):[]);
+  const w=generateWorkout(ti,dateKey,(store.regens&&store.regens[dateKey])||0,recentNames,eqFilter);
+  if(!store.workouts)store.workouts={};store.workouts[dateKey]=w;saveStore();return w;
+}
+function setTheme(c){document.documentElement.style.setProperty('--theme',c);document.documentElement.style.setProperty('--theme-glow',getTheme().glow||'rgba(245,158,11,0.1)');document.documentElement.style.setProperty('--theme-50',c+'80');}
+function showView(v){document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));document.getElementById('view-'+v).classList.add('active');const nb=document.getElementById('nav-'+v);if(nb)nb.classList.add('active');if(v==='schedule')renderSchedule();else if(v==='history')renderHistory();else if(v==='stats')renderStats();}
+function renderSchedule(){
+  const today=new Date().getDay(),rawDayType=DAY_TYPES[activeDay],dayType=(restOverride&&rawDayType==="rest")?"workout":rawDayType,ti=themeOverride!==null?themeOverride:getThemeIndex(getDateKey(activeDay-today));
+  themeIdx=ti;const theme=THEMES[ti];setTheme(theme.color);
+  let html=`<div class="card fadeUp" style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px"><div><div style="font-size:13px;font-weight:700">Ahmed</div><div style="font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:2px;margin-top:1px">LATEST SCAN</div></div><div style="text-align:right"><div style="font-size:9px;color:rgba(255,255,255,0.25);margin-bottom:3px">Body Fat &rarr; Target</div><div style="display:flex;align-items:baseline;gap:5px"><span style="font-size:22px;font-weight:800;color:#f87171">${USER_STATS.bf}%</span><span style="font-size:14px;color:rgba(255,255,255,0.2)">&rarr;</span><span style="font-size:22px;font-weight:800;color:#4ade80">${USER_STATS.targetBf}%</span></div></div></div><div class="prog-bar" style="margin-bottom:4px"><div class="prog-fill" style="width:${(USER_STATS.targetBf/USER_STATS.bf*100).toFixed(1)}%;background:linear-gradient(90deg,#4ade80,#f87171)"></div></div><div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,0.2);margin-bottom:12px"><span>12% target</span><span style="color:#fb923c">~${(USER_STATS.weight*(USER_STATS.bf-USER_STATS.targetBf)/100).toFixed(1)}kg to lose</span></div><div style="display:flex;gap:8px"><div class="stat-mini"><div class="lbl">MUSCLE</div><div class="val" style="color:#4ade80">${USER_STATS.muscleMass}kg</div></div><div class="stat-mini"><div class="lbl">BMR</div><div class="val" style="color:#60a5fa">${USER_STATS.bmr}</div></div><div class="stat-mini"><div class="lbl">PROTEIN</div><div class="val" style="color:#f59e0b">${USER_STATS.protein}%</div></div></div></div>`;
+  html+=`<div style="font-size:9px;color:rgba(255,255,255,0.2);letter-spacing:3px;margin-bottom:10px">THIS WEEK</div><div id="week-strip">`;
+  for(let d=0;d<7;d++){const type=DAY_TYPES[d],isToday=d===today,isActive=d===activeDay,dKey=getDateKey(d-today),done=store.log&&store.log[dKey],tColor=THEMES[getThemeIndex(dKey)].color,icon=type==="soccer"?"⚽":type==="workout"?(done?"✅":"💪"):"💤";html+=`<div class="day-cell ${isActive?'active-day':''}" style="${isActive&&type==='workout'?`border-color:${tColor}99;background:${tColor}14`:''}" onclick="selectDay(${d})"><div class="day-name" style="${isActive&&type==='workout'?`color:${tColor}`:''}">${DAY_NAMES[d]}</div><div class="day-icon">${icon}</div>${isToday?'<div class="today-dot"></div>':''}</div>`;}
+  html+=`</div><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:18px"><div style="font-size:32px;font-weight:800;letter-spacing:-0.5px">${FULL_DAY_NAMES[activeDay]}</div>${activeDay===today?`<span style="font-size:9px;color:${theme.color};background:${theme.glow};border:1px solid ${theme.color}44;padding:3px 9px;border-radius:20px;letter-spacing:2px">TODAY</span>`:''}</div>`;
+  if(rawDayType==="rest"&&!restOverride){html+=`<div class="card" style="text-align:center;padding:28px 20px"><div style="font-size:36px;margin-bottom:12px">&#128164;</div><div style="font-size:14px;color:rgba(255,255,255,0.4);margin-bottom:16px">Rest day. Recovery is training.</div><div class="rest-tip">Foam roll: quads, IT band, calves</div><div class="rest-tip">Hip + thoracic mobility - 10 min</div><div class="rest-tip">8-9 hrs sleep, hydrate well</div><button onclick="restOverride=true;renderSchedule()" style="margin-top:18px;background:transparent;border:1px dashed ${theme.color}66;color:${theme.color};padding:10px 24px;font-size:12px;font-weight:600;cursor:pointer;border-radius:12px;width:100%">Train anyway &rarr;</button></div>`;}
+  else if(rawDayType==="soccer"&&!restOverride){html+=`<div style="background:rgba(134,239,172,0.04);border:1px solid rgba(134,239,172,0.15);border-radius:20px;overflow:hidden"><div style="padding:14px 16px;border-bottom:1px solid rgba(134,239,172,0.08);display:flex;gap:12px;align-items:center"><div style="font-size:28px">&#9917;</div><div><div style="font-size:15px;font-weight:600;color:#86efac">Soccer Day</div><div style="font-size:10px;color:rgba(134,239,172,0.4);margin-top:2px">No lifting - sport is your session</div></div></div><div style="padding:12px 16px">${[["Activation","Glute bridges, band walks - 2x15"],["Dynamic Warm-up","Leg swings, hip circles, high knees - 5 min"],["CNS Prime","3x3 box jumps or sprint accelerations"],["Ball Work","10 min light touch before match"]].map(([l,d])=>`<div class="soccer-row"><div class="soccer-lbl" style="color:#86efac">${l}</div><div class="soccer-detail">${d}</div></div>`).join('')}</div></div>`;}
+  else{
+    const workout=getOrGenWorkout(),dateKey=getDateKey(activeDay-today),isLogged=store.log&&store.log[dateKey];
+    html+=`<div style="font-size:9px;color:rgba(255,255,255,0.2);letter-spacing:3px;margin-bottom:8px">WORKOUT TYPE</div><div class="pill-row">${THEMES.map(t=>`<button class="pill ${(themeOverride===t.id||(themeOverride===null&&ti===t.id))?'active':''}" onclick="changeTheme(${t.id})">${t.emoji} ${t.short}</button>`).join('')}</div>`;
+    html+=`<div style="font-size:9px;color:rgba(255,255,255,0.2);letter-spacing:3px;margin-bottom:8px">EQUIPMENT</div><div class="pill-row">${EQ_TYPES.map((eq,i)=>`<button class="pill ${eqFilter===eq?'active':''}" onclick="changeEq('${eq}')">${EQ_ICONS[i]} ${eq}</button>`).join('')}</div>`;
+    html+=`<div style="margin-bottom:16px"><div style="background:${theme.glow};padding:14px 16px;border:1px solid ${theme.color}33;border-bottom:none;border-radius:16px 16px 0 0"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:18px">${theme.emoji}</span><span style="font-size:18px;font-weight:800;color:${theme.color}">${theme.label}</span></div><div style="font-size:11px;color:rgba(255,255,255,0.35);font-style:italic">${workout.tagline}</div></div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">${isLogged?`<span style="font-size:9px;color:#4ade80;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);padding:3px 8px;border-radius:20px">&#10003; Logged</span>`:''}<button onclick="regenerateWorkout()" style="background:transparent;border:1px solid ${theme.color}44;color:${theme.color};font-size:10px;padding:4px 10px;cursor:pointer;border-radius:8px">&#8635; New</button></div></div></div>`;
+    html+=`<div style="border:1px solid ${theme.color}22;border-top:none;border-radius:0 0 16px 16px;overflow:hidden">${workout.exercises.map((ex,i)=>renderExCard(ex,i,theme,false)).join('')}<div style="padding:10px 14px 14px">${!isLogged?`<button class="btn-main" onclick="startWorkout()" style="background:${theme.color};color:#000">Start Session &rarr;</button>`:`<div style="text-align:center;font-size:12px;color:#4ade80;padding:8px">Session logged &#10003; - rest up</div>`}</div></div></div>`;
+  }
+  document.getElementById('view-schedule').innerHTML=html;
+}
+function renderExCard(ex,i,theme,isActive){
+  const tc=TAG_COLORS[ex.tag]||'#6b7280',totalSets=isActive?(ex.sets+(extraSets[i]||0)):ex.sets;
+  return `<div class="ex-row" id="ex-row-${i}"><div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span class="tag-pill" style="color:${tc};background:${tc}22;border-color:${tc}44">${ex.tag}</span><span class="tag-pill" style="color:rgba(255,255,255,0.2);background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08)">${ex.eq}</span><button onclick="${isActive?`openSwap(${i})`:`openPlanSwap(${i})`}" style="margin-left:auto;background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.3);width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:12px">&#8644;</button></div><div class="ex-name">${ex.name}</div><div class="srr-bar"><div class="srr-cell"><div class="srr-label">SETS</div><div class="srr-val">${totalSets}</div></div><div class="srr-cell"><div class="srr-label">REPS</div><div class="srr-val">${ex.reps}</div></div><div class="srr-cell"><div class="srr-label">REST</div><div class="srr-val rest">${ex.rest}</div></div></div><button class="cue-toggle" onclick="toggleCue(${i})"><span id="cue-arrow-${i}">&#9658;</span> COACHING CUE</button><div id="cue-${i}" class="cue-text hidden">${ex.cues}</div>${isActive?`<div style="display:flex;align-items:center;gap:8px;margin:10px 0"><input class="weight-input" type="number" placeholder="weight" value="${weights[i]||''}" oninput="setWeight(${i},this.value)"/><span style="font-size:9px;color:rgba(255,255,255,0.2)">KG/LBS</span></div><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${Array.from({length:totalSets}).map((_,si)=>`<button class="set-btn ${completedSets[i+'-'+si]?'done':''}" onclick="toggleSet(${i},${si})">${completedSets[i+'-'+si]?'&#10003;':si+1}</button>`).join('')}<button class="set-btn add-set" onclick="addSet(${i})">+</button>${(extraSets[i]||0)>0?`<button class="set-btn rm-set" onclick="rmSet(${i})">&#8722;</button>`:''}</div>`:''}</div>`;
+}
+function toggleCue(i){const el=document.getElementById('cue-'+i),ar=document.getElementById('cue-arrow-'+i);el.classList.toggle('hidden');ar.innerHTML=el.classList.contains('hidden')?'&#9658;':'&#9660;';}
+function changeTheme(idx){themeOverride=idx;themeIdx=idx;const dateKey=getDateKey(activeDay-new Date().getDay()),recentNames=Object.entries(store.log||{}).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,2).flatMap(([,e])=>e.exercises?e.exercises.map(x=>x.name):[]);const w=generateWorkout(idx,dateKey,(store.regens&&store.regens[dateKey])||0,recentNames,eqFilter);if(!store.workouts)store.workouts={};store.workouts[dateKey]=w;saveStore();renderSchedule();}
+function changeEq(eq){eqFilter=eq;const dateKey=getDateKey(activeDay-new Date().getDay()),ti=themeOverride!==null?themeOverride:themeIdx,recentNames=Object.entries(store.log||{}).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,2).flatMap(([,e])=>e.exercises?e.exercises.map(x=>x.name):[]);const w=generateWorkout(ti,dateKey,(store.regens&&store.regens[dateKey])||0,recentNames,eq);if(!store.workouts)store.workouts={};store.workouts[dateKey]=w;saveStore();renderSchedule();}
+function regenerateWorkout(){const dateKey=getDateKey(activeDay-new Date().getDay());if(!store.regens)store.regens={};store.regens[dateKey]=(store.regens[dateKey]||0)+1;const ti=themeOverride!==null?themeOverride:themeIdx,recentNames=Object.entries(store.log||{}).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,2).flatMap(([,e])=>e.exercises?e.exercises.map(x=>x.name):[]);const w=generateWorkout(ti,dateKey,store.regens[dateKey],recentNames,eqFilter);if(!store.workouts)store.workouts={};store.workouts[dateKey]=w;saveStore();renderSchedule();}
+function selectDay(d){activeDay=d;themeOverride=null;restOverride=false;themeIdx=getThemeIndex(getDateKey(d-new Date().getDay()));renderSchedule();}
+function startWorkout(){const w=getOrGenWorkout();activeWorkout=JSON.parse(JSON.stringify(w));completedSets={};weights={};extraSets={};renderActiveWorkout();document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));document.getElementById('view-workout').classList.add('active');}
+function renderActiveWorkout(){
+  const theme=THEMES[activeWorkout.tIdx],totalSets=activeWorkout.exercises.reduce((a,e,i)=>a+e.sets+(extraSets[i]||0),0),totalDone=Object.values(completedSets).filter(Boolean).length,pct=totalSets?Math.round(totalDone/totalSets*100):0,complete=totalDone===totalSets&&totalSets>0;
+  document.getElementById('view-workout').innerHTML=`<div class="fadeUp"><div style="display:flex;gap:10px;align-items:center;margin-bottom:18px"><button onclick="showView('schedule')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);padding:7px 14px;font-size:11px;cursor:pointer;border-radius:10px">&larr; Back</button><div style="font-size:16px;font-weight:700;color:${theme.color}">${theme.emoji} ${theme.label}</div></div><div class="card-sm" style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:6px;letter-spacing:1px"><span>SESSION PROGRESS</span><span style="color:${complete?'#4ade80':'rgba(255,255,255,0.4)'};font-weight:600">${totalDone}/${totalSets} sets</span></div><div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${complete?'#4ade80':theme.color}"></div></div></div>${activeWorkout.exercises.map((ex,i)=>renderExCard(ex,i,theme,true)).join('')}<button class="btn-outline" onclick="openAddSheet()" style="color:${theme.color};border-color:${theme.color}55;margin-top:4px">+ Add Exercise</button><button class="btn-main" onclick="finishWorkout()" style="background:${complete?'#4ade80':'rgba(255,255,255,0.05)'};color:${complete?'#000':'rgba(255,255,255,0.3)'};border:1px solid ${complete?'#4ade80':'rgba(255,255,255,0.08)'}">
+  ${complete?'&#10003; Log Session':`Log Session (${totalDone}/${totalSets})`}</button></div>`;
+}
+function toggleSet(ei,si){const k=ei+'-'+si;completedSets[k]=!completedSets[k];renderActiveWorkout();}
+function addSet(ei){extraSets[ei]=(extraSets[ei]||0)+1;renderActiveWorkout();}
+function rmSet(ei){extraSets[ei]=Math.max(0,(extraSets[ei]||0)-1);renderActiveWorkout();}
+function setWeight(ei,v){weights[ei]=v;}
+function finishWorkout(){const totalSets=activeWorkout.exercises.reduce((a,e,i)=>a+e.sets+(extraSets[i]||0),0),totalDone=Object.values(completedSets).filter(Boolean).length,dateKey=getDateKey(activeDay-new Date().getDay());if(!store.log)store.log={};store.log[dateKey]={exercises:activeWorkout.exercises,themeIdx:activeWorkout.tIdx,theme:THEMES[activeWorkout.tIdx].label,date:dateKey,sets:completedSets,weights,pct:totalSets?Math.round(totalDone/totalSets*100):0};saveStore();activeWorkout=null;showView('schedule');}
+function getAllExercises(){const seen=new Set();return EXERCISES.filter(e=>{if(seen.has(e.name))return false;seen.add(e.name);return true;}).sort((a,b)=>a.name.localeCompare(b.name));}
+function openPlanSwap(exIdx){swapExIdx=exIdx;sheetMode='plan';sheetAllItems=getAllExercises();document.getElementById('sheet-title').textContent='Swap Exercise';document.getElementById('sheet-sub').textContent='ALL EXERCISES · A-Z';document.getElementById('sheet-search').value='';filterSheet();document.getElementById('overlay').classList.add('open');}
+function openSwap(exIdx){swapExIdx=exIdx;sheetMode='swap';sheetAllItems=getAllExercises();document.getElementById('sheet-title').textContent='Swap Exercise';document.getElementById('sheet-sub').textContent='ALL EXERCISES · A-Z';document.getElementById('sheet-search').value='';filterSheet();document.getElementById('overlay').classList.add('open');}
+function openAddSheet(){sheetMode='add';sheetAllItems=getAllExercises();document.getElementById('sheet-title').textContent='Add Exercise';document.getElementById('sheet-sub').textContent='FULL LIBRARY · A-Z';document.getElementById('sheet-search').value='';filterSheet();document.getElementById('overlay').classList.add('open');}
+function filterSheet(){
+  const q=document.getElementById('sheet-search').value.toLowerCase(),filtered=sheetAllItems.filter(e=>e.name.toLowerCase().includes(q)),theme=THEMES[activeWorkout?activeWorkout.tIdx:themeIdx];
+  const currentNames=sheetMode==='add'?(activeWorkout?activeWorkout.exercises.map(e=>e.name):[]):(sheetMode==='plan'?(getOrGenWorkout().exercises.map(e=>e.name)):(activeWorkout?activeWorkout.exercises.map(e=>e.name):[]));
+  const currentEx=sheetMode==='plan'?getOrGenWorkout().exercises[swapExIdx]:(activeWorkout?activeWorkout.exercises[swapExIdx]:null);
+  document.getElementById('sheet-list').innerHTML=filtered.map(ex=>{const tc=TAG_COLORS[ex.tag]||'#6b7280',isCurrent=currentEx&&currentEx.name===ex.name,isIn=sheetMode==='add'&&currentNames.includes(ex.name);return`<div class="sheet-item ${isCurrent?'current':''}" style="opacity:${isIn&&!isCurrent?0.3:1}" onclick="${isIn&&!isCurrent?'':'selectSheetItem('+JSON.stringify(ex.name)+')'}"><div><div style="display:flex;align-items:center;gap:7px;margin-bottom:3px"><div class="ex-nm">${ex.name}</div>${isCurrent?`<span style="font-size:9px;color:${theme.color};border:1px solid ${theme.color}44;padding:1px 6px;border-radius:10px">current</span>`:''}</div><div class="ex-cue">${ex.cues.slice(0,55)}...</div></div><div class="ex-meta"><span class="tag-pill" style="color:${tc};background:${tc}22;border-color:${tc}44">${ex.tag}</span><span style="font-size:10px;color:rgba(255,255,255,0.25)">${ex.reps} reps</span></div></div>`;}).join('');
+}
+function selectSheetItem(name){const ex=EXERCISES.find(e=>e.name===name);if(!ex)return;if(sheetMode==='add'){activeWorkout.exercises.push({...ex});closeSheet();renderActiveWorkout();}else if(sheetMode==='swap'&&activeWorkout){activeWorkout.exercises[swapExIdx]={...ex,sets:activeWorkout.exercises[swapExIdx].sets};closeSheet();renderActiveWorkout();}else if(sheetMode==='plan'){const dateKey=getDateKey(activeDay-new Date().getDay()),w=store.workouts&&store.workouts[dateKey];if(w){w.exercises[swapExIdx]={...ex,sets:w.exercises[swapExIdx].sets};saveStore();}closeSheet();renderSchedule();}}
+function closeSheet(){document.getElementById('overlay').classList.remove('open');document.getElementById('sheet-search').value='';}
+function renderHistory(){
+  const entries=Object.entries(store.log||{}).sort((a,b)=>b[0].localeCompare(a[0]));
+  let html=`<div class="fadeUp"><div style="font-size:26px;font-weight:800;margin-bottom:4px">Session Log</div><div style="font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:2px;margin-bottom:20px">${entries.length} SESSIONS RECORDED</div>`;
+  if(!entries.length){html+=`<div style="text-align:center;padding:50px 0;color:rgba(255,255,255,0.15)"><div style="font-size:32px;margin-bottom:10px">&#128203;</div><div>No sessions yet.</div></div>`;}
+  else{entries.forEach(([date,entry])=>{const t=THEMES[entry.themeIdx||0],pct=entry.pct||0;html+=`<div class="hist-card" style="border-color:${t.color}"><div class="hist-inner"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div><div style="font-size:13px;font-weight:600;color:${t.color}">${t.emoji} ${entry.theme||t.label}</div><div style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:3px">${date}</div></div><div style="font-size:24px;font-weight:800;color:${pct===100?'#4ade80':'rgba(255,255,255,0.3)'}">${pct}%</div></div><div class="prog-bar" style="margin-bottom:8px"><div class="prog-fill" style="width:${pct}%;background:${pct===100?'#4ade80':t.color}"></div></div>${(entry.exercises||[]).map((ex,i)=>`<div class="hist-ex"><span>${ex.name}</span>${entry.weights&&entry.weights[i]?`<span style="color:${t.color}">${entry.weights[i]}</span>`:''}</div>`).join('')}</div></div>`;});}
+  html+=`</div>`;document.getElementById('view-history').innerHTML=html;
+}
+function renderStats(){
+  const theme=THEMES[themeIdx];
+  document.getElementById('view-stats').innerHTML=`<div class="fadeUp"><div style="font-size:26px;font-weight:800;margin-bottom:4px">Body Stats</div><div style="font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:2px;margin-bottom:20px">LATEST SCAN - ATHLETE MODE</div><div class="card"><div style="display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px"><span>Body Fat %</span><span>Target: ${USER_STATS.targetBf}%</span></div><div style="display:flex;align-items:baseline;gap:10px;margin-bottom:12px"><span style="font-size:40px;font-weight:800;color:#f87171;letter-spacing:-1px">${USER_STATS.bf}%</span><span style="font-size:16px;color:rgba(255,255,255,0.2)">&rarr;</span><span style="font-size:28px;font-weight:700;color:#4ade80">${USER_STATS.targetBf}%</span><span style="font-size:12px;color:#fb923c;margin-left:auto">~${(USER_STATS.weight*(USER_STATS.bf-USER_STATS.targetBf)/100).toFixed(1)}kg to go</span></div><div class="prog-bar" style="height:6px"><div class="prog-fill" style="width:${(USER_STATS.targetBf/USER_STATS.bf*100).toFixed(1)}%;background:linear-gradient(90deg,#4ade80,#f87171)"></div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">${[["Weight",USER_STATS.weight+" kg","#60a5fa"],["Muscle Mass",USER_STATS.muscleMass+" kg","#4ade80"],["BMR",USER_STATS.bmr+" kcal","#f59e0b"],["Skeletal Muscle",USER_STATS.skeletalMuscle+"%","#a78bfa"],["Visceral Fat",USER_STATS.visceralFat,"#f87171"],["Protein",USER_STATS.protein+"%","#34d399"]].map(([l,v,c])=>`<div class="card" style="margin:0;padding:14px 16px"><div style="font-size:9px;color:rgba(255,255,255,0.2);letter-spacing:2px;margin-bottom:6px">${l.toUpperCase()}</div><div style="font-size:22px;font-weight:700;color:${c}">${v}</div></div>`).join('')}</div><div class="card"><div style="font-size:9px;color:rgba(255,255,255,0.2);letter-spacing:3px;margin-bottom:14px">RECOMMENDATIONS FOR 12% BF</div>${[["&#127947;","Prioritise Strength & Power themes - preserve muscle while in deficit"],["&#128293;","200-300 kcal deficit on rest days only, maintenance on training days"],["&#129385;","Keep protein at ~165g/day (2g/kg bodyweight) to protect muscle mass"],["&#9889;","Hip hinge focus: Deadlifts, RDLs, Hip Thrusts - targets visceral fat best"]].map(([icon,text],i)=>`<div style="display:flex;gap:12px;padding:10px 0;border-bottom:${i<3?'1px solid rgba(255,255,255,0.05)':'none'}"><span style="font-size:16px">${icon}</span><span style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.6">${text}</span></div>`).join('')}</div><div style="height:40px"></div></div>`;
+}
+setTheme(THEMES[0].color);
+renderSchedule();
+</script>
+</body>
+</html>
