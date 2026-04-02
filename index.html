@@ -59,7 +59,7 @@ body{display:flex;flex-direction:column;min-height:100vh;font-family:-apple-syst
 .header-controls{margin-left:auto;display:flex;gap:8px;align-items:center}
 
 /* Main area scrolls independently (iPhone friendly) */
-.main{overflow:auto;flex:1;padding:12px;-webkit-overflow-scrolling:touch;min-height:0}
+.main{overflow:auto;flex:1;padding:12px;-webkit-overflow-scrolling:touch;min-height:0;touch-action:pan-y}
 
 /* Grid */
 .grid{display:grid;grid-template-columns:1fr;gap:12px}
@@ -100,7 +100,10 @@ body{display:flex;flex-direction:column;min-height:100vh;font-family:-apple-syst
 #overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:120;display:none;align-items:flex-end}
 #overlay.open{display:flex}
 #sheet{background:linear-gradient(180deg,#0f1418,#0b0f12);border-radius:16px 16px 0 0;width:100%;max-height:82vh;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,0.06)}
-#sheet-list{overflow:auto;padding-bottom:20px}
+#sheet-list{overflow:auto;padding-bottom:20px;position:relative;height:60vh}
+
+/* Virtual list inner container */
+#sheet-virtual-inner{position:relative;width:100%}
 
 /* Modal */
 .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:140}
@@ -123,6 +126,9 @@ body{display:flex;flex-direction:column;min-height:100vh;font-family:-apple-syst
 .select{padding:8px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--text)}
 .input{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text);width:100%}
 .small-note{font-size:12px;color:var(--muted-3)}
+.icon-btn{background:transparent;border:none;color:var(--muted-2);cursor:pointer;padding:6px;border-radius:8px}
+.icon-btn:hover{background:rgba(255,255,255,0.02)}
+.mark{background:rgba(255,255,255,0.06);padding:0 4px;border-radius:4px}
 </style>
 </head>
 <body>
@@ -241,7 +247,9 @@ body{display:flex;flex-direction:column;min-height:100vh;font-family:-apple-syst
       <div id="sheet-loading" class="small-note" style="display:none;margin-top:8px">Loading…</div>
     </div>
 
-    <div id="sheet-list" style="padding:8px 0;overflow:auto;max-height:60vh"></div>
+    <div id="sheet-list" style="padding:8px 0;overflow:auto;max-height:60vh">
+      <div id="sheet-virtual-inner"></div>
+    </div>
   </div>
 </div>
 
@@ -315,10 +323,8 @@ let DATA = loadData();
 let currentDayId = DATA.days[0].id;
 let GLOBAL_ALLOW_SOCCER_WORKOUTS = JSON.parse(localStorage.getItem('fi_global_allow') || 'false');
 let lastRemoved = null; // for undo
-let sheetRenderChunk = 25; // chunk size for sheet rendering
-let sheetRenderIndex = 0;
-let sheetRenderTimer = null;
 let sheetSearchTimer = null;
+let virtualState = { rowHeight: 72, buffer: 6, filtered: [], start: 0, count: 0 };
 
 function uid(prefix='id'){return prefix + Math.random().toString(36).slice(2,9)}
 function el(tag, props={}, ...children){
@@ -339,8 +345,9 @@ function findDay(id){ return DATA.days.find(d=>d.id===id) }
 /* =========================
    Full exercise pool (127 items) + extra stretches
    ========================= */
-/* Pool merged from earlier lists; added extra stretch entries at end */
+/* (Same pool as before — omitted here for brevity in comments; full array below) */
 const EXERCISES = [
+/* ... full 127+ items including stretch entries ... */
 {name:"Back Squat",sets:4,reps:"5",rest:"2min",cues:"Chest up, drive knees out, explode on concentric.",eq:"Barbell",theme:"Power",tag:"power"},
 {name:"Power Clean",sets:4,reps:"3",rest:"2min",cues:"Triple extension, fast elbows, soft catch in rack.",eq:"Barbell",theme:"Power",tag:"olympic"},
 {name:"Clean and Jerk",sets:3,reps:"3",rest:"3min",cues:"Pull, catch in rack, dip and drive overhead to lockout.",eq:"Barbell",theme:"Power",tag:"olympic"},
@@ -504,6 +511,7 @@ const currentDayTitle = document.getElementById('currentDayTitle');
 const dayDescription = document.getElementById('dayDescription');
 const sheetOverlay = document.getElementById('overlay');
 const sheetList = document.getElementById('sheet-list');
+const sheetVirtualInner = document.getElementById('sheet-virtual-inner');
 const sheetSearch = document.getElementById('sheet-search');
 const sheetThemeFilter = document.getElementById('sheetThemeFilter');
 const cntPool = document.getElementById('cntPool');
@@ -533,7 +541,7 @@ function ensureDayFields(){
 
   // Auto-fill logic
   DATA.days.forEach(d=>{
-    if(d.type === 'workout' && !d.userEdited && !d._autoFilled){
+    if(d.type === 'workout' && !d.userEdited && !d._autoFilled && !d._locked){
       if((d.exercises?.length || 0) < DEFAULT_EX_COUNT_CURRENT){
         const pool = EXERCISES.filter(e => !e.theme || e.theme === d.theme || d.theme === 'Mix');
         const picks = [];
@@ -573,7 +581,7 @@ function renderWeek(){
   weekRoot.innerHTML = '';
   DATA.days.forEach(d=>{
     const isActive = d.id === currentDayId;
-    const dayEl = el('div',{class:isActive ? 'day active' : 'day'},
+    const dayEl = el('div',{class:isActive ? 'day active' : 'day', role:'button', tabindex:0},
       el('div',{}, el('div',{class:'d'}, d.name.slice(0,3)), el('div',{class:'sub'}, `${d.exercises.length} ex`))
     );
     const badgeText = d.type === 'soccer' ? '⚽ Soccer' : (d.type === 'rest' ? '— Rest' : d.theme || 'Workout');
@@ -582,8 +590,10 @@ function renderWeek(){
     if(d._autoFilled && !d.userEdited){
       const autoBadge = el('div',{class:'day-badge auto', title:'Auto-filled'}, 'Auto');
       dayEl.appendChild(autoBadge);
+      // regenerate icon
+      const regenBtn = el('button',{class:'icon-btn', title:'Regenerate this day', onClick:(e)=>{ e.stopPropagation(); regenerateDay(d.id); }}, '🔁');
+      dayEl.appendChild(regenBtn);
     }
-    // lock icon for auto-filled days
     if(d._locked){
       const lock = el('div',{class:'day-badge', title:'Locked (won’t auto-change)'}, '🔒');
       dayEl.appendChild(lock);
@@ -591,6 +601,7 @@ function renderWeek(){
     const editBtn = el('div',{class:'day-edit-btn', onClick:(e)=>{ e.stopPropagation(); openDaySettings(d.id); }}, 'Edit');
     dayEl.appendChild(editBtn);
     dayEl.addEventListener('click', ()=>{ currentDayId = d.id; renderAll(); });
+    dayEl.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter' || ev.key===' ') { ev.preventDefault(); currentDayId = d.id; renderAll(); } });
     weekRoot.appendChild(dayEl);
   });
 }
@@ -831,58 +842,76 @@ function addDefaultStretches(dayId){
 }
 
 /* =========================
-   Exercise library sheet (chunked render + debounce)
+   Exercise library sheet (virtualized)
    ========================= */
 function openSheet(){
   sheetOverlay.classList.add('open');
   document.getElementById('sheet-search').value = '';
   sheetThemeFilter.value = '';
-  sheetRenderIndex = 0;
-  sheetList.innerHTML = '';
-  renderSheetListChunked(true);
+  virtualUpdateFiltered();
+  sheetList.scrollTop = 0;
+  virtualRender();
 }
 function closeSheet(){ sheetOverlay.classList.remove('open'); }
-function renderSheetListChunked(reset=false){
+function virtualUpdateFiltered(){
   const q = (document.getElementById('sheet-search').value || '').trim().toLowerCase();
   const theme = sheetThemeFilter.value;
-  const filtered = EXERCISES.filter(ex=>{
+  virtualState.filtered = EXERCISES.filter(ex=>{
     if(theme && ex.theme !== theme) return false;
     if(q && !(ex.name.toLowerCase().includes(q) || (ex.cues||'').toLowerCase().includes(q))) return false;
     return true;
   });
-  // show loading if large
+  // update loading indicator
   const loading = document.getElementById('sheet-loading');
-  if(filtered.length > 80) loading.style.display = 'block';
-  else loading.style.display = 'none';
-
-  if(reset){
-    sheetList.innerHTML = '';
-    sheetRenderIndex = 0;
-  }
-  // render chunk
-  const start = sheetRenderIndex;
-  const end = Math.min(filtered.length, start + sheetRenderChunk);
+  loading.style.display = virtualState.filtered.length > 80 ? 'block' : 'none';
+}
+function virtualRender(){
+  const container = sheetList;
+  const inner = sheetVirtualInner;
+  const total = virtualState.filtered.length;
+  const rowH = virtualState.rowHeight;
+  const buffer = virtualState.buffer;
+  const visibleCount = Math.ceil(container.clientHeight / rowH) + buffer*2;
+  const scrollTop = container.scrollTop;
+  let start = Math.floor(scrollTop / rowH) - buffer;
+  if(start < 0) start = 0;
+  let end = Math.min(total, start + visibleCount);
+  virtualState.start = start;
+  virtualState.count = end - start;
+  // set spacers
+  const topHeight = start * rowH;
+  const bottomHeight = Math.max(0, (total - end) * rowH);
+  inner.style.height = (total * rowH) + 'px';
+  inner.innerHTML = '';
+  // top spacer
+  const top = el('div',{style:`height:${topHeight}px`});
+  inner.appendChild(top);
+  // render visible items
   for(let i=start;i<end;i++){
-    const ex = filtered[i];
-    const item = el('div',{style:'display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.02)'},
-      el('div',{}, el('div',{style:'font-weight:700'}, ex.name), el('div',{class:'small-muted'}, ex.cues || `${ex.sets || ''} ${ex.reps || ''}`)),
+    const ex = virtualState.filtered[i];
+    const item = el('div',{style:'display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.02);height:'+ (rowH-2) +'px;box-sizing:border-box'},
+      el('div',{}, el('div',{style:'font-weight:700'}, highlightMatch(ex.name, document.getElementById('sheet-search').value || '')), el('div',{class:'small-muted'}, ex.cues || `${ex.sets || ''} ${ex.reps || ''}`)),
       el('div',{}, el('button',{class:'btn', onClick:()=>addExerciseToCurrentDay(ex)}, 'Add'))
     );
-    sheetList.appendChild(item);
+    inner.appendChild(item);
   }
-  sheetRenderIndex = end;
-  if(sheetRenderIndex < filtered.length){
-    // schedule next chunk
-    clearTimeout(sheetRenderTimer);
-    sheetRenderTimer = setTimeout(()=>renderSheetListChunked(false), 80);
-  } else {
-    loading.style.display = 'none';
-  }
+  // bottom spacer
+  const bottom = el('div',{style:`height:${bottomHeight}px`});
+  inner.appendChild(bottom);
+  // hide loading
+  const loading = document.getElementById('sheet-loading');
+  loading.style.display = 'none';
 }
-function renderSheetList(){
-  // debounce
-  clearTimeout(sheetSearchTimer);
-  sheetSearchTimer = setTimeout(()=>renderSheetListChunked(true), 220);
+function highlightMatch(text, q){
+  if(!q) return text;
+  const s = String(text);
+  const qi = q.trim().toLowerCase();
+  const idx = s.toLowerCase().indexOf(qi);
+  if(idx === -1) return s;
+  const before = s.slice(0, idx);
+  const match = s.slice(idx, idx + qi.length);
+  const after = s.slice(idx + qi.length);
+  return el('span',{}, before, el('span',{class:'mark'}, match), after);
 }
 function addExerciseToCurrentDay(ex){
   const day = findDay(currentDayId);
@@ -891,6 +920,21 @@ function addExerciseToCurrentDay(ex){
   day.userEdited = true;
   saveData(); renderAll(); closeSheet();
 }
+
+/* sheet scroll handler (virtual) */
+sheetList.addEventListener('scroll', ()=>{
+  // throttle using requestAnimationFrame
+  if(virtualState._ticking) return;
+  virtualState._ticking = true;
+  requestAnimationFrame(()=>{ virtualRender(); virtualState._ticking = false; });
+});
+
+/* search debounce */
+sheetSearch.addEventListener('input', ()=>{
+  clearTimeout(sheetSearchTimer);
+  sheetSearchTimer = setTimeout(()=>{ virtualUpdateFiltered(); virtualRender(); }, 220);
+});
+sheetThemeFilter.addEventListener('change', ()=>{ virtualUpdateFiltered(); virtualRender(); });
 
 /* =========================
    Calendar view
@@ -964,7 +1008,8 @@ function renderAll(){
   renderWeek();
   renderWorkout();
   renderHistory();
-  renderSheetList();
+  virtualUpdateFiltered();
+  virtualRender();
   updateCounters();
 }
 
@@ -972,6 +1017,7 @@ function renderAll(){
 function shuffleDay(dayId){
   const day = findDay(dayId);
   if(!day) return;
+  if(day._locked){ alert('This day is locked. Unlock to regenerate.'); return; }
   const pool = EXERCISES.filter(e => !e.theme || e.theme === day.theme || day.theme === 'Mix');
   const picks = [];
   const copy = pool.slice();
@@ -988,7 +1034,18 @@ function shuffleDay(dayId){
   }
   day.exercises = picks;
   day.userEdited = true;
+  day._autoFilled = true;
   saveData(); renderAll();
+  showToast('Day regenerated', 'OK', ()=>{}, 2500);
+}
+
+/* Regenerate a specific day (used by week strip) */
+function regenerateDay(dayId){
+  const day = findDay(dayId);
+  if(!day) return;
+  if(day._locked){ alert('This day is locked. Unlock it in settings to regenerate.'); return; }
+  if(!confirm(`Regenerate exercises for ${day.name}? This will replace current exercises.`)) return;
+  shuffleDay(dayId);
 }
 
 /* New workout: create placeholder with DEFAULT_EX_COUNT_CURRENT random picks */
@@ -1068,8 +1125,8 @@ document.getElementById('resetBtn').addEventListener('click', ()=>{
   ensureDayFields(); saveData(); renderAll();
 });
 document.getElementById('settingsBtn').addEventListener('click', openSettings);
-document.getElementById('sheet-search').addEventListener('input', ()=>renderSheetList());
-sheetThemeFilter.addEventListener('change', ()=>renderSheetList());
+document.getElementById('sheet-search').addEventListener('input', ()=>{ clearTimeout(sheetSearchTimer); sheetSearchTimer = setTimeout(()=>{ virtualUpdateFiltered(); virtualRender(); }, 220); });
+sheetThemeFilter.addEventListener('change', ()=>{ virtualUpdateFiltered(); virtualRender(); });
 searchInput.addEventListener('input', ()=>renderWorkout());
 
 /* Theme picker: switch data-theme attribute to swap CSS variables and persist choice */
@@ -1099,7 +1156,7 @@ renderAll();
 updateCounters();
 
 /* Expose for debugging */
-window.FI = { DATA, EXERCISES, saveData, renderAll, openDaySettings, openSheet, openCalendar, shuffleDay, newWorkoutForDay, applyTheme, undoRemove };
+window.FI = { DATA, EXERCISES, saveData, renderAll, openDaySettings, openSheet, openCalendar, shuffleDay, newWorkoutForDay, applyTheme, regenerateDay, virtualState };
 </script>
 </body>
 </html>
