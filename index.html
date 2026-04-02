@@ -7,98 +7,126 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <title>Field+Iron — WOD</title>
 <style>
+/* -------------------------
+   Theme variables (swappable)
+   ------------------------- */
+/* Lively theme (default) */
 :root{
-  --bg:#0a0a0a;
-  --card:#0f1113;
-  --muted:rgba(255,255,255,0.18);
-  --accent:#f59e0b;
-  --accent-2:#7c5cff;
-  --glass:rgba(255,255,255,0.03);
-  --radius:14px;
-  --shadow: 0 8px 28px rgba(0,0,0,0.6);
-  --theme:#7c5cff;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial;
-  -webkit-font-smoothing:antialiased;
+  --bg-1: #071018;            /* deep navy */
+  --bg-2: #081827;            /* slightly lighter */
+  --card: linear-gradient(180deg,#0f1724,#0b1220);
+  --muted: rgba(255,255,255,0.78);
+  --muted-2: rgba(255,255,255,0.55);
+  --accent: #ff8a00;          /* warm orange */
+  --accent-2: #00c2a8;        /* teal */
+  --glass: rgba(255,255,255,0.03);
+  --radius: 14px;
+  --shadow: 0 12px 36px rgba(2,6,23,0.6);
+  --card-border: rgba(255,255,255,0.04);
+  --text: #ffffff;
+  --muted-3: rgba(255,255,255,0.35);
+  --success: #22c55e;
 }
+
+/* Calm theme (muted) */
+[data-theme="calm"]{
+  --bg-1: #0b0f14;
+  --bg-2: #0e1418;
+  --card: linear-gradient(180deg,#0f1720,#0c1316);
+  --muted: rgba(230,240,250,0.9);
+  --muted-2: rgba(230,240,250,0.6);
+  --accent: #6ea8fe;          /* soft blue */
+  --accent-2: #7dd3fc;        /* light cyan */
+  --glass: rgba(255,255,255,0.02);
+  --radius: 12px;
+  --shadow: 0 8px 24px rgba(2,6,23,0.5);
+  --card-border: rgba(255,255,255,0.03);
+  --text: #eaf6ff;
+  --muted-3: rgba(230,240,250,0.4);
+  --success: #34d399;
+}
+
+/* -------------------------
+   Base layout & typography
+   ------------------------- */
 *{box-sizing:border-box}
-html,body{height:100%;margin:0;background:linear-gradient(180deg,#070708,#0a0a0a);color:#fff}
-body{display:flex;flex-direction:column;min-height:100vh}
+html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-1),var(--bg-2));color:var(--text);-webkit-font-smoothing:antialiased}
+body{display:flex;flex-direction:column;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial}
 .app{flex:1;display:flex;flex-direction:column;max-width:980px;margin:0 auto;width:100%}
 
-/* Header compact for mobile */
+/* Header */
 .header{
   position:sticky;top:0;z-index:60;
-  display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(10,10,10,0.9);
-  border-bottom:1px solid rgba(255,255,255,0.04);backdrop-filter:blur(8px)
+  display:flex;align-items:center;gap:12px;padding:10px 14px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);
+  border-bottom:1px solid var(--card-border);backdrop-filter:blur(8px)
 }
-.brand{display:flex;align-items:center;gap:10px}
-.logo{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800}
-.title{font-weight:800;font-size:16px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#071018;box-shadow:0 8px 28px rgba(0,0,0,0.35)}
+.title{font-weight:800;font-size:16px;color:var(--text)}
 .header-controls{margin-left:auto;display:flex;gap:8px;align-items:center}
 
-/* Main area scrolls independently (fixes iPhone full-page scroll) */
-.main{
-  overflow:auto;flex:1;padding:12px; -webkit-overflow-scrolling:touch;
-}
+/* Main area scrolls independently (iPhone friendly) */
+.main{overflow:auto;flex:1;padding:12px;-webkit-overflow-scrolling:touch}
 
-/* Layout */
+/* Grid */
 .grid{display:grid;grid-template-columns:1fr;gap:12px}
 @media(min-width:900px){.grid{grid-template-columns:320px 1fr}}
 
 /* Cards */
-.card{background:linear-gradient(180deg,var(--card),#0b0b0b);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);box-shadow:var(--shadow)}
-.small-muted{font-size:12px;color:var(--muted)}
-.kv{font-size:12px;color:var(--muted)}
+.card{background:var(--card);padding:14px;border-radius:var(--radius);border:1px solid var(--card-border);box-shadow:var(--shadow)}
+.small-muted{font-size:12px;color:var(--muted-3)}
+.kv{font-size:12px;color:var(--muted-2)}
 
 /* Week strip */
-.week{display:flex;gap:8px;flex-wrap:wrap}
-.day{flex:1;min-width:44px;background:var(--glass);padding:8px;border-radius:10px;text-align:center;cursor:pointer;border:1px solid rgba(255,255,255,0.03);position:relative}
-.day.active{background:linear-gradient(180deg,#141416,#0f0f10);transform:translateY(-6px);box-shadow:0 10px 30px rgba(0,0,0,0.6)}
-.day .d{font-weight:700}
-.day .sub{font-size:11px;color:var(--muted)}
-.day-badge{display:inline-block;font-size:10px;padding:4px 6px;border-radius:8px;background:rgba(255,255,255,0.03);color:var(--muted);margin-top:6px}
+.week{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.day{flex:1;min-width:44px;background:var(--glass);padding:10px;border-radius:10px;text-align:center;cursor:pointer;border:1px solid rgba(255,255,255,0.03);position:relative;transition:transform .18s,box-shadow .18s}
+.day.active{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));transform:translateY(-6px);box-shadow:0 14px 40px rgba(0,0,0,0.5)}
+.day .d{font-weight:800}
+.day .sub{font-size:11px;color:var(--muted-3)}
+.day-badge{display:inline-block;font-size:11px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,0.02);color:var(--muted-2);margin-top:8px}
 
 /* Workout list */
-.workout{display:flex;flex-direction:column;gap:10px}
-.exercise{display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03)}
+.workout{display:flex;flex-direction:column;gap:12px}
+.exercise{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.005));border:1px solid rgba(255,255,255,0.02)}
 .exercise .meta{flex:1}
 .exercise .name{font-weight:700}
-.exercise .sub{font-size:12px;color:var(--muted)}
+.exercise .sub{font-size:12px;color:var(--muted-3)}
 .actions{display:flex;gap:8px}
 
-/* Stretch section */
-.stretch{margin-top:8px;padding:10px;border-radius:10px;background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.03)}
+/* Stretch */
+.stretch{margin-top:8px;padding:12px;border-radius:12px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
 .stretch h4{margin:0 0 8px 0;font-size:14px}
 
 /* Buttons */
-.btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:10px;color:#fff;cursor:pointer;font-size:13px}
-.btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;color:#000;font-weight:700}
+.btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:10px 12px;border-radius:12px;color:var(--text);cursor:pointer;font-size:14px}
+.btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;color:#071018;font-weight:800;box-shadow:0 10px 30px rgba(0,0,0,0.25)}
 .btn.ghost{border-style:dashed}
 
-/* Sheet */
-#overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:120;display:none;align-items:flex-end}
+/* Sheet overlay */
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:120;display:none;align-items:flex-end}
 #overlay.open{display:flex}
-#sheet{background:#161616;border-radius:16px 16px 0 0;width:100%;max-height:82vh;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,0.06)}
+#sheet{background:linear-gradient(180deg,#0f1418,#0b0f12);border-radius:16px 16px 0 0;width:100%;max-height:82vh;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,0.06)}
 #sheet-list{overflow:auto;padding-bottom:20px}
 
 /* Modal */
 .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:140}
-.modal{width:94%;max-width:720px;background:#0b0b0b;padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.04)}
+.modal{width:94%;max-width:720px;background:var(--card);padding:14px;border-radius:12px;border:1px solid var(--card-border)}
 
 /* Calendar */
 .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
-.cal-cell{background:var(--glass);padding:8px;border-radius:8px;min-height:80px;border:1px solid rgba(255,255,255,0.03);cursor:pointer}
+.cal-cell{background:rgba(255,255,255,0.02);padding:10px;border-radius:10px;min-height:80px;border:1px solid rgba(255,255,255,0.02);cursor:pointer}
 
 /* small helpers */
 .hidden{display:none!important}
 .counter{font-size:12px;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.02);margin-left:8px}
 .tag{font-size:11px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);margin-left:6px}
 .row{display:flex;gap:8px;align-items:center}
-.footer{position:sticky;bottom:0;padding:10px;background:linear-gradient(180deg,transparent,rgba(0,0,0,0.4));display:flex;justify-content:center;gap:8px}
+.footer{position:sticky;bottom:0;padding:12px;background:linear-gradient(180deg,transparent,rgba(0,0,0,0.35));display:flex;justify-content:center;gap:8px}
+.select{padding:8px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--text)}
 </style>
 </head>
 <body>
-<div class="app">
+<div class="app" id="appRoot" data-theme="lively">
   <header class="header">
     <div class="brand">
       <div class="logo">FI</div>
@@ -108,12 +136,19 @@ body{display:flex;flex-direction:column;min-height:100vh}
       </div>
     </div>
 
-    <input id="search" class="search" placeholder="Search exercises or days..." style="flex:1;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#fff" />
+    <input id="search" class="search" placeholder="Search exercises or days..." style="flex:1;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)" />
 
     <div class="header-controls">
       <div class="kv">Pool <span id="cntPool" class="counter">0</span></div>
+
+      <!-- Theme picker -->
+      <select id="themePicker" class="select" title="Choose UI theme">
+        <option value="lively">Lively</option>
+        <option value="calm">Calm</option>
+      </select>
+
       <button id="sheetOpen" class="btn" title="Library">📚</button>
-      <button id="themeToggle" class="btn" title="Theme">🌗</button>
+      <button id="themeToggle" class="btn" title="Toggle contrast">🌗</button>
     </div>
   </header>
 
@@ -132,7 +167,7 @@ body{display:flex;flex-direction:column;min-height:100vh}
           </div>
         </div>
 
-        <div style="margin-top:10px" id="weekDays" class="week"></div>
+        <div id="weekDays" class="week"></div>
 
         <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center">
           <div class="small-muted">Workout Theme</div>
@@ -150,7 +185,7 @@ body{display:flex;flex-direction:column;min-height:100vh}
 
       <!-- Right column -->
       <section>
-        <div class="card" style="margin-bottom:10px">
+        <div class="card" style="margin-bottom:12px">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <div>
               <div class="small-muted">Today</div>
@@ -186,7 +221,7 @@ body{display:flex;flex-direction:column;min-height:100vh}
         <div class="small-muted">Library · Filter by theme or tag</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
-        <select id="sheetThemeFilter" style="padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:#fff">
+        <select id="sheetThemeFilter" class="select" style="min-width:120px">
           <option value="">All themes</option>
           <option value="Power">Power</option>
           <option value="Strength">Strength</option>
@@ -199,7 +234,7 @@ body{display:flex;flex-direction:column;min-height:100vh}
     </div>
 
     <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.03)">
-      <input id="sheet-search" placeholder="Search library..." style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:#fff" />
+      <input id="sheet-search" placeholder="Search library..." style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:var(--text)" />
     </div>
 
     <div id="sheet-list" style="padding:8px 0;overflow:auto;max-height:60vh"></div>
@@ -216,7 +251,7 @@ body{display:flex;flex-direction:column;min-height:100vh}
 /* =========================
    Config
    ========================= */
-const DEFAULT_EX_COUNT = 5; // default number of exercises per workout (change to 6 if you prefer)
+const DEFAULT_EX_COUNT = 5;
 const DEFAULT_STRETCHES = [
   {name:'Hamstring Stretch', meta:'2 x 30s each'},
   {name:'Hip Flexor Stretch', meta:'2 x 30s each'},
@@ -283,24 +318,11 @@ function el(tag, props={}, ...children){
 }
 function findDay(id){ return DATA.days.find(d=>d.id===id) }
 
-/* Ensure day fields exist */
-function ensureDayFields(){
-  DATA.days.forEach(d=>{
-    if(!('type' in d)) d.type = 'workout';
-    if(!('theme' in d)) d.theme = 'Mix';
-    if(!('allowWorkoutOnSoccer' in d)) d.allowWorkoutOnSoccer = false;
-    if(!Array.isArray(d.exercises)) d.exercises = [];
-    if(!Array.isArray(d.stretches)) d.stretches = DEFAULT_STRETCHES.slice();
-  });
-  saveData();
-}
-
 /* =========================
-   Exercise pools (merged)
-   - small pool included; you can expand EXERCISES array as needed
+   Exercise pool (compact sample)
+   Replace EXERCISES with your full pool if desired
    ========================= */
 const EXERCISES = [
-  /* base examples (you already have many; this is a compact sample) */
   {name:"Back Squat",sets:4,reps:"5",rest:"2min",cues:"Chest up, drive knees out, explode.",eq:"Barbell",theme:"Strength",tag:"power"},
   {name:"Power Clean",sets:4,reps:"3",rest:"2min",cues:"Triple extension, fast elbows.",eq:"Barbell",theme:"Power",tag:"olympic"},
   {name:"Deadlift",sets:4,reps:"5",rest:"3min",cues:"Bar over mid-foot, hinge at hips.",eq:"Barbell",theme:"Strength",tag:"strength"},
@@ -311,7 +333,6 @@ const EXERCISES = [
   {name:"Hamstring Stretch",sets:1,reps:"30s",rest:"-",cues:"Long hold, breathe.",eq:"Bodyweight",theme:"Stretch",tag:"stretch"},
   {name:"Hip Flexor Stretch",sets:1,reps:"30s",rest:"-",cues:"Knee down, tilt pelvis.",eq:"Bodyweight",theme:"Stretch",tag:"stretch"}
 ];
-/* You can paste the larger 127-item pool into EXERCISES if you want full library */
 
 /* =========================
    DOM refs
@@ -330,9 +351,57 @@ const openCalendarBtn = document.getElementById('openCalendar');
 const addHistoryBtn = document.getElementById('addHistory');
 const searchInput = document.getElementById('search');
 const currentThemeTag = document.getElementById('currentTheme');
+const themePicker = document.getElementById('themePicker');
+const appRoot = document.getElementById('appRoot');
 
 /* =========================
-   Rendering
+   Ensure day fields and auto-fill defaults
+   ========================= */
+function ensureDayFields(){
+  DATA.days.forEach(d=>{
+    if(!('type' in d)) d.type = 'workout';
+    if(!('theme' in d)) d.theme = 'Mix';
+    if(!('allowWorkoutOnSoccer' in d)) d.allowWorkoutOnSoccer = false;
+    if(!Array.isArray(d.exercises)) d.exercises = [];
+    if(!Array.isArray(d.stretches)) d.stretches = DEFAULT_STRETCHES.slice();
+    if(!('userEdited' in d)) d.userEdited = false;
+    if(!('_autoFilled' in d)) d._autoFilled = false;
+  });
+
+  // Auto-fill logic
+  DATA.days.forEach(d=>{
+    if(d.type === 'workout' && !d.userEdited && !d._autoFilled){
+      if((d.exercises?.length || 0) < DEFAULT_EX_COUNT){
+        const pool = EXERCISES.filter(e => !e.theme || e.theme === d.theme || d.theme === 'Mix');
+        const picks = [];
+        const copy = pool.slice();
+        while(picks.length < DEFAULT_EX_COUNT && copy.length){
+          const i = Math.floor(Math.random()*copy.length);
+          const ex = copy.splice(i,1)[0];
+          picks.push({id:uid('ex'), name:ex.name, meta: ex.sets ? `${ex.sets} sets x ${ex.reps}` : ex.meta || ''});
+        }
+        const fallback = EXERCISES.slice();
+        while(picks.length < DEFAULT_EX_COUNT && fallback.length){
+          const i = Math.floor(Math.random()*fallback.length);
+          const ex = fallback.splice(i,1)[0];
+          if(!picks.find(p=>p.name===ex.name)) picks.push({id:uid('ex'), name:ex.name, meta: ex.sets ? `${ex.sets} sets x ${ex.reps}` : ex.meta || ''});
+        }
+        const existing = d.exercises || [];
+        const final = existing.slice();
+        picks.forEach(p=>{
+          if(final.length < DEFAULT_EX_COUNT && !final.find(f=>f.name === p.name)) final.push(p);
+        });
+        d.exercises = final;
+        d._autoFilled = true;
+      }
+    }
+  });
+
+  saveData();
+}
+
+/* =========================
+   Rendering & UI
    ========================= */
 function updateCounters(){
   cntPool.textContent = EXERCISES.length;
@@ -372,12 +441,10 @@ function renderWorkout(){
     return;
   }
 
-  // If no exercises, show hint and quick add
   if(day.exercises.length === 0){
     workoutList.appendChild(el('div',{class:'card'}, el('div',{class:'small-muted'}, 'No exercises yet. Use Library to add or press Shuffle to auto-fill.')));
   }
 
-  // Render exercises
   day.exercises.forEach((ex, idx)=>{
     const exEl = el('div',{class:'exercise'},
       el('div',{class:'meta'},
@@ -393,7 +460,13 @@ function renderWorkout(){
     workoutList.appendChild(exEl);
   });
 
-  // Stretch / cooldown section (editable)
+  if(day.exercises.length < DEFAULT_EX_COUNT){
+    workoutList.appendChild(el('div',{style:'margin-top:8px;display:flex;gap:8px;justify-content:center'},
+      el('button',{class:'btn', onClick:()=>shuffleDay(day.id)}, `Auto-fill to ${DEFAULT_EX_COUNT}`),
+      el('button',{class:'btn ghost', onClick:()=>openSheet()}, 'Open Library')
+    ));
+  }
+
   const stretches = day.stretches || DEFAULT_STRETCHES;
   const stretchEl = el('div',{class:'stretch'},
     el('h4',{}, 'Stretch / Cooldown'),
@@ -416,6 +489,7 @@ function replaceExercise(dayId, index, newExercise){
   if(index < 0 || index >= day.exercises.length) return;
   const ex = { id: newExercise.id || uid('ex'), name: (newExercise.name||'Unnamed').trim(), meta: (newExercise.meta||'').trim() };
   day.exercises.splice(index,1,ex);
+  day.userEdited = true;
   saveData(); renderAll();
 }
 function editExercise(dayId, index, updates){
@@ -425,6 +499,7 @@ function editExercise(dayId, index, updates){
   const ex = day.exercises[index];
   ex.name = (updates.name || ex.name).trim();
   ex.meta = (updates.meta || ex.meta || '').trim();
+  day.userEdited = true;
   saveData(); renderAll();
 }
 function removeExercise(dayId, index){
@@ -433,6 +508,7 @@ function removeExercise(dayId, index){
   if(index < 0 || index >= day.exercises.length) return;
   if(!confirm('Remove this exercise?')) return;
   day.exercises.splice(index,1);
+  day.userEdited = true;
   saveData(); renderAll();
 }
 
@@ -465,8 +541,8 @@ function openReplaceModal(dayId, index){
   if(!day || index<0 || index>=day.exercises.length) return;
   const current = day.exercises[index];
   const title = el('h3',{}, 'Replace Exercise');
-  const nameInput = el('input',{class:'input', value:current.name, placeholder:'Exercise name', style:'margin-top:8px;padding:8px'});
-  const metaInput = el('input',{class:'input', value:current.meta||'', placeholder:'Meta (sets x reps)', style:'margin-top:8px;padding:8px'});
+  const nameInput = el('input',{class:'input', value:current.name, placeholder:'Exercise name', style:'margin-top:8px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);width:100%'});
+  const metaInput = el('input',{class:'input', value:current.meta||'', placeholder:'Meta (sets x reps)', style:'margin-top:8px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);width:100%'});
   const save = el('button',{class:'btn primary', onClick:()=>{
     const newName = nameInput.value.trim();
     if(!newName){ alert('Enter a name'); return; }
@@ -482,8 +558,8 @@ function openEditModal(dayId, index){
   if(!day || index<0 || index>=day.exercises.length) return;
   const current = day.exercises[index];
   const title = el('h3',{}, 'Edit Exercise');
-  const nameInput = el('input',{class:'input', value:current.name, placeholder:'Exercise name', style:'margin-top:8px;padding:8px'});
-  const metaInput = el('input',{class:'input', value:current.meta||'', placeholder:'Meta (sets x reps)', style:'margin-top:8px;padding:8px'});
+  const nameInput = el('input',{class:'input', value:current.name, placeholder:'Exercise name', style:'margin-top:8px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);width:100%'});
+  const metaInput = el('input',{class:'input', value:current.meta||'', placeholder:'Meta (sets x reps)', style:'margin-top:8px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);width:100%'});
   const save = el('button',{class:'btn primary', onClick:()=>{
     const newName = nameInput.value.trim();
     if(!newName){ alert('Enter a name'); return; }
@@ -501,27 +577,16 @@ function openDaySettings(dayId){
   const day = findDay(dayId);
   if(!day) return;
   const title = el('h3',{}, `Edit ${day.name}`);
-  const typeSelect = el('select',{class:'input', style:'margin-top:8px;padding:8px'},
-    el('option',{value:'workout'}, 'Workout'),
-    el('option',{value:'soccer'}, 'Soccer'),
-    el('option',{value:'rest'}, 'Rest')
-  );
+  const typeSelect = el('select',{class:'select', style:'margin-top:8px;padding:8px'}, el('option',{value:'workout'}, 'Workout'), el('option',{value:'soccer'}, 'Soccer'), el('option',{value:'rest'}, 'Rest'));
   typeSelect.value = day.type || 'workout';
-  const themeSelect = el('select',{class:'input', style:'margin-top:8px;padding:8px'},
-    el('option',{value:'Power'}, 'Power'),
-    el('option',{value:'Strength'}, 'Strength'),
-    el('option',{value:'Hypertrophy'}, 'Hypertrophy'),
-    el('option',{value:'Mix'}, 'Mix')
-  );
+  const themeSelect = el('select',{class:'select', style:'margin-top:8px;padding:8px'}, el('option',{value:'Power'}, 'Power'), el('option',{value:'Strength'}, 'Strength'), el('option',{value:'Hypertrophy'}, 'Hypertrophy'), el('option',{value:'Mix'}, 'Mix'));
   themeSelect.value = day.theme || 'Mix';
-  const overrideRow = el('div',{style:'margin-top:10px;display:flex;align-items:center;gap:8px'},
-    el('input',{type:'checkbox', id:'overrideChk', checked: day.allowWorkoutOnSoccer}),
-    el('label',{for:'overrideChk'}, 'Allow workouts on soccer days (override)')
-  );
+  const overrideRow = el('div',{style:'margin-top:10px;display:flex;align-items:center;gap:8px'}, el('input',{type:'checkbox', id:'overrideChk', checked: day.allowWorkoutOnSoccer}), el('label',{for:'overrideChk'}, 'Allow workouts on soccer days (override)'));
   const save = el('button',{class:'btn primary', onClick:()=>{
     day.type = typeSelect.value;
     day.theme = themeSelect.value;
     day.allowWorkoutOnSoccer = document.getElementById('overrideChk').checked;
+    day.userEdited = true;
     saveData(); closeModal(); renderAll();
   }}, 'Save');
   const cancel = el('button',{class:'btn', onClick:()=>closeModal()}, 'Cancel');
@@ -536,15 +601,15 @@ function openEditStretches(dayId){
   (day.stretches || DEFAULT_STRETCHES).forEach((s, i)=>{
     const name = el('input',{value:s.name, style:'padding:8px', placeholder:'Stretch name'});
     const meta = el('input',{value:s.meta||'', style:'padding:8px', placeholder:'Duration / notes'});
-    list.appendChild(el('div',{style:'display:flex;gap:8px'}, name, meta, el('button',{class:'btn', onClick:()=>{ list.removeChild(list.children[i]); }}, 'Remove')));
+    const row = el('div',{style:'display:flex;gap:8px;align-items:center'}, name, meta, el('button',{class:'btn', onClick:()=>row.remove()}, 'Remove'));
+    list.appendChild(row);
   });
-  const addRow = el('div',{style:'margin-top:8px;display:flex;gap:8px'},
-    el('button',{class:'btn', onClick:()=>{
+  const addRow = el('div',{style:'margin-top:8px;display:flex;gap:8px'}, el('button',{class:'btn', onClick':()=>{
       const n = el('input',{placeholder:'Stretch name', style:'padding:8px'});
       const m = el('input',{placeholder:'Duration', style:'padding:8px'});
-      list.appendChild(el('div',{style:'display:flex;gap:8px'}, n, m, el('button',{class:'btn', onClick:()=>list.removeChild(list.lastChild)}, 'Remove')));
-    }}, 'Add Stretch')
-  );
+      const row = el('div',{style:'display:flex;gap:8px;align-items:center'}, n, m, el('button',{class:'btn', onClick:()=>row.remove()}, 'Remove'));
+      list.appendChild(row);
+    }}, 'Add Stretch'));
   const save = el('button',{class:'btn primary', onClick:()=>{
     const newSt = [];
     Array.from(list.children).forEach(row=>{
@@ -554,6 +619,7 @@ function openEditStretches(dayId){
       }
     });
     day.stretches = newSt;
+    day.userEdited = true;
     saveData(); closeModal(); renderAll();
   }}, 'Save');
   const cancel = el('button',{class:'btn', onClick:()=>closeModal()}, 'Cancel');
@@ -563,6 +629,7 @@ function addDefaultStretches(dayId){
   const day = findDay(dayId);
   if(!day) return;
   day.stretches = DEFAULT_STRETCHES.slice();
+  day.userEdited = true;
   saveData(); renderAll();
 }
 
@@ -583,7 +650,7 @@ function renderSheetList(){
   EXERCISES.forEach(ex=>{
     if(theme && ex.theme !== theme) return;
     if(q && !(ex.name.toLowerCase().includes(q) || (ex.cues||'').toLowerCase().includes(q))) return;
-    const item = el('div',{style:'display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.02)'},
+    const item = el('div',{style:'display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.02)'},
       el('div',{}, el('div',{style:'font-weight:700'}, ex.name), el('div',{class:'small-muted'}, ex.cues || `${ex.sets || ''} ${ex.reps || ''}`)),
       el('div',{}, el('button',{class:'btn', onClick:()=>addExerciseToCurrentDay(ex)}, 'Add'))
     );
@@ -594,6 +661,7 @@ function addExerciseToCurrentDay(ex){
   const day = findDay(currentDayId);
   if(!day) return alert('Select a day first.');
   day.exercises.push({ id: uid('ex'), name: ex.name, meta: ex.sets ? `${ex.sets} sets x ${ex.reps}` : ex.meta || '' });
+  day.userEdited = true;
   saveData(); renderAll(); closeSheet();
 }
 
@@ -635,7 +703,7 @@ function openBulkEdit(){
     if(!type) return;
     DATA.days.forEach(d=>{
       const chk = document.getElementById('bulk_'+d.id);
-      if(chk && chk.checked){ d.type = type; if(type!=='soccer') d.allowWorkoutOnSoccer=false; }
+      if(chk && chk.checked){ d.type = type; if(type!=='soccer') d.allowWorkoutOnSoccer=false; d.userEdited = true; }
     });
     saveData(); closeModal(); renderAll();
   }}, 'Apply Type');
@@ -671,8 +739,6 @@ function renderAll(){
   renderHistory();
   renderSheetList();
   updateCounters();
-  // reflect global toggle UI (small visual)
-  document.querySelectorAll('.day-badge').forEach(b=>{});
 }
 
 /* Shuffle: fill day with DEFAULT_EX_COUNT random exercises matching theme if possible */
@@ -687,7 +753,6 @@ function shuffleDay(dayId){
     const ex = copy.splice(i,1)[0];
     picks.push({id:uid('ex'), name:ex.name, meta: ex.sets ? `${ex.sets} sets x ${ex.reps}` : ex.meta || ''});
   }
-  // if not enough theme matches, fill from full pool
   const fallback = EXERCISES.slice();
   while(picks.length < DEFAULT_EX_COUNT && fallback.length){
     const i = Math.floor(Math.random()*fallback.length);
@@ -695,6 +760,7 @@ function shuffleDay(dayId){
     if(!picks.find(p=>p.name===ex.name)) picks.push({id:uid('ex'), name:ex.name, meta: ex.sets ? `${ex.sets} sets x ${ex.reps}` : ex.meta || ''});
   }
   day.exercises = picks;
+  day.userEdited = true;
   saveData(); renderAll();
 }
 
@@ -711,6 +777,7 @@ function newWorkoutForDay(dayId, name){
   }
   day.exercises = picks;
   if(name) day.workoutName = name;
+  day.userEdited = true;
   saveData(); renderAll();
 }
 
@@ -741,11 +808,15 @@ document.getElementById('sheet-search').addEventListener('input', renderSheetLis
 sheetThemeFilter.addEventListener('change', renderSheetList);
 searchInput.addEventListener('input', renderWorkout);
 
-/* Sheet overlay click handlers */
-document.getElementById('overlay').addEventListener('click', (e)=>{ if(e.target.id==='overlay') closeSheet(); });
+/* Theme picker: switch data-theme attribute to swap CSS variables */
+themePicker.addEventListener('change', (e)=>{
+  const val = e.target.value || 'lively';
+  if(val === 'calm') appRoot.setAttribute('data-theme','calm');
+  else appRoot.setAttribute('data-theme','lively');
+});
 
-/* Global soccer override toggle (small keyboard shortcut) */
-window.addEventListener('keydown', (e)=>{ if(e.key==='o' && e.ctrlKey){ GLOBAL_ALLOW_SOCCER_WORKOUTS = !GLOBAL_ALLOW_SOCCER_WORKOUTS; localStorage.setItem('fi_global_allow', JSON.stringify(GLOBAL_ALLOW_SOCCER_WORKOUTS)); renderAll(); } });
+/* Overlay close */
+document.getElementById('overlay').addEventListener('click', (e)=>{ if(e.target.id==='overlay') closeSheet(); });
 
 /* =========================
    Init
