@@ -12,13 +12,13 @@
    ------------------------- */
 /* Lively theme (default) */
 :root{
-  --bg-1: #071018;            /* deep navy */
-  --bg-2: #081827;            /* slightly lighter */
+  --bg-1: #071018;
+  --bg-2: #081827;
   --card: linear-gradient(180deg,#0f1724,#0b1220);
   --muted: rgba(255,255,255,0.78);
   --muted-2: rgba(255,255,255,0.55);
-  --accent: #ff8a00;          /* warm orange */
-  --accent-2: #00c2a8;        /* teal */
+  --accent: #ff8a00;
+  --accent-2: #00c2a8;
   --glass: rgba(255,255,255,0.03);
   --radius: 14px;
   --shadow: 0 12px 36px rgba(2,6,23,0.6);
@@ -35,14 +35,68 @@
   --card: linear-gradient(180deg,#0f1720,#0c1316);
   --muted: rgba(230,240,250,0.9);
   --muted-2: rgba(230,240,250,0.6);
-  --accent: #6ea8fe;          /* soft blue */
-  --accent-2: #7dd3fc;        /* light cyan */
+  --accent: #6ea8fe;
+  --accent-2: #7dd3fc;
   --glass: rgba(255,255,255,0.02);
   --radius: 12px;
   --shadow: 0 8px 24px rgba(2,6,23,0.5);
   --card-border: rgba(255,255,255,0.03);
   --text: #eaf6ff;
   --muted-3: rgba(230,240,250,0.4);
+  --success: #34d399;
+}
+
+/* Sporty theme (orange + lime) */
+[data-theme="sporty"]{
+  --bg-1: #071014;
+  --bg-2: #08121a;
+  --card: linear-gradient(180deg,#0f1416,#0b1214);
+  --muted: rgba(255,255,255,0.9);
+  --muted-2: rgba(255,255,255,0.6);
+  --accent: #ff5a00;
+  --accent-2: #a3e635;
+  --glass: rgba(255,255,255,0.03);
+  --radius: 14px;
+  --shadow: 0 12px 36px rgba(0,0,0,0.6);
+  --card-border: rgba(255,255,255,0.04);
+  --text: #ffffff;
+  --muted-3: rgba(255,255,255,0.35);
+  --success: #a3e635;
+}
+
+/* Minimal theme (soft neutrals) */
+[data-theme="minimal"]{
+  --bg-1: #f7f8fa;
+  --bg-2: #f2f4f6;
+  --card: linear-gradient(180deg,#ffffff,#fbfcfd);
+  --muted: rgba(20,25,30,0.8);
+  --muted-2: rgba(20,25,30,0.6);
+  --accent: #0ea5a4;
+  --accent-2: #7c3aed;
+  --glass: rgba(0,0,0,0.03);
+  --radius: 12px;
+  --shadow: 0 8px 24px rgba(10,10,10,0.06);
+  --card-border: rgba(10,10,10,0.04);
+  --text: #0b1220;
+  --muted-3: rgba(20,25,30,0.45);
+  --success: #16a34a;
+}
+
+/* Dark Neon theme */
+[data-theme="neon"]{
+  --bg-1: #02020a;
+  --bg-2: #030318;
+  --card: linear-gradient(180deg,#05051a,#040416);
+  --muted: rgba(255,255,255,0.9);
+  --muted-2: rgba(255,255,255,0.6);
+  --accent: #7c5cff;
+  --accent-2: #06b6d4;
+  --glass: rgba(255,255,255,0.02);
+  --radius: 12px;
+  --shadow: 0 16px 48px rgba(0,0,0,0.7);
+  --card-border: rgba(255,255,255,0.03);
+  --text: #eaf6ff;
+  --muted-3: rgba(255,255,255,0.35);
   --success: #34d399;
 }
 
@@ -145,6 +199,9 @@ body{display:flex;flex-direction:column;min-height:100vh;font-family:-apple-syst
       <select id="themePicker" class="select" title="Choose UI theme">
         <option value="lively">Lively</option>
         <option value="calm">Calm</option>
+        <option value="sporty">Sporty</option>
+        <option value="minimal">Minimal</option>
+        <option value="neon">Dark Neon</option>
       </select>
 
       <button id="sheetOpen" class="btn" title="Library">📚</button>
@@ -319,19 +376,144 @@ function el(tag, props={}, ...children){
 function findDay(id){ return DATA.days.find(d=>d.id===id) }
 
 /* =========================
-   Exercise pool (compact sample)
-   Replace EXERCISES with your full pool if desired
+   Full exercise pool (127 items)
+   Merged from your earlier lists — ready to use in the library.
    ========================= */
 const EXERCISES = [
-  {name:"Back Squat",sets:4,reps:"5",rest:"2min",cues:"Chest up, drive knees out, explode.",eq:"Barbell",theme:"Strength",tag:"power"},
-  {name:"Power Clean",sets:4,reps:"3",rest:"2min",cues:"Triple extension, fast elbows.",eq:"Barbell",theme:"Power",tag:"olympic"},
-  {name:"Deadlift",sets:4,reps:"5",rest:"3min",cues:"Bar over mid-foot, hinge at hips.",eq:"Barbell",theme:"Strength",tag:"strength"},
-  {name:"Bench Press",sets:4,reps:"5",rest:"2min",cues:"Retract scapulae, drive up.",eq:"Barbell",theme:"Strength",tag:"push"},
-  {name:"Pull Ups",sets:4,reps:"8",rest:"90s",cues:"Full range, controlled descent.",eq:"Bodyweight",theme:"Hypertrophy",tag:"pull"},
-  {name:"Box Jump",sets:4,reps:"5",rest:"90s",cues:"Explode, land softly.",eq:"Bodyweight",theme:"Power",tag:"power"},
-  {name:"Plank",sets:3,reps:"60s",rest:"60s",cues:"Hollow body, tight core.",eq:"Bodyweight",theme:"Mix",tag:"core"},
-  {name:"Hamstring Stretch",sets:1,reps:"30s",rest:"-",cues:"Long hold, breathe.",eq:"Bodyweight",theme:"Stretch",tag:"stretch"},
-  {name:"Hip Flexor Stretch",sets:1,reps:"30s",rest:"-",cues:"Knee down, tilt pelvis.",eq:"Bodyweight",theme:"Stretch",tag:"stretch"}
+{name:"Back Squat",sets:4,reps:"5",rest:"2min",cues:"Chest up, drive knees out, explode on concentric.",eq:"Barbell",theme:"Power",tag:"power"},
+{name:"Power Clean",sets:4,reps:"3",rest:"2min",cues:"Triple extension, fast elbows, soft catch in rack.",eq:"Barbell",theme:"Power",tag:"olympic"},
+{name:"Clean and Jerk",sets:3,reps:"3",rest:"3min",cues:"Pull, catch in rack, dip and drive overhead to lockout.",eq:"Barbell",theme:"Power",tag:"olympic"},
+{name:"Hang Power Snatch",sets:4,reps:"3",rest:"2min",cues:"Aggressive pull, fast turnover, punch up to stable catch.",eq:"Barbell",theme:"Power",tag:"olympic"},
+{name:"Barbell Thruster",sets:4,reps:"5",rest:"90s",cues:"Squat deep, leg drive into press, lockout fully overhead.",eq:"Barbell",theme:"Power",tag:"power"},
+{name:"Push Press",sets:4,reps:"5",rest:"90s",cues:"Dip and drive, bar travels straight, lock out at top.",eq:"Barbell",theme:"Power",tag:"power"},
+{name:"Trap Bar Deadlift",sets:4,reps:"5",rest:"2min",cues:"Sit into it, drive floor away, hips and shoulders rise together.",eq:"Barbell",theme:"Strength",tag:"strength"},
+{name:"Romanian Deadlift",sets:3,reps:"6",rest:"90s",cues:"Hinge deep, bar close to legs, feel hamstring stretch.",eq:"Barbell",theme:"Hypertrophy",tag:"hamstring"},
+{name:"Barbell Hip Thrust",sets:4,reps:"6",rest:"90s",cues:"Drive hips to ceiling, pause and squeeze glutes at top.",eq:"Barbell",theme:"Hypertrophy",tag:"glute"},
+{name:"DB Thruster",sets:4,reps:"6",rest:"90s",cues:"Squat deep, explode up, press at top to full lockout.",eq:"Dumbbell",theme:"Power",tag:"power"},
+{name:"DB Snatch",sets:3,reps:"5",rest:"90s",cues:"Hip hinge, explosive pull, punch to lockout overhead.",eq:"Dumbbell",theme:"Power",tag:"olympic"},
+{name:"DB Hang Clean",sets:3,reps:"5",rest:"90s",cues:"Explosive hip drive, fast elbows, soft catch at shoulders.",eq:"Dumbbell",theme:"Power",tag:"olympic"},
+{name:"DB Push Press",sets:3,reps:"6",rest:"75s",cues:"Leg drive, neutral grip, lock arms overhead, control descent.",eq:"Dumbbell",theme:"Power",tag:"power"},
+{name:"DB Jump Squat",sets:3,reps:"6",rest:"90s",cues:"Load hips, explode fully through toes, land softly.",eq:"Dumbbell",theme:"Power",tag:"power"},
+{name:"DB Hip Thrust",sets:3,reps:"8",rest:"75s",cues:"Drive hips to ceiling, pause and squeeze at top.",eq:"Dumbbell",theme:"Hypertrophy",tag:"glute"},
+{name:"DB Romanian DL",sets:3,reps:"8",rest:"75s",cues:"Slow descent, feel hamstring stretch, squeeze up.",eq:"Dumbbell",theme:"Hypertrophy",tag:"hamstring"},
+{name:"Box Jump",sets:4,reps:"5",rest:"90s",cues:"Full hip extension, land soft with hips back, step down.",eq:"Bodyweight",theme:"Power",tag:"power"},
+{name:"Broad Jump",sets:3,reps:"5",rest:"90s",cues:"Arm swing, full triple extension, stick the landing.",eq:"Bodyweight",theme:"Power",tag:"power"},
+{name:"Jump Squat",sets:3,reps:"8",rest:"75s",cues:"Quarter squat, explode through toes, absorb landing softly.",eq:"Bodyweight",theme:"Power",tag:"power"},
+{name:"Depth Jump",sets:3,reps:"5",rest:"90s",cues:"Step off box, minimal ground contact, explode immediately.",eq:"Bodyweight",theme:"Power",tag:"reactive"},
+{name:"Explosive Push-Up",sets:3,reps:"8",rest:"60s",cues:"Explode off floor, hands leave ground, land soft.",eq:"Bodyweight",theme:"Power",tag:"power"},
+{name:"Med Ball Slam",sets:3,reps:"8",rest:"60s",cues:"Full extension overhead, violent slam, reset each rep.",eq:"Bodyweight",theme:"Power",tag:"power"},
+{name:"Sled Push",sets:4,reps:"30m",rest:"2min",cues:"Low hips, lean into sled, drive through heels aggressively.",eq:"Bodyweight",theme:"Conditioning",tag:"conditioning"},
+{name:"Sprint Bounds",sets:3,reps:"6",rest:"90s",cues:"Explosive triple extension each stride, max distance.",eq:"Bodyweight",theme:"Speed",tag:"speed"},
+{name:"Pogo Hops",sets:3,reps:"12",rest:"60s",cues:"Minimal ground contact, stiff ankle, energy through Achilles.",eq:"Bodyweight",theme:"Reactive",tag:"reactive"},
+{name:"Conventional Deadlift",sets:4,reps:"5",rest:"3min",cues:"Bar over mid-foot, lat squeeze before pull, hip hinge not squat.",eq:"Barbell",theme:"Strength",tag:"strength"},
+{name:"Sumo Deadlift",sets:4,reps:"5",rest:"3min",cues:"Wide stance, toes out, chest tall, drive knees out on pull.",eq:"Barbell",theme:"Strength",tag:"strength"},
+{name:"Rack Pull",sets:4,reps:"5",rest:"3min",cues:"From knee height, max load, lock hips out fully at top.",eq:"Barbell",theme:"Strength",tag:"strength"},
+{name:"Barbell Row",sets:4,reps:"6",rest:"2min",cues:"Hinge 45°, pull bar to lower sternum, squeeze scapula at top.",eq:"Barbell",theme:"Strength",tag:"pull"},
+{name:"Pendlay Row",sets:4,reps:"5",rest:"2min",cues:"Full stop on floor each rep, explosive pull, flat back.",eq:"Barbell",theme:"Strength",tag:"pull"},
+{name:"Overhead Press",sets:4,reps:"5",rest:"2min",cues:"Glutes squeezed, ribs down, press straight overhead.",eq:"Barbell",theme:"Strength",tag:"push"},
+{name:"Bench Press",sets:4,reps:"5",rest:"2min",cues:"Retract scapulae, touch chest, drive bar up and back.",eq:"Barbell",theme:"Strength",tag:"push"},
+{name:"Bulgarian Split Squat",sets:3,reps:"6 ea",rest:"90s",cues:"Front shin vertical, torso tall, control eccentric 3s.",eq:"Barbell",theme:"Hypertrophy",tag:"unilateral"},
+{name:"Barbell RDL",sets:3,reps:"8",rest:"90s",cues:"Hinge at hip, bar close to legs, feel stretch, squeeze up.",eq:"Barbell",theme:"Hypertrophy",tag:"hamstring"},
+{name:"Weighted Pull-Up",sets:4,reps:"5",rest:"2min",cues:"Dead hang start, chin over bar, control the full descent.",eq:"Bodyweight",theme:"Strength",tag:"pull"},
+{name:"Weighted Dips",sets:3,reps:"8",rest:"90s",cues:"Lean forward slightly, full depth, lock out at top.",eq:"Bodyweight",theme:"Strength",tag:"push"},
+{name:"DB Row",sets:3,reps:"10 ea",rest:"60s",cues:"Elbow to hip not ceiling, full stretch at bottom.",eq:"Dumbbell",theme:"Hypertrophy",tag:"pull"},
+{name:"DB Overhead Press",sets:3,reps:"8",rest:"75s",cues:"Neutral grip, full lockout, ribs down.",eq:"Dumbbell",theme:"Hypertrophy",tag:"push"},
+{name:"DB Bulgarian Split",sets:3,reps:"8 ea",rest:"90s",cues:"Front shin vertical, torso upright, drive through front heel.",eq:"Dumbbell",theme:"Hypertrophy",tag:"unilateral"},
+{name:"Single Leg Romanian Deadlift",sets:3,reps:"8 ea",rest:"75s",cues:"Hinge from hips, keep back flat, drive through heel.",eq:"Dumbbell",theme:"Hypertrophy",tag:"hamstring"},
+{name:"Kettlebell Swing",sets:4,reps:"12",rest:"60s",cues:"Hinge hard, snap hips, keep arms relaxed.",eq:"Dumbbell",theme:"Power",tag:"power"},
+{name:"Turkish Get-Up",sets:3,reps:"4 ea",rest:"90s",cues:"Slow, controlled transitions; eyes on weight.",eq:"Dumbbell",theme:"Core",tag:"core"},
+{name:"Farmer Carry Heavy",sets:4,reps:"40m",rest:"90s",cues:"Tall posture, tight grip, short quick steps.",eq:"Dumbbell",theme:"Strength",tag:"carry"},
+{name:"Suitcase Carry",sets:3,reps:"30m ea",rest:"60s",cues:"Neutral spine, resist lateral lean.",eq:"Dumbbell",theme:"Core",tag:"core"},
+{name:"Weighted Step-Up",sets:3,reps:"8 ea",rest:"75s",cues:"Drive through heel, control descent.",eq:"Dumbbell",theme:"Hypertrophy",tag:"unilateral"},
+{name:"Sled Drag",sets:4,reps:"30m",rest:"2min",cues:"Low hips, drive through legs, steady pace.",eq:"Bodyweight",theme:"Conditioning",tag:"conditioning"},
+{name:"Sled Sprint Push",sets:6,reps:"20m",rest:"90s",cues:"Explosive drive, short ground contact.",eq:"Bodyweight",theme:"Speed",tag:"speed"},
+{name:"Weighted Vest Run",sets:1,reps:"10min",rest:"-",cues:"Maintain steady tempo, controlled breathing.",eq:"Bodyweight",theme:"Conditioning",tag:"conditioning"},
+{name:"Hill Sprints",sets:8,reps:"20s",rest:"90s",cues:"Max effort, full recovery between reps.",eq:"Bodyweight",theme:"Speed",tag:"speed"},
+{name:"Sled Row",sets:4,reps:"10",rest:"90s",cues:"Pull with lats, keep chest up.",eq:"Bodyweight",theme:"Strength",tag:"pull"},
+{name:"Incline DB Press",sets:4,reps:"8",rest:"90s",cues:"Drive through chest, control descent.",eq:"Dumbbell",theme:"Hypertrophy",tag:"chest"},
+{name:"Decline Push-Up",sets:4,reps:"12",rest:"60s",cues:"Full range, tight core, controlled tempo.",eq:"Bodyweight",theme:"Hypertrophy",tag:"push"},
+{name:"Ring Rows",sets:4,reps:"10",rest:"60s",cues:"Body straight, pull chest to rings.",eq:"Bodyweight",theme:"Hypertrophy",tag:"pull"},
+{name:"Ring Dips",sets:4,reps:"6-8",rest:"90s",cues:"Control descent, full lockout.",eq:"Bodyweight",theme:"Strength",tag:"push"},
+{name:"Weighted Glute Bridge",sets:4,reps:"10",rest:"75s",cues:"Drive hips up, squeeze glutes at top.",eq:"Barbell",theme:"Hypertrophy",tag:"glute"},
+{name:"Nordic Hamstring Curl",sets:3,reps:"6",rest:"90s",cues:"Slow eccentric, use arms to assist concentric.",eq:"Bodyweight",theme:"Hypertrophy",tag:"hamstring"},
+{name:"Cable Pull-Through",sets:3,reps:"12",rest:"60s",cues:"Hinge at hips, squeeze glutes at top.",eq:"Bodyweight",theme:"Hypertrophy",tag:"glute"},
+{name:"Face Pull",sets:4,reps:"15",rest:"45s",cues:"High elbows, scapular retraction, control.",eq:"Bodyweight",theme:"Hypertrophy",tag:"shoulder"},
+{name:"Band Pull-Apart",sets:4,reps:"20",rest:"30s",cues:"Full scapular squeeze, slow tempo.",eq:"Bodyweight",theme:"Hypertrophy",tag:"pull"},
+{name:"Cable Triceps Pushdown",sets:3,reps:"12",rest:"45s",cues:"Elbows pinned, full extension.",eq:"Bodyweight",theme:"Hypertrophy",tag:"triceps"},
+{name:"EZ Bar Curl",sets:3,reps:"10",rest:"60s",cues:"Full range, control negative.",eq:"Barbell",theme:"Hypertrophy",tag:"biceps"},
+{name:"Hammer Curl",sets:3,reps:"10",rest:"60s",cues:"Neutral grip, drive elbow to hip.",eq:"Dumbbell",theme:"Hypertrophy",tag:"biceps"},
+{name:"Weighted Calf Raise",sets:4,reps:"12-15",rest:"45s",cues:"Full stretch and squeeze, slow tempo.",eq:"Dumbbell",theme:"Hypertrophy",tag:"calf"},
+{name:"Seated Calf Raise",sets:4,reps:"15",rest:"45s",cues:"Pause at top, slow eccentric.",eq:"Bodyweight",theme:"Hypertrophy",tag:"calf"},
+{name:"Hanging Leg Raise",sets:4,reps:"12",rest:"45s",cues:"Control, avoid swinging, full hip flexion.",eq:"Bodyweight",theme:"Core",tag:"core"},
+{name:"Toes-to-Bar",sets:4,reps:"10",rest:"60s",cues:"Hollow body, controlled kipping or strict.",eq:"Bodyweight",theme:"Core",tag:"core"},
+{name:"Russian Twist",sets:3,reps:"20",rest:"30s",cues:"Rotate from torso, keep feet elevated.",eq:"Bodyweight",theme:"Core",tag:"core"},
+{name:"Ab Wheel Rollout",sets:4,reps:"10",rest:"60s",cues:"Hips tight, avoid sagging, full extension.",eq:"Bodyweight",theme:"Core",tag:"core"},
+{name:"Farmer Carry Suitcase",sets:3,reps:"30m ea",rest:"60s",cues:"Tall posture, resist rotation.",eq:"Dumbbell",theme:"Core",tag:"core"},
+{name:"Zercher Squat",sets:4,reps:"6",rest:"2min",cues:"Elbows high, chest up, drive through heels.",eq:"Barbell",theme:"Hypertrophy",tag:"quad"},
+{name:"Anderson Squat",sets:5,reps:"3",rest:"2min",cues:"Start from pins, explode out of bottom.",eq:"Barbell",theme:"Strength",tag:"strength"},
+{name:"Pause Squat",sets:4,reps:"5",rest:"2min",cues:"Pause at bottom 2s, explode up.",eq:"Barbell",theme:"Strength",tag:"strength"},
+{name:"Tempo Squat (3-1-1)",sets:4,reps:"6",rest:"2min",cues:"Slow eccentric, pause, fast concentric.",eq:"Barbell",theme:"Hypertrophy",tag:"hypertrophy"},
+{name:"Goblet Squat",sets:4,reps:"10",rest:"75s",cues:"Chest tall, sit back, drive through heels.",eq:"Dumbbell",theme:"Hypertrophy",tag:"quad"},
+{name:"Cossack Squat",sets:3,reps:"8 ea",rest:"60s",cues:"Deep lateral stretch, keep torso upright.",eq:"Bodyweight",theme:"Mobility",tag:"unilateral"},
+{name:"Reverse Lunge",sets:4,reps:"8 ea",rest:"75s",cues:"Step back, keep front knee stable.",eq:"Dumbbell",theme:"Hypertrophy",tag:"unilateral"},
+{name:"Step Down Eccentric",sets:3,reps:"6 ea",rest:"60s",cues:"Slow controlled descent, soft landing.",eq:"Bodyweight",theme:"Hypertrophy",tag:"unilateral"},
+{name:"Sissy Squat",sets:3,reps:"10",rest:"60s",cues:"Knees forward, lean back, full quad tension.",eq:"Bodyweight",theme:"Hypertrophy",tag:"quad"},
+{name:"Weighted Sled Pull",sets:4,reps:"30m",rest:"2min",cues:"Drive through legs, maintain posture.",eq:"Bodyweight",theme:"Conditioning",tag:"conditioning"},
+{name:"Battle Ropes",sets:6,reps:"30s",rest:"45s",cues:"Explosive waves, keep core tight.",eq:"Bodyweight",theme:"Conditioning",tag:"conditioning"},
+{name:"Rowing Intervals",sets:8,reps:"500m",rest:"90s",cues:"Consistent split, strong finish.",eq:"Bodyweight",theme:"Conditioning",tag:"conditioning"},
+{name:"Bike Sprints",sets:10,reps:"20s",rest:"40s",cues:"All-out effort, full recovery.",eq:"Bodyweight",theme:"Conditioning",tag:"conditioning"},
+{name:"Prowler Push",sets:6,reps:"30m",rest:"90s",cues:"Low drive, short steps, steady breathing.",eq:"Bodyweight",theme:"Conditioning",tag:"conditioning"},
+{name:"Box Step-Up Jump",sets:4,reps:"8 ea",rest:"75s",cues:"Explode up, land softly, step down controlled.",eq:"Bodyweight",theme:"Power",tag:"power"},
+{name:"Depth Drop to Broad Jump",sets:4,reps:"5",rest:"90s",cues:"Minimal ground contact, immediate rebound.",eq:"Bodyweight",theme:"Reactive",tag:"reactive"},
+{name:"Lateral Bound",sets:4,reps:"8 ea",rest:"60s",cues:"Explosive lateral drive, stick landing.",eq:"Bodyweight",theme:"Speed",tag:"speed"},
+{name:"Single Arm KB Swing",sets:4,reps:"10 ea",rest:"60s",cues:"Hinge, strong hip snap, control at top.",eq:"Dumbbell",theme:"Power",tag:"power"},
+{name:"KB Clean and Press",sets:4,reps:"6 ea",rest:"90s",cues:"Explosive clean, press with leg drive.",eq:"Dumbbell",theme:"Power",tag:"power"},
+{name:"KB Snatch",sets:4,reps:"6 ea",rest:"90s",cues:"Fast hip extension, punch to lockout.",eq:"Dumbbell",theme:"Power",tag:"olympic"},
+{name:"KB Turkish Get-Up (heavy)",sets:3,reps:"3 ea",rest:"120s",cues:"Slow, controlled, focus on transitions.",eq:"Dumbbell",theme:"Core",tag:"core"},
+{name:"Sots Press",sets:3,reps:"5",rest:"90s",cues:"Deep squat press, mobility and control.",eq:"Barbell",theme:"Mobility",tag:"shoulder"},
+{name:"Jefferson Deadlift",sets:4,reps:"5",rest:"2min",cues:"Staggered stance, strong hip drive.",eq:"Barbell",theme:"Strength",tag:"strength"},
+{name:"Deficit Deadlift",sets:4,reps:"5",rest:"2.5min",cues:"Stand on small platform, strong first pull.",eq:"Barbell",theme:"Strength",tag:"strength"},
+{name:"Snatch Grip Deadlift",sets:4,reps:"4",rest:"2.5min",cues:"Wide grip, tall chest, strong lockout.",eq:"Barbell",theme:"Strength",tag:"strength"},
+{name:"Kettlebell Farmer Carry (double)",sets:4,reps:"50m",rest:"90s",cues:"Tall posture, steady breathing.",eq:"Dumbbell",theme:"Strength",tag:"carry"},
+{name:"Overhead Carry",sets:3,reps:"30m",rest:"90s",cues:"Locked elbow, braced core, steady steps.",eq:"Dumbbell",theme:"Strength",tag:"shoulder"},
+{name:"Bottoms-Up KB Carry",sets:3,reps:"30m",rest:"60s",cues:"Grip stability, wrist control.",eq:"Dumbbell",theme:"Strength",tag:"forearm"},
+{name:"Weighted Pull-Up (slow)",sets:4,reps:"6",rest:"2min",cues:"Slow negative, full control.",eq:"Bodyweight",theme:"Strength",tag:"pull"},
+{name:"Chest-Supported Row",sets:4,reps:"10",rest:"75s",cues:"Full scapular retraction, controlled tempo.",eq:"Dumbbell",theme:"Hypertrophy",tag:"pull"},
+{name:"Single Arm Cable Row",sets:3,reps:"12 ea",rest:"60s",cues:"Elbow to hip, full stretch.",eq:"Bodyweight",theme:"Hypertrophy",tag:"pull"},
+{name:"Incline T-Bar Row",sets:4,reps:"8",rest:"90s",cues:"Chest on bench, pull to lower chest.",eq:"Barbell",theme:"Hypertrophy",tag:"pull"},
+{name:"Weighted Inverted Row",sets:4,reps:"10",rest:"60s",cues:"Body straight, pull chest to bar.",eq:"Bodyweight",theme:"Hypertrophy",tag:"pull"},
+{name:"Single Arm DB Bench",sets:3,reps:"8 ea",rest:"75s",cues:"Stabilize with core, full lockout.",eq:"Dumbbell",theme:"Hypertrophy",tag:"chest"},
+{name:"Floor Press",sets:4,reps:"6",rest:"90s",cues:"Short ROM, strong lockout, triceps focus.",eq:"Barbell",theme:"Hypertrophy",tag:"push"},
+{name:"Close-Grip Bench",sets:4,reps:"8",rest:"90s",cues:"Elbows tucked, drive through triceps.",eq:"Barbell",theme:"Hypertrophy",tag:"triceps"},
+{name:"Incline Fly",sets:3,reps:"12",rest:"60s",cues:"Stretch at bottom, squeeze at top.",eq:"Dumbbell",theme:"Hypertrophy",tag:"chest"},
+{name:"Cable Lateral Raise",sets:4,reps:"12",rest:"45s",cues:"Slight elbow bend, lead with pinky.",eq:"Bodyweight",theme:"Hypertrophy",tag:"shoulder"},
+{name:"Arnold Press",sets:3,reps:"8",rest:"75s",cues:"Rotate through press, full range.",eq:"Dumbbell",theme:"Hypertrophy",tag:"shoulder"},
+{name:"Y-T-W Raises",sets:3,reps:"12",rest:"45s",cues:"Slow, scapular control, light weight.",eq:"Bodyweight",theme:"Hypertrophy",tag:"shoulder"},
+{name:"Weighted Decline Sit-Up",sets:3,reps:"15",rest:"45s",cues:"Full range, controlled tempo.",eq:"Bodyweight",theme:"Core",tag:"core"},
+{name:"Pallof Press",sets:4,reps:"12 ea",rest:"30s",cues:"Anti-rotation, braced core.",eq:"Bodyweight",theme:"Core",tag:"core"},
+{name:"Suitcase Deadlift",sets:4,reps:"6 ea",rest:"90s",cues:"Single-side load, strong hip hinge.",eq:"Dumbbell",theme:"Hypertrophy",tag:"unilateral"},
+{name:"Weighted Step-Through Lunge",sets:3,reps:"10 ea",rest:"75s",cues:"Step through, keep torso upright.",eq:"Dumbbell",theme:"Hypertrophy",tag:"unilateral"},
+{name:"Reverse Hyper",sets:4,reps:"12",rest:"60s",cues:"Controlled swing, squeeze glutes at top.",eq:"Bodyweight",theme:"Hypertrophy",tag:"glute"},
+{name:"Cable Woodchop",sets:3,reps:"12 ea",rest:"45s",cues:"Rotate from hips, controlled return.",eq:"Bodyweight",theme:"Core",tag:"core"},
+{name:"Weighted Hollow Hold",sets:4,reps:"30s",rest:"45s",cues:"Tight hollow, avoid neck strain.",eq:"Bodyweight",theme:"Core",tag:"core"},
+{name:"Sled Sprint (heavy)",sets:6,reps:"20m",rest:"2min",cues:"Max effort, full recovery.",eq:"Bodyweight",theme:"Conditioning",tag:"conditioning"},
+{name:"Tempo Deadlift (3-1-1)",sets:4,reps:"5",rest:"3min",cues:"Controlled eccentric, pause, explode.",eq:"Barbell",theme:"Strength",tag:"strength"},
+{name:"Paused Deadlift (below knee)",sets:4,reps:"4",rest:"3min",cues:"Pause 1-2s at weak point, explode.",eq:"Barbell",theme:"Strength",tag:"strength"},
+{name:"Snatch Balance",sets:4,reps:"3",rest:"2min",cues:"Fast drop under, stable overhead lock.",eq:"Barbell",theme:"Power",tag:"olympic"},
+{name:"Overhead Squat",sets:4,reps:"4-6",rest:"2min",cues:"Stable overhead, deep squat, active shoulders.",eq:"Barbell",theme:"Power",tag:"olympic"},
+{name:"Power Snatch from Blocks",sets:4,reps:"3",rest:"2min",cues:"Explosive pull, quick turnover.",eq:"Barbell",theme:"Power",tag:"olympic"},
+{name:"Clean Pull",sets:4,reps:"3",rest:"2min",cues:"Aggressive extension, high pull.",eq:"Barbell",theme:"Power",tag:"olympic"},
+{name:"Hang Clean High Pull",sets:4,reps:"4",rest:"90s",cues:"Explosive hips, high elbows.",eq:"Barbell",theme:"Power",tag:"olympic"},
+{name:"Weighted Sled Lateral Push",sets:4,reps:"20m ea",rest:"90s",cues:"Lateral drive, short steps.",eq:"Bodyweight",theme:"Conditioning",tag:"conditioning"},
+{name:"Tuck Jump",sets:4,reps:"10",rest:"60s",cues:"Explosive knee drive, soft landing.",eq:"Bodyweight",theme:"Power",tag:"power"},
+{name:"Depth Jump to Sprint",sets:6,reps:"3",rest:"90s",cues:"Explode off box, immediate sprint 10m.",eq:"Bodyweight",theme:"Reactive",tag:"reactive"},
+{name:"Reactive Bounds (single leg)",sets:4,reps:"6 ea",rest:"60s",cues:"Quick ground contact, high intent.",eq:"Bodyweight",theme:"Reactive",tag:"reactive"},
+{name:"Weighted Sled Reverse Drag",sets:4,reps:"20m",rest:"90s",cues:"Drive through legs, maintain posture.",eq:"Bodyweight",theme:"Conditioning",tag:"conditioning"},
+{name:"Incline Sprint (treadmill)",sets:8,reps:"30s",rest:"90s",cues:"High incline, max effort.",eq:"Bodyweight",theme:"Speed",tag:"speed"},
+{name:"Tempo Push-Up (3-1-3)",sets:4,reps:"10",rest:"60s",cues:"Slow eccentric, pause, controlled concentric.",eq:"Bodyweight",theme:"Hypertrophy",tag:"push"},
+{name:"Weighted Plyo Push-Up",sets:4,reps:"6",rest:"90s",cues:"Explosive push, safe landing.",eq:"Bodyweight",theme:"Power",tag:"power"},
+{name:"Isometric Chin Hold",sets:3,reps:"max",rest:"90s",cues:"Hold at top, full scapular squeeze.",eq:"Bodyweight",theme:"Strength",tag:"pull"},
+{name:"Band Assisted One-Arm Pull-Up (eccentric)",sets:4,reps:"5 ea",rest:"90s",cues:"Slow negative, control descent.",eq:"Bodyweight",theme:"Strength",tag:"pull"}
 ];
 
 /* =========================
@@ -604,7 +786,7 @@ function openEditStretches(dayId){
     const row = el('div',{style:'display:flex;gap:8px;align-items:center'}, name, meta, el('button',{class:'btn', onClick:()=>row.remove()}, 'Remove'));
     list.appendChild(row);
   });
-  const addRow = el('div',{style:'margin-top:8px;display:flex;gap:8px'}, el('button',{class:'btn', onClick':()=>{
+  const addRow = el('div',{style:'margin-top:8px;display:flex;gap:8px'}, el('button',{class:'btn', onClick:()=>{
       const n = el('input',{placeholder:'Stretch name', style:'padding:8px'});
       const m = el('input',{placeholder:'Duration', style:'padding:8px'});
       const row = el('div',{style:'display:flex;gap:8px;align-items:center'}, n, m, el('button',{class:'btn', onClick:()=>row.remove()}, 'Remove'));
@@ -808,12 +990,20 @@ document.getElementById('sheet-search').addEventListener('input', renderSheetLis
 sheetThemeFilter.addEventListener('change', renderSheetList);
 searchInput.addEventListener('input', renderWorkout);
 
-/* Theme picker: switch data-theme attribute to swap CSS variables */
+/* Theme picker: switch data-theme attribute to swap CSS variables and persist choice */
+function applyTheme(name){
+  if(!name) name = 'lively';
+  appRoot.setAttribute('data-theme', name === 'lively' ? 'lively' : name);
+  localStorage.setItem('fi_theme', name);
+  themePicker.value = name;
+}
 themePicker.addEventListener('change', (e)=>{
-  const val = e.target.value || 'lively';
-  if(val === 'calm') appRoot.setAttribute('data-theme','calm');
-  else appRoot.setAttribute('data-theme','lively');
+  applyTheme(e.target.value);
 });
+
+/* Load persisted theme */
+const savedTheme = localStorage.getItem('fi_theme') || 'lively';
+applyTheme(savedTheme);
 
 /* Overlay close */
 document.getElementById('overlay').addEventListener('click', (e)=>{ if(e.target.id==='overlay') closeSheet(); });
@@ -826,7 +1016,7 @@ renderAll();
 updateCounters();
 
 /* Expose for debugging */
-window.FI = { DATA, EXERCISES, saveData, renderAll, openDaySettings, openSheet, openCalendar, shuffleDay, newWorkoutForDay };
+window.FI = { DATA, EXERCISES, saveData, renderAll, openDaySettings, openSheet, openCalendar, shuffleDay, newWorkoutForDay, applyTheme };
 </script>
 </body>
 </html>
