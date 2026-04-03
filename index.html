@@ -5,14 +5,13 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Field+Iron</title>
 
-  <!-- PWA / Icons -->
+  <!-- Icons and PWA manifest (place files in site root or adjust paths) -->
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="manifest" href="/site.webmanifest">
   <meta name="msapplication-TileColor" content="#071018">
   <meta name="theme-color" content="#071018">
-
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
@@ -26,11 +25,12 @@
       --accent:#ff6a00;
       --glass: rgba(255,255,255,0.03);
       --radius:12px;
+      --max-width:980px;
     }
     html,body{height:100%;margin:0;}
     body{
       font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background:var(--bg);
+      background:linear-gradient(180deg,#071018 0%, #071827 100%);
       color:var(--text);
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
@@ -38,8 +38,9 @@
       box-sizing:border-box;
       -webkit-touch-callout:none;
       -webkit-user-select:none;
+      -webkit-tap-highlight-color: transparent;
     }
-    .wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:18px;min-height:100vh;}
+    .wrap{max-width:var(--max-width);margin:0 auto;display:flex;flex-direction:column;gap:18px;min-height:100vh;}
     header{margin-top:6px;}
     .day-header{
       display:flex;
@@ -52,30 +53,35 @@
     .subtitle{margin:0;color:var(--muted);font-size:14px;}
     main{flex:1;}
     .card{
-      background:var(--card);
+      background:linear-gradient(180deg, rgba(11,26,36,0.9), rgba(11,26,36,0.85));
       border-radius:var(--radius);
       padding:16px;
-      box-shadow:0 6px 18px rgba(0,0,0,0.5);
+      box-shadow:0 8px 30px rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.02);
     }
     .section-title{margin:0 0 8px 0;color:#cfe6f6;font-size:16px;}
-    ul{color:#cfe6f6;padding-left:18px;margin:0 0 12px 0;}
-    .actions{display:flex;gap:12px;align-items:center;}
-    .btn{border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:600;}
-    .btn-primary{background:var(--accent);color:#fff;}
-    .btn-ghost{background:transparent;color:var(--muted);border:1px solid rgba(159,179,200,0.12);}
     .muted { color: var(--muted); font-size:13px; }
-    .workout-item { display:flex; justify-content:space-between; gap:12px; align-items:center; padding:8px 0; border-bottom:1px solid var(--glass); }
+    .workout-item { display:flex; justify-content:space-between; gap:12px; align-items:center; padding:10px 0; border-bottom:1px solid var(--glass); }
     .workout-item:last-child { border-bottom: none; }
     .small { font-size:13px; color:#cfe6f6; opacity:0.95; }
     .input-row { display:flex; gap:8px; margin-top:12px; }
-    input[type="text"], textarea{ flex:1; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:var(--text); }
+    input[type="text"], textarea{ flex:1; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:var(--text); outline:none; }
+    .btn{border:none;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;letter-spacing:0.2px;}
+    .btn-primary{background:linear-gradient(90deg,#ff7a2b,#ff5a00);color:#fff;box-shadow:0 6px 18px rgba(255,106,0,0.12);}
+    .btn-ghost{background:transparent;color:var(--muted);border:1px solid rgba(159,179,200,0.08);}
     .pill { background: rgba(255,255,255,0.02); padding:6px 10px; border-radius:999px; color:var(--muted); font-size:13px; }
-    footer{color:#6f8b9a;font-size:13px;padding-bottom:18px;}
-    .sr-only { position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
     .controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
     .meta { color:var(--muted); font-size:12px; }
     .import-export { display:flex; gap:8px; align-items:center; }
     .search { margin-left:auto; }
+    .row { display:flex; gap:12px; align-items:center; }
+    .col { display:flex; flex-direction:column; gap:8px; }
+    .hidden { display:none !important; }
+    .hr { height:1px; background:var(--glass); margin:12px 0; border-radius:2px; }
+    .timer { font-weight:700; font-size:18px; color:#fff; }
+    .toast { position:fixed; left:50%; transform:translateX(-50%); bottom:28px; background:rgba(0,0,0,0.6); color:#fff; padding:10px 14px; border-radius:10px; box-shadow:0 6px 18px rgba(0,0,0,0.6); display:none; z-index:9999; }
+    footer{color:#6f8b9a;font-size:13px;padding-bottom:18px;}
+    .sr-only { position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
     @media (max-width:720px){
       .day-header{font-size:22px;}
       body{padding:14px;}
@@ -89,14 +95,23 @@
         <span id="current-day">Loading…</span>
         <span class="pill" id="timezone-label" aria-hidden="true"></span>
       </h1>
-      <p class="subtitle">Field+Iron</p>
+      <p class="subtitle">Field+Iron — personal workout manager</p>
     </header>
 
     <main>
+      <!-- Today card -->
       <section class="card" aria-labelledby="today-heading">
-        <div style="display:flex;gap:12px;align-items:center;">
-          <h2 id="today-heading" class="section-title" style="margin:0;">Today</h2>
-          <div class="meta" id="last-saved" style="margin-left:8px;">—</div>
+        <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;">
+          <div style="display:flex;gap:12px;align-items:center;">
+            <h2 id="today-heading" class="section-title" style="margin:0;">Today</h2>
+            <div class="meta" id="last-saved">—</div>
+          </div>
+
+          <div class="controls">
+            <button id="start-session" class="btn btn-primary">Start Session</button>
+            <button id="pause-session" class="btn btn-ghost">Pause</button>
+            <button id="stop-session" class="btn btn-ghost">Stop</button>
+          </div>
         </div>
 
         <div id="workouts-list" aria-live="polite" style="margin-top:12px;">
@@ -108,7 +123,9 @@
           <button id="add-workout" class="btn btn-primary">Add</button>
         </div>
 
-        <div class="actions" style="margin-top:12px;">
+        <div class="hr"></div>
+
+        <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;">
           <div class="controls">
             <button id="clear-all" class="btn btn-ghost">Clear All</button>
             <button id="reset-defaults" class="btn btn-ghost">Reset Defaults</button>
@@ -118,19 +135,34 @@
               <input id="import-file" type="file" accept="application/json" style="display:none" />
             </div>
           </div>
-          <div style="flex:1"></div>
-          <div class="search">
+
+          <div style="display:flex;gap:8px;align-items:center;">
             <input id="filter" type="text" placeholder="Filter workouts" style="padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)" />
+            <span class="muted">Saved locally</span>
           </div>
         </div>
       </section>
 
+      <!-- Settings / Tools -->
       <section class="card" style="margin-top:12px;">
-        <h3 class="section-title" style="margin-bottom:8px;">Settings</h3>
-        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+        <h3 class="section-title" style="margin-bottom:8px;">Settings & Tools</h3>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
           <label class="pill"><input id="show-timezone" type="checkbox" style="margin-right:8px" /> Show timezone</label>
-          <label class="pill"><input id="use-short-day" type="checkbox" style="margin-right:8px" /> Use short weekday (Mon)</label>
+          <label class="pill"><input id="use-short-day" type="checkbox" style="margin-right:8px" /> Use short weekday</label>
           <label class="pill"><input id="enable-sw" type="checkbox" style="margin-right:8px" /> Enable offline (service worker)</label>
+          <label class="pill"><input id="vibrate" type="checkbox" style="margin-right:8px" /> Vibrate on actions</label>
+          <button id="debug-export-local" class="btn btn-ghost">Download local dump</button>
+        </div>
+
+        <div style="margin-top:12px;">
+          <details>
+            <summary style="cursor:pointer;color:var(--muted)">Advanced / Debug</summary>
+            <div style="margin-top:8px;">
+              <button id="unregister-sw" class="btn btn-ghost">Unregister Service Workers</button>
+              <button id="clear-storage" class="btn btn-ghost">Clear localStorage</button>
+              <div style="margin-top:8px;" class="muted">If you previously had a service worker caching the old app, unregistering it and clearing storage will force a fresh load.</div>
+            </div>
+          </details>
         </div>
       </section>
     </main>
@@ -140,20 +172,32 @@
     </footer>
   </div>
 
-  <!-- Full app script: dynamic day + localStorage workout manager + export/import + optional service worker -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Full app script: dynamic day + localStorage workout manager + export/import + optional service worker + session timer -->
   <script>
     (function () {
       'use strict';
 
       /* ---------- Config / Storage ---------- */
-      const STORAGE_KEY = 'fieldiron.workouts.v2';
-      const SETTINGS_KEY = 'fieldiron.settings.v1';
+      const STORAGE_KEY = 'fieldiron.workouts.v3';
+      const SETTINGS_KEY = 'fieldiron.settings.v2';
       const DEFAULTS = [
         'Reverse Lunge — 4 sets × 8 ea',
         'Kettlebell Farmer Carry (double) — 4 sets × 50m',
         'DB Bulgarian Split — 3 sets × 8 ea',
         'Kneeling Hip Flexor Stretch — 2 sets × 30s ea'
       ];
+
+      /* ---------- Utilities ---------- */
+      function nowISO() { return new Date().toISOString(); }
+      function showToast(msg, ms = 2500) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.style.display = 'block';
+        clearTimeout(t._timeout);
+        t._timeout = setTimeout(() => { t.style.display = 'none'; }, ms);
+      }
 
       /* ---------- Day header logic ---------- */
       function getLocalWeekday(locale, short) {
@@ -185,14 +229,7 @@
         }
       }
 
-      // Run immediately on load or when DOM ready
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', updateCurrentDay);
-      } else {
-        updateCurrentDay();
-      }
-
-      // Schedule an update at the next local midnight, then every 24 hours
+      // Schedule midnight update
       (function scheduleMidnightUpdate() {
         const now = new Date();
         const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
@@ -210,10 +247,10 @@
       function loadSettings() {
         try {
           const raw = localStorage.getItem(SETTINGS_KEY);
-          if (!raw) return { showTimezone: true, useShortDay: false, enableSW: false };
-          return Object.assign({ showTimezone: true, useShortDay: false, enableSW: false }, JSON.parse(raw));
+          if (!raw) return { showTimezone: true, useShortDay: false, enableSW: false, vibrate: true };
+          return Object.assign({ showTimezone: true, useShortDay: false, enableSW: false, vibrate: true }, JSON.parse(raw));
         } catch (e) {
-          return { showTimezone: true, useShortDay: false, enableSW: false };
+          return { showTimezone: true, useShortDay: false, enableSW: false, vibrate: true };
         }
       }
 
@@ -317,6 +354,8 @@
         list.unshift(text.trim());
         saveWorkouts(list);
         renderWorkouts(document.getElementById('filter').value);
+        vibrateIfEnabled(20);
+        showToast('Workout added');
       }
 
       function removeItem(index) {
@@ -325,6 +364,7 @@
         list.splice(index, 1);
         saveWorkouts(list);
         renderWorkouts(document.getElementById('filter').value);
+        showToast('Workout removed');
       }
 
       function moveItem(index, delta) {
@@ -340,13 +380,15 @@
       function clearAll() {
         if (!confirm('Clear all workouts? This cannot be undone.')) return;
         saveWorkouts([]);
-        renderWorkouts();
+        renderWorkouts(document.getElementById('filter').value);
+        showToast('All workouts cleared');
       }
 
       function resetDefaults() {
         if (!confirm('Reset to default workouts?')) return;
         saveWorkouts(DEFAULTS.slice());
-        renderWorkouts();
+        renderWorkouts(document.getElementById('filter').value);
+        showToast('Defaults restored');
       }
 
       /* ---------- Export / Import ---------- */
@@ -361,6 +403,7 @@
         a.click();
         a.remove();
         URL.revokeObjectURL(url);
+        showToast('Export started');
       }
 
       function importJSONFile(file) {
@@ -372,7 +415,7 @@
             if (Array.isArray(parsed.workouts)) {
               saveWorkouts(parsed.workouts);
               renderWorkouts();
-              alert('Imported workouts.');
+              showToast('Imported workouts');
             } else {
               alert('Invalid file format.');
             }
@@ -388,8 +431,10 @@
         if (!('serviceWorker' in navigator)) return;
         navigator.serviceWorker.register('/sw.js').then(reg => {
           console.log('SW registered', reg);
+          showToast('Service worker registered');
         }).catch(err => {
           console.warn('SW registration failed', err);
+          showToast('Service worker failed');
         });
       }
 
@@ -397,7 +442,66 @@
         if (!('serviceWorker' in navigator)) return;
         navigator.serviceWorker.getRegistrations().then(regs => {
           regs.forEach(r => r.unregister());
+          showToast('Service workers unregistered');
         });
+      }
+
+      /* ---------- Session timer (simple) ---------- */
+      let sessionTimer = null;
+      let sessionStart = null;
+      let sessionElapsed = 0; // ms
+
+      function startSession() {
+        if (sessionTimer) return;
+        sessionStart = Date.now() - sessionElapsed;
+        sessionTimer = setInterval(() => {
+          sessionElapsed = Date.now() - sessionStart;
+          updateSessionUI();
+        }, 250);
+        showToast('Session started');
+        vibrateIfEnabled(30);
+      }
+
+      function pauseSession() {
+        if (!sessionTimer) return;
+        clearInterval(sessionTimer);
+        sessionTimer = null;
+        showToast('Session paused');
+      }
+
+      function stopSession() {
+        if (sessionTimer) {
+          clearInterval(sessionTimer);
+          sessionTimer = null;
+        }
+        sessionElapsed = 0;
+        sessionStart = null;
+        updateSessionUI();
+        showToast('Session stopped');
+      }
+
+      function updateSessionUI() {
+        const btn = document.getElementById('start-session');
+        const pause = document.getElementById('pause-session');
+        const stop = document.getElementById('stop-session');
+        const elapsed = msToTime(sessionElapsed);
+        btn.textContent = sessionTimer ? `Running • ${elapsed}` : 'Start Session';
+        pause.textContent = sessionTimer ? 'Pause' : 'Resume';
+      }
+
+      function msToTime(ms) {
+        const s = Math.floor(ms / 1000) % 60;
+        const m = Math.floor(ms / (60 * 1000)) % 60;
+        const h = Math.floor(ms / (60 * 60 * 1000));
+        return (h ? (h + ':') : '') + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+      }
+
+      /* ---------- Vibration helper ---------- */
+      function vibrateIfEnabled(duration) {
+        try {
+          const s = loadSettings();
+          if (s.vibrate && navigator.vibrate) navigator.vibrate(duration);
+        } catch (e) { /* ignore */ }
       }
 
       /* ---------- Wire up UI ---------- */
@@ -407,10 +511,12 @@
         document.getElementById('show-timezone').checked = !!settings.showTimezone;
         document.getElementById('use-short-day').checked = !!settings.useShortDay;
         document.getElementById('enable-sw').checked = !!settings.enableSW;
+        document.getElementById('vibrate').checked = !!settings.vibrate;
 
         renderWorkouts();
         updateLastSaved();
         updateCurrentDay();
+        updateSessionUI();
 
         const input = document.getElementById('new-workout');
         const addBtn = document.getElementById('add-workout');
@@ -467,9 +573,57 @@
           saveSettings(s);
           if (s.enableSW) registerServiceWorker(); else unregisterServiceWorker();
         });
+        document.getElementById('vibrate').addEventListener('change', function (e) {
+          const s = loadSettings();
+          s.vibrate = !!e.target.checked;
+          saveSettings(s);
+        });
+
+        // session controls
+        document.getElementById('start-session').addEventListener('click', function () {
+          if (!sessionTimer) startSession(); else showToast('Session already running');
+        });
+        document.getElementById('pause-session').addEventListener('click', function () {
+          if (sessionTimer) pauseSession(); else startSession();
+        });
+        document.getElementById('stop-session').addEventListener('click', function () {
+          stopSession();
+        });
+
+        // debug tools
+        document.getElementById('unregister-sw').addEventListener('click', unregisterServiceWorker);
+        document.getElementById('clear-storage').addEventListener('click', function () {
+          if (!confirm('Clear localStorage? This will remove workouts and settings.')) return;
+          localStorage.removeItem(STORAGE_KEY);
+          localStorage.removeItem(SETTINGS_KEY);
+          renderWorkouts();
+          updateLastSaved();
+          showToast('Local storage cleared');
+        });
+
+        document.getElementById('debug-export-local').addEventListener('click', function () {
+          const dump = {
+            workouts: loadWorkouts(),
+            settings: loadSettings(),
+            exportedAt: new Date().toISOString()
+          };
+          const blob = new Blob([JSON.stringify(dump, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'fieldiron-local-dump.json';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+          showToast('Local dump downloaded');
+        });
 
         // focus input
         setTimeout(() => input.focus(), 300);
+
+        // register SW if enabled
+        if (loadSettings().enableSW) registerServiceWorker();
       });
 
       // refresh day label when tab becomes visible
@@ -478,7 +632,7 @@
       });
 
       // expose a small debug API on window for recovery
-      try { window.__FieldIron = { loadWorkouts, saveWorkouts, loadSettings, saveSettings }; } catch (e) { /* ignore */ }
+      try { window.__FieldIron = { loadWorkouts, saveWorkouts, loadSettings, saveSettings, DEFAULTS }; } catch (e) { /* ignore */ }
 
     })();
   </script>
