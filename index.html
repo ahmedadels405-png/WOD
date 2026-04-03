@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Field+Iron</title>
 
-  <!-- Icons and PWA manifest -->
+  <!-- PWA / Icons -->
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -16,20 +16,20 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <!--
-    Full single-file app: Field+Iron
-    - Day header (local weekday, updates at midnight)
-    - LocalStorage-backed workouts list (add, remove, reorder)
-    - Export / Import JSON
-    - Session timer (start/pause/stop)
-    - Service worker registration hook (optional)
-    - Recovery helper that saves previously deployed HTML to localStorage
-    - Offline caching friendly (register sw.js if provided)
-    - Debug tools: unregister SW, clear storage, download local dump
-    - Accessibility attributes and small-screen responsive styles
+    Field+Iron — single-file app
+    Features:
+      - Day header with timezone and midnight update
+      - Workouts list: add, edit, delete, reorder (drag + buttons), filter
+      - LocalStorage persistence with versioned keys and migration helper
+      - Export / Import JSON (validated)
+      - Session timer and session log (downloadable)
+      - Service worker registration/unregister hooks
+      - Recovery helper that saves last deployed HTML to localStorage
+      - Debug tools: clear storage, download local dump, unregister SW
+      - Accessibility and responsive layout
   -->
 
   <style>
-    /* ---------- Visual styles ---------- */
     :root{
       --bg:#071018;
       --card:#0b1a24;
@@ -40,6 +40,8 @@
       --radius:12px;
       --max-width:1100px;
       --shadow: 0 8px 30px rgba(0,0,0,0.6);
+      --success: #2ecc71;
+      --danger: #ff4d4f;
     }
     html,body{height:100%;margin:0;}
     body{
@@ -52,8 +54,6 @@
       box-sizing:border-box;
       -webkit-touch-callout:none;
       -webkit-user-select:none;
-      -webkit-tap-highlight-color: transparent;
-      -webkit-font-variant-ligatures: contextual;
     }
     .wrap{max-width:var(--max-width);margin:0 auto;display:flex;flex-direction:column;gap:18px;min-height:100vh;}
     header{margin-top:6px;}
@@ -64,11 +64,11 @@
       margin:0;
       font-size:30px;
       font-weight:800;
-      letter-spacing: -0.02em;
+      letter-spacing:-0.02em;
     }
     .subtitle{margin:0;color:var(--muted);font-size:14px;}
     main{flex:1; display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap;}
-    .col-2 { display:flex; flex-direction:column; gap:18px; flex:1 1 420px; min-width:320px; }
+    .col-2 { display:flex; flex-direction:column; gap:18px; flex:1 1 620px; min-width:320px; }
     .col-1 { flex: 0 0 320px; min-width:280px; }
     .card{
       background:linear-gradient(180deg, rgba(11,26,36,0.95), rgba(11,26,36,0.9));
@@ -106,6 +106,8 @@
     .drag-handle:active { cursor:grabbing; }
     .badge { background: rgba(255,255,255,0.03); padding:6px 8px; border-radius:8px; color:var(--muted); font-size:12px; }
     .empty { color:var(--muted); padding:12px 0; }
+    .editable { background: rgba(255,255,255,0.02); padding:6px 8px; border-radius:8px; }
+    .confirm { color:var(--danger); font-weight:700; }
     @media (max-width:980px){
       main{flex-direction:column;}
       .col-1{order:2;}
@@ -227,7 +229,6 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <!-- Full app script -->
   <script>
     (function () {
       'use strict';
@@ -441,13 +442,27 @@
           row.setAttribute('data-index', idx);
 
           const left = document.createElement('div');
-          left.className = 'small';
+          left.className = 'small editable';
+          left.tabIndex = 0;
+          left.setAttribute('role', 'textbox');
+          left.setAttribute('aria-label', 'Workout text');
           left.textContent = text;
+          // inline edit on double click or Enter
+          left.addEventListener('dblclick', () => startInlineEdit(left, idx));
+          left.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); startInlineEdit(left, idx); }
+          });
 
           const right = document.createElement('div');
           right.style.display = 'flex';
           right.style.gap = '8px';
           right.style.alignItems = 'center';
+
+          const drag = document.createElement('span');
+          drag.className = 'drag-handle';
+          drag.title = 'Drag to reorder';
+          drag.textContent = '☰';
+          drag.setAttribute('aria-hidden', 'true');
 
           const up = document.createElement('button');
           up.className = 'btn btn-ghost';
@@ -470,6 +485,7 @@
           del.textContent = '✕';
           del.onclick = () => removeItem(idx);
 
+          right.appendChild(drag);
           right.appendChild(up);
           right.appendChild(down);
           right.appendChild(del);
@@ -477,6 +493,54 @@
           row.appendChild(left);
           row.appendChild(right);
           container.appendChild(row);
+
+          // make draggable
+          row.draggable = true;
+          row.addEventListener('dragstart', (ev) => {
+            ev.dataTransfer.setData('text/plain', String(idx));
+            ev.dataTransfer.effectAllowed = 'move';
+            row.classList.add('dragging');
+          });
+          row.addEventListener('dragend', () => row.classList.remove('dragging'));
+          row.addEventListener('dragover', (ev) => ev.preventDefault());
+          row.addEventListener('drop', (ev) => {
+            ev.preventDefault();
+            const from = Number(ev.dataTransfer.getData('text/plain'));
+            const to = idx;
+            if (!Number.isFinite(from)) return;
+            reorder(from, to);
+          });
+        });
+      }
+
+      /* ---------- Inline edit ---------- */
+      function startInlineEdit(el, idx) {
+        const old = el.textContent;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = old;
+        input.style.width = '100%';
+        input.className = 'editable';
+        el.replaceWith(input);
+        input.focus();
+        input.select();
+        function commit() {
+          const v = input.value.trim();
+          if (v) {
+            const list = loadWorkouts();
+            list[idx] = v;
+            saveWorkouts(list);
+            renderWorkouts(document.getElementById('filter').value);
+            showToast('Workout updated');
+          } else {
+            // if empty, restore old
+            renderWorkouts(document.getElementById('filter').value);
+          }
+        }
+        input.addEventListener('blur', commit);
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') { commit(); }
+          if (e.key === 'Escape') { renderWorkouts(document.getElementById('filter').value); }
         });
       }
 
@@ -505,6 +569,15 @@
         const to = index + delta;
         if (to < 0 || to >= list.length) return;
         const [item] = list.splice(index, 1);
+        list.splice(to, 0, item);
+        saveWorkouts(list);
+        renderWorkouts(document.getElementById('filter').value);
+      }
+
+      function reorder(from, to) {
+        const list = loadWorkouts();
+        if (from === to) return;
+        const [item] = list.splice(from, 1);
         list.splice(to, 0, item);
         saveWorkouts(list);
         renderWorkouts(document.getElementById('filter').value);
