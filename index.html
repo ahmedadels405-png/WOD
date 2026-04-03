@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Field+Iron</title>
 
-  <!-- Icons and PWA manifest (place files in site root or adjust paths) -->
+  <!-- Icons and PWA manifest -->
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -14,6 +14,19 @@
   <meta name="theme-color" content="#071018">
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <!--
+    Full single-file app: Field+Iron
+    - Day header (local weekday, updates at midnight)
+    - LocalStorage-backed workouts list (add, remove, reorder)
+    - Export / Import JSON
+    - Session timer (start/pause/stop)
+    - Service worker registration hook (optional)
+    - Recovery helper that saves previously deployed HTML to localStorage
+    - Offline caching friendly (register sw.js if provided)
+    - Debug tools: unregister SW, clear storage, download local dump
+    - Accessibility attributes and small-screen responsive styles
+  -->
 
   <style>
     /* ---------- Visual styles ---------- */
@@ -25,7 +38,8 @@
       --accent:#ff6a00;
       --glass: rgba(255,255,255,0.03);
       --radius:12px;
-      --max-width:980px;
+      --max-width:1100px;
+      --shadow: 0 8px 30px rgba(0,0,0,0.6);
     }
     html,body{height:100%;margin:0;}
     body{
@@ -34,11 +48,12 @@
       color:var(--text);
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
-      padding:20px;
+      padding:22px;
       box-sizing:border-box;
       -webkit-touch-callout:none;
       -webkit-user-select:none;
       -webkit-tap-highlight-color: transparent;
+      -webkit-font-variant-ligatures: contextual;
     }
     .wrap{max-width:var(--max-width);margin:0 auto;display:flex;flex-direction:column;gap:18px;min-height:100vh;}
     header{margin-top:6px;}
@@ -47,16 +62,19 @@
       align-items:baseline;
       gap:12px;
       margin:0;
-      font-size:28px;
-      font-weight:700;
+      font-size:30px;
+      font-weight:800;
+      letter-spacing: -0.02em;
     }
     .subtitle{margin:0;color:var(--muted);font-size:14px;}
-    main{flex:1;}
+    main{flex:1; display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap;}
+    .col-2 { display:flex; flex-direction:column; gap:18px; flex:1 1 420px; min-width:320px; }
+    .col-1 { flex: 0 0 320px; min-width:280px; }
     .card{
-      background:linear-gradient(180deg, rgba(11,26,36,0.9), rgba(11,26,36,0.85));
+      background:linear-gradient(180deg, rgba(11,26,36,0.95), rgba(11,26,36,0.9));
       border-radius:var(--radius);
       padding:16px;
-      box-shadow:0 8px 30px rgba(0,0,0,0.6);
+      box-shadow:var(--shadow);
       border: 1px solid rgba(255,255,255,0.02);
     }
     .section-title{margin:0 0 8px 0;color:#cfe6f6;font-size:16px;}
@@ -65,7 +83,7 @@
     .workout-item:last-child { border-bottom: none; }
     .small { font-size:13px; color:#cfe6f6; opacity:0.95; }
     .input-row { display:flex; gap:8px; margin-top:12px; }
-    input[type="text"], textarea{ flex:1; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:var(--text); outline:none; }
+    input[type="text"], textarea, select{ flex:1; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:var(--text); outline:none; }
     .btn{border:none;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;letter-spacing:0.2px;}
     .btn-primary{background:linear-gradient(90deg,#ff7a2b,#ff5a00);color:#fff;box-shadow:0 6px 18px rgba(255,106,0,0.12);}
     .btn-ghost{background:transparent;color:var(--muted);border:1px solid rgba(159,179,200,0.08);}
@@ -80,11 +98,18 @@
     .hr { height:1px; background:var(--glass); margin:12px 0; border-radius:2px; }
     .timer { font-weight:700; font-size:18px; color:#fff; }
     .toast { position:fixed; left:50%; transform:translateX(-50%); bottom:28px; background:rgba(0,0,0,0.6); color:#fff; padding:10px 14px; border-radius:10px; box-shadow:0 6px 18px rgba(0,0,0,0.6); display:none; z-index:9999; }
-    footer{color:#6f8b9a;font-size:13px;padding-bottom:18px;}
+    .kbd { background: rgba(255,255,255,0.03); padding:4px 8px; border-radius:6px; font-weight:700; font-size:12px; color:var(--muted); }
+    .note { font-size:13px; color:var(--muted); }
+    .footer-row { display:flex; justify-content:space-between; align-items:center; gap:12px; }
     .sr-only { position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
-    @media (max-width:720px){
-      .day-header{font-size:22px;}
-      body{padding:14px;}
+    .drag-handle { cursor:grab; padding:6px; border-radius:6px; color:var(--muted); }
+    .drag-handle:active { cursor:grabbing; }
+    .badge { background: rgba(255,255,255,0.03); padding:6px 8px; border-radius:8px; color:var(--muted); font-size:12px; }
+    .empty { color:var(--muted); padding:12px 0; }
+    @media (max-width:980px){
+      main{flex-direction:column;}
+      .col-1{order:2;}
+      .col-2{order:1;}
     }
   </style>
 </head>
@@ -99,81 +124,110 @@
     </header>
 
     <main>
-      <!-- Today card -->
-      <section class="card" aria-labelledby="today-heading">
-        <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;">
-          <div style="display:flex;gap:12px;align-items:center;">
-            <h2 id="today-heading" class="section-title" style="margin:0;">Today</h2>
-            <div class="meta" id="last-saved">—</div>
-          </div>
+      <div class="col-2">
+        <!-- Today / Workouts -->
+        <section class="card" aria-labelledby="today-heading">
+          <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;">
+            <div style="display:flex;gap:12px;align-items:center;">
+              <h2 id="today-heading" class="section-title" style="margin:0;">Today</h2>
+              <div class="meta" id="last-saved">—</div>
+            </div>
 
-          <div class="controls">
-            <button id="start-session" class="btn btn-primary">Start Session</button>
-            <button id="pause-session" class="btn btn-ghost">Pause</button>
-            <button id="stop-session" class="btn btn-ghost">Stop</button>
-          </div>
-        </div>
-
-        <div id="workouts-list" aria-live="polite" style="margin-top:12px;">
-          <!-- workout items injected here -->
-        </div>
-
-        <div class="input-row" role="form" aria-label="Add workout">
-          <input id="new-workout" type="text" placeholder="Add workout (e.g., Reverse Lunge — 4×8)" aria-label="New workout" />
-          <button id="add-workout" class="btn btn-primary">Add</button>
-        </div>
-
-        <div class="hr"></div>
-
-        <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;">
-          <div class="controls">
-            <button id="clear-all" class="btn btn-ghost">Clear All</button>
-            <button id="reset-defaults" class="btn btn-ghost">Reset Defaults</button>
-            <div class="import-export">
-              <button id="export-json" class="btn btn-ghost">Export</button>
-              <label for="import-file" class="btn btn-ghost" style="cursor:pointer;">Import</label>
-              <input id="import-file" type="file" accept="application/json" style="display:none" />
+            <div class="controls">
+              <button id="start-session" class="btn btn-primary">Start Session</button>
+              <button id="pause-session" class="btn btn-ghost">Pause</button>
+              <button id="stop-session" class="btn btn-ghost">Stop</button>
             </div>
           </div>
 
-          <div style="display:flex;gap:8px;align-items:center;">
-            <input id="filter" type="text" placeholder="Filter workouts" style="padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)" />
-            <span class="muted">Saved locally</span>
+          <div id="workouts-list" aria-live="polite" style="margin-top:12px;">
+            <!-- workout items injected here -->
           </div>
-        </div>
-      </section>
 
-      <!-- Settings / Tools -->
-      <section class="card" style="margin-top:12px;">
-        <h3 class="section-title" style="margin-bottom:8px;">Settings & Tools</h3>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
-          <label class="pill"><input id="show-timezone" type="checkbox" style="margin-right:8px" /> Show timezone</label>
-          <label class="pill"><input id="use-short-day" type="checkbox" style="margin-right:8px" /> Use short weekday</label>
-          <label class="pill"><input id="enable-sw" type="checkbox" style="margin-right:8px" /> Enable offline (service worker)</label>
-          <label class="pill"><input id="vibrate" type="checkbox" style="margin-right:8px" /> Vibrate on actions</label>
-          <button id="debug-export-local" class="btn btn-ghost">Download local dump</button>
-        </div>
+          <div class="input-row" role="form" aria-label="Add workout">
+            <input id="new-workout" type="text" placeholder="Add workout (e.g., Reverse Lunge — 4×8)" aria-label="New workout" />
+            <button id="add-workout" class="btn btn-primary">Add</button>
+          </div>
 
-        <div style="margin-top:12px;">
-          <details>
-            <summary style="cursor:pointer;color:var(--muted)">Advanced / Debug</summary>
-            <div style="margin-top:8px;">
-              <button id="unregister-sw" class="btn btn-ghost">Unregister Service Workers</button>
-              <button id="clear-storage" class="btn btn-ghost">Clear localStorage</button>
-              <div style="margin-top:8px;" class="muted">If you previously had a service worker caching the old app, unregistering it and clearing storage will force a fresh load.</div>
+          <div class="hr"></div>
+
+          <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;">
+            <div class="controls">
+              <button id="clear-all" class="btn btn-ghost">Clear All</button>
+              <button id="reset-defaults" class="btn btn-ghost">Reset Defaults</button>
+              <div class="import-export">
+                <button id="export-json" class="btn btn-ghost">Export</button>
+                <label for="import-file" class="btn btn-ghost" style="cursor:pointer;">Import</label>
+                <input id="import-file" type="file" accept="application/json" style="display:none" />
+              </div>
             </div>
-          </details>
-        </div>
-      </section>
+
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input id="filter" type="text" placeholder="Filter workouts" style="padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)" />
+              <span class="muted">Saved locally</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Session log / history -->
+        <section class="card" id="session-log-card" style="margin-top:12px;">
+          <h3 class="section-title">Session Log</h3>
+          <div id="session-log" class="small empty">No sessions yet.</div>
+          <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+            <button id="download-log" class="btn btn-ghost">Download Log</button>
+            <button id="clear-log" class="btn btn-ghost">Clear Log</button>
+            <div style="flex:1"></div>
+            <span class="muted">Local only</span>
+          </div>
+        </section>
+      </div>
+
+      <aside class="col-1">
+        <!-- Settings & Tools -->
+        <section class="card">
+          <h3 class="section-title">Settings & Tools</h3>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+            <label class="pill"><input id="show-timezone" type="checkbox" style="margin-right:8px" /> Show timezone</label>
+            <label class="pill"><input id="use-short-day" type="checkbox" style="margin-right:8px" /> Use short weekday</label>
+            <label class="pill"><input id="enable-sw" type="checkbox" style="margin-right:8px" /> Enable offline (service worker)</label>
+            <label class="pill"><input id="vibrate" type="checkbox" style="margin-right:8px" /> Vibrate on actions</label>
+          </div>
+
+          <div style="margin-top:12px;">
+            <details>
+              <summary style="cursor:pointer;color:var(--muted)">Advanced / Debug</summary>
+              <div style="margin-top:8px;">
+                <button id="unregister-sw" class="btn btn-ghost">Unregister Service Workers</button>
+                <button id="clear-storage" class="btn btn-ghost">Clear localStorage</button>
+                <button id="download-recovery" class="btn btn-ghost">Download last deployed HTML</button>
+                <div style="margin-top:8px;" class="muted">If a service worker cached the old app, unregistering it and clearing storage will force a fresh load.</div>
+              </div>
+            </details>
+          </div>
+        </section>
+
+        <!-- Shortcuts / Tips -->
+        <section class="card" style="margin-top:12px;">
+          <h3 class="section-title">Quick Tips</h3>
+          <ul style="margin:0 0 0 18px; padding:0; color:#cfe6f6;">
+            <li>Tap <span class="kbd">Add</span> or press <span class="kbd">Enter</span> to add a workout.</li>
+            <li>Use <span class="kbd">Export</span> to back up your list.</li>
+            <li>Enable offline to register a service worker (requires <code>/sw.js</code> on your host).</li>
+            <li>Use the debug tools to recover previously deployed HTML if needed.</li>
+          </ul>
+        </section>
+      </aside>
     </main>
 
-    <footer>
+    <footer class="footer-row">
       <small>Personal app — Field+Iron</small>
+      <div class="muted">v1.0 • Local only</div>
     </footer>
   </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+  <!-- Full app script -->
   <script>
     (function () {
       'use strict';
@@ -199,8 +253,10 @@
       } catch (e) { /* ignore */ }
 
       /* ---------- Config / Storage ---------- */
-      const STORAGE_KEY = 'fieldiron.workouts.v3';
-      const SETTINGS_KEY = 'fieldiron.settings.v2';
+      const STORAGE_KEY = 'fieldiron.workouts.v4';
+      const SETTINGS_KEY = 'fieldiron.settings.v3';
+      const LOG_KEY = 'fieldiron.sessions.v1';
+      const RECOVERY_KEY = 'fieldiron.recovery.lastDeployedHTML';
       const DEFAULTS = [
         'Reverse Lunge — 4 sets × 8 ea',
         'Kettlebell Farmer Carry (double) — 4 sets × 50m',
@@ -216,6 +272,17 @@
         t.style.display = 'block';
         clearTimeout(t._timeout);
         t._timeout = setTimeout(() => { t.style.display = 'none'; }, ms);
+      }
+      function downloadFile(filename, content, type='application/json') {
+        const blob = new Blob([content], { type });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
       }
 
       /* ---------- Day header logic ---------- */
@@ -307,15 +374,63 @@
         el.textContent = `Saved ${t}`;
       }
 
-      /* ---------- Render ---------- */
+      /* ---------- Session log ---------- */
+      function loadSessionLog() {
+        try {
+          const raw = localStorage.getItem(LOG_KEY);
+          if (!raw) return [];
+          const parsed = JSON.parse(raw);
+          if (!Array.isArray(parsed)) return [];
+          return parsed;
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function saveSessionLog(log) {
+        try {
+          localStorage.setItem(LOG_KEY, JSON.stringify(log));
+        } catch (e) { /* ignore */ }
+      }
+
+      function appendSessionLog(entry) {
+        const log = loadSessionLog();
+        log.unshift(entry);
+        saveSessionLog(log);
+        renderSessionLog();
+      }
+
+      function renderSessionLog() {
+        const el = document.getElementById('session-log');
+        const log = loadSessionLog();
+        if (!el) return;
+        if (!log.length) {
+          el.className = 'small empty';
+          el.textContent = 'No sessions yet.';
+          return;
+        }
+        el.className = 'small';
+        el.innerHTML = '';
+        log.forEach((entry) => {
+          const d = document.createElement('div');
+          d.style.padding = '8px 0';
+          d.style.borderBottom = '1px solid rgba(255,255,255,0.02)';
+          d.innerHTML = `<strong style="display:block;color:#fff">${entry.title || 'Session'}</strong>
+                         <span class="muted">${new Date(entry.startedAt).toLocaleString()} — ${entry.duration}</span>
+                         <div class="muted" style="margin-top:6px">${entry.notes || ''}</div>`;
+          el.appendChild(d);
+        });
+      }
+
+      /* ---------- Render workouts ---------- */
       function renderWorkouts(filter) {
         const container = document.getElementById('workouts-list');
         container.innerHTML = '';
         const list = loadWorkouts();
         const filtered = (filter && filter.trim()) ? list.filter(i => i.toLowerCase().includes(filter.trim().toLowerCase())) : list;
         if (filtered.length === 0) {
-          const p = document.createElement('p');
-          p.className = 'muted';
+          const p = document.createElement('div');
+          p.className = 'empty';
           p.textContent = 'No workouts yet. Add one below.';
           container.appendChild(p);
           return;
@@ -412,15 +527,8 @@
       /* ---------- Export / Import ---------- */
       function exportJSON() {
         const data = loadWorkouts();
-        const blob = new Blob([JSON.stringify({ workouts: data, exportedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'fieldiron-workouts.json';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
+        const blob = JSON.stringify({ workouts: data, exportedAt: new Date().toISOString() }, null, 2);
+        downloadFile('fieldiron-workouts.json', blob, 'application/json');
         showToast('Export started');
       }
 
@@ -432,6 +540,11 @@
             const parsed = JSON.parse(e.target.result);
             if (Array.isArray(parsed.workouts)) {
               saveWorkouts(parsed.workouts);
+              renderWorkouts();
+              showToast('Imported workouts');
+            } else if (Array.isArray(parsed)) {
+              // support older format: raw array
+              saveWorkouts(parsed);
               renderWorkouts();
               showToast('Imported workouts');
             } else {
@@ -460,6 +573,10 @@
         if (!('serviceWorker' in navigator)) return;
         navigator.serviceWorker.getRegistrations().then(regs => {
           regs.forEach(r => r.unregister());
+          // clear caches
+          if ('caches' in window) {
+            caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+          }
           showToast('Service workers unregistered');
         });
       }
@@ -492,10 +609,18 @@
           clearInterval(sessionTimer);
           sessionTimer = null;
         }
+        const duration = msToTime(sessionElapsed);
+        // append to session log
+        appendSessionLog({
+          title: `Session ${new Date().toLocaleString()}`,
+          startedAt: sessionStart ? new Date(sessionStart).toISOString() : new Date().toISOString(),
+          duration,
+          notes: ''
+        });
         sessionElapsed = 0;
         sessionStart = null;
         updateSessionUI();
-        showToast('Session stopped');
+        showToast('Session stopped and logged');
       }
 
       function updateSessionUI() {
@@ -526,12 +651,18 @@
       document.addEventListener('DOMContentLoaded', function () {
         // initial render
         const settings = loadSettings();
-        document.getElementById('show-timezone').checked = !!settings.showTimezone;
-        document.getElementById('use-short-day').checked = !!settings.useShortDay;
-        document.getElementById('enable-sw').checked = !!settings.enableSW;
-        document.getElementById('vibrate').checked = !!settings.vibrate;
+        const showTZ = document.getElementById('show-timezone');
+        const useShort = document.getElementById('use-short-day');
+        const enableSW = document.getElementById('enable-sw');
+        const vibrate = document.getElementById('vibrate');
+
+        if (showTZ) showTZ.checked = !!settings.showTimezone;
+        if (useShort) useShort.checked = !!settings.useShortDay;
+        if (enableSW) enableSW.checked = !!settings.enableSW;
+        if (vibrate) vibrate.checked = !!settings.vibrate;
 
         renderWorkouts();
+        renderSessionLog();
         updateLastSaved();
         updateCurrentDay();
         updateSessionUI();
@@ -573,25 +704,25 @@
         });
 
         // settings toggles
-        document.getElementById('show-timezone').addEventListener('change', function (e) {
+        if (showTZ) showTZ.addEventListener('change', function (e) {
           const s = loadSettings();
           s.showTimezone = !!e.target.checked;
           saveSettings(s);
           updateCurrentDay();
         });
-        document.getElementById('use-short-day').addEventListener('change', function (e) {
+        if (useShort) useShort.addEventListener('change', function (e) {
           const s = loadSettings();
           s.useShortDay = !!e.target.checked;
           saveSettings(s);
           updateCurrentDay();
         });
-        document.getElementById('enable-sw').addEventListener('change', function (e) {
+        if (enableSW) enableSW.addEventListener('change', function (e) {
           const s = loadSettings();
           s.enableSW = !!e.target.checked;
           saveSettings(s);
           if (s.enableSW) registerServiceWorker(); else unregisterServiceWorker();
         });
-        document.getElementById('vibrate').addEventListener('change', function (e) {
+        if (vibrate) vibrate.addEventListener('change', function (e) {
           const s = loadSettings();
           s.vibrate = !!e.target.checked;
           saveSettings(s);
@@ -614,27 +745,35 @@
           if (!confirm('Clear localStorage? This will remove workouts and settings.')) return;
           localStorage.removeItem(STORAGE_KEY);
           localStorage.removeItem(SETTINGS_KEY);
+          localStorage.removeItem(LOG_KEY);
           renderWorkouts();
+          renderSessionLog();
           updateLastSaved();
           showToast('Local storage cleared');
         });
 
-        document.getElementById('debug-export-local').addEventListener('click', function () {
-          const dump = {
-            workouts: loadWorkouts(),
-            settings: loadSettings(),
-            exportedAt: new Date().toISOString()
-          };
-          const blob = new Blob([JSON.stringify(dump, null, 2)], { type: 'application/json' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'fieldiron-local-dump.json';
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          URL.revokeObjectURL(url);
-          showToast('Local dump downloaded');
+        document.getElementById('download-recovery').addEventListener('click', function () {
+          try {
+            const html = localStorage.getItem(RECOVERY_KEY);
+            if (!html) { alert('No recovery HTML saved.'); return; }
+            downloadFile('recovered-deployed.html', html, 'text/html');
+            showToast('Downloaded last deployed HTML');
+          } catch (e) {
+            alert('Failed to download recovery HTML.');
+          }
+        });
+
+        document.getElementById('download-log').addEventListener('click', function () {
+          const dump = { sessions: loadSessionLog(), exportedAt: new Date().toISOString() };
+          downloadFile('fieldiron-session-log.json', JSON.stringify(dump, null, 2), 'application/json');
+          showToast('Session log downloaded');
+        });
+
+        document.getElementById('clear-log').addEventListener('click', function () {
+          if (!confirm('Clear session log?')) return;
+          localStorage.removeItem(LOG_KEY);
+          renderSessionLog();
+          showToast('Session log cleared');
         });
 
         // focus input
@@ -650,7 +789,7 @@
       });
 
       // expose a small debug API on window for recovery
-      try { window.__FieldIron = { loadWorkouts, saveWorkouts, loadSettings, saveSettings, DEFAULTS }; } catch (e) { /* ignore */ }
+      try { window.__FieldIron = { loadWorkouts, saveWorkouts, loadSettings, saveSettings, DEFAULTS, loadSessionLog, appendSessionLog }; } catch (e) { /* ignore */ }
 
     })();
   </script>
