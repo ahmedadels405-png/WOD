@@ -17,6 +17,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <style>
+    /* ---------- Visual styles ---------- */
     :root{
       --bg:#071018;
       --card:#0b1a24;
@@ -24,6 +25,7 @@
       --text:#e6eef6;
       --accent:#ff6a00;
       --glass: rgba(255,255,255,0.03);
+      --radius:12px;
     }
     html,body{height:100%;margin:0;}
     body{
@@ -37,7 +39,7 @@
       -webkit-touch-callout:none;
       -webkit-user-select:none;
     }
-    .wrap{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:18px;min-height:100vh;}
+    .wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:18px;min-height:100vh;}
     header{margin-top:6px;}
     .day-header{
       display:flex;
@@ -51,7 +53,7 @@
     main{flex:1;}
     .card{
       background:var(--card);
-      border-radius:12px;
+      border-radius:var(--radius);
       padding:16px;
       box-shadow:0 6px 18px rgba(0,0,0,0.5);
     }
@@ -64,13 +66,17 @@
     .muted { color: var(--muted); font-size:13px; }
     .workout-item { display:flex; justify-content:space-between; gap:12px; align-items:center; padding:8px 0; border-bottom:1px solid var(--glass); }
     .workout-item:last-child { border-bottom: none; }
-    .small { font-size:13px; color:#cfe6f6; opacity:0.9; }
+    .small { font-size:13px; color:#cfe6f6; opacity:0.95; }
     .input-row { display:flex; gap:8px; margin-top:12px; }
-    input[type="text"]{ flex:1; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:var(--text); }
+    input[type="text"], textarea{ flex:1; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:var(--text); }
     .pill { background: rgba(255,255,255,0.02); padding:6px 10px; border-radius:999px; color:var(--muted); font-size:13px; }
     footer{color:#6f8b9a;font-size:13px;padding-bottom:18px;}
     .sr-only { position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
-    @media (max-width:420px){
+    .controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .meta { color:var(--muted); font-size:12px; }
+    .import-export { display:flex; gap:8px; align-items:center; }
+    .search { margin-left:auto; }
+    @media (max-width:720px){
       .day-header{font-size:22px;}
       body{padding:14px;}
     }
@@ -88,9 +94,12 @@
 
     <main>
       <section class="card" aria-labelledby="today-heading">
-        <h2 id="today-heading" class="section-title">Today</h2>
+        <div style="display:flex;gap:12px;align-items:center;">
+          <h2 id="today-heading" class="section-title" style="margin:0;">Today</h2>
+          <div class="meta" id="last-saved" style="margin-left:8px;">—</div>
+        </div>
 
-        <div id="workouts-list" aria-live="polite">
+        <div id="workouts-list" aria-live="polite" style="margin-top:12px;">
           <!-- workout items injected here -->
         </div>
 
@@ -100,9 +109,28 @@
         </div>
 
         <div class="actions" style="margin-top:12px;">
-          <button id="clear-all" class="btn btn-ghost">Clear All</button>
+          <div class="controls">
+            <button id="clear-all" class="btn btn-ghost">Clear All</button>
+            <button id="reset-defaults" class="btn btn-ghost">Reset Defaults</button>
+            <div class="import-export">
+              <button id="export-json" class="btn btn-ghost">Export</button>
+              <label for="import-file" class="btn btn-ghost" style="cursor:pointer;">Import</label>
+              <input id="import-file" type="file" accept="application/json" style="display:none" />
+            </div>
+          </div>
           <div style="flex:1"></div>
-          <span class="muted">Saved locally on this device</span>
+          <div class="search">
+            <input id="filter" type="text" placeholder="Filter workouts" style="padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)" />
+          </div>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:12px;">
+        <h3 class="section-title" style="margin-bottom:8px;">Settings</h3>
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+          <label class="pill"><input id="show-timezone" type="checkbox" style="margin-right:8px" /> Show timezone</label>
+          <label class="pill"><input id="use-short-day" type="checkbox" style="margin-right:8px" /> Use short weekday (Mon)</label>
+          <label class="pill"><input id="enable-sw" type="checkbox" style="margin-right:8px" /> Enable offline (service worker)</label>
         </div>
       </section>
     </main>
@@ -112,10 +140,20 @@
     </footer>
   </div>
 
-  <!-- Full app script: dynamic day + simple local storage workout list -->
+  <!-- Full app script: dynamic day + localStorage workout manager + export/import + optional service worker -->
   <script>
     (function () {
       'use strict';
+
+      /* ---------- Config / Storage ---------- */
+      const STORAGE_KEY = 'fieldiron.workouts.v2';
+      const SETTINGS_KEY = 'fieldiron.settings.v1';
+      const DEFAULTS = [
+        'Reverse Lunge — 4 sets × 8 ea',
+        'Kettlebell Farmer Carry (double) — 4 sets × 50m',
+        'DB Bulgarian Split — 3 sets × 8 ea',
+        'Kneeling Hip Flexor Stretch — 2 sets × 30s ea'
+      ];
 
       /* ---------- Day header logic ---------- */
       function getLocalWeekday(locale, short) {
@@ -130,22 +168,31 @@
       function updateCurrentDay() {
         const el = document.getElementById('current-day');
         if (!el) return;
-        el.textContent = getLocalWeekday();
+        const settings = loadSettings();
+        el.textContent = getLocalWeekday(undefined, settings.useShortDay);
         const tzLabel = document.getElementById('timezone-label');
-        try {
-          const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
-          tzLabel.textContent = tz ? tz.replace('_',' ') : '';
-        } catch (e) {
-          tzLabel.textContent = '';
+        if (settings.showTimezone) {
+          try {
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+            tzLabel.textContent = tz ? tz.replace('_',' ') : '';
+            tzLabel.style.display = tz ? 'inline-block' : 'none';
+          } catch (e) {
+            tzLabel.textContent = '';
+            tzLabel.style.display = 'none';
+          }
+        } else {
+          tzLabel.style.display = 'none';
         }
       }
 
+      // Run immediately on load or when DOM ready
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', updateCurrentDay);
       } else {
         updateCurrentDay();
       }
 
+      // Schedule an update at the next local midnight, then every 24 hours
       (function scheduleMidnightUpdate() {
         const now = new Date();
         const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
@@ -159,50 +206,66 @@
         }, msUntilMidnight);
       })();
 
-      /* ---------- Workout list logic (localStorage) ---------- */
-      const STORAGE_KEY = 'fieldiron.workouts.v1';
+      /* ---------- Settings ---------- */
+      function loadSettings() {
+        try {
+          const raw = localStorage.getItem(SETTINGS_KEY);
+          if (!raw) return { showTimezone: true, useShortDay: false, enableSW: false };
+          return Object.assign({ showTimezone: true, useShortDay: false, enableSW: false }, JSON.parse(raw));
+        } catch (e) {
+          return { showTimezone: true, useShortDay: false, enableSW: false };
+        }
+      }
 
+      function saveSettings(s) {
+        try {
+          localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+        } catch (e) { /* ignore */ }
+      }
+
+      /* ---------- Workouts storage ---------- */
       function loadWorkouts() {
         try {
           const raw = localStorage.getItem(STORAGE_KEY);
-          if (!raw) return defaultWorkouts();
+          if (!raw) return DEFAULTS.slice();
           const parsed = JSON.parse(raw);
-          if (!Array.isArray(parsed)) return defaultWorkouts();
+          if (!Array.isArray(parsed)) return DEFAULTS.slice();
           return parsed;
         } catch (e) {
-          return defaultWorkouts();
+          return DEFAULTS.slice();
         }
       }
 
       function saveWorkouts(list) {
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+          updateLastSaved();
         } catch (e) {
           console.warn('Failed to save workouts', e);
         }
       }
 
-      function defaultWorkouts() {
-        return [
-          'Reverse Lunge — 4 sets × 8 ea',
-          'Kettlebell Farmer Carry (double) — 4 sets × 50m',
-          'DB Bulgarian Split — 3 sets × 8 ea',
-          'Kneeling Hip Flexor Stretch — 2 sets × 30s ea'
-        ];
+      function updateLastSaved() {
+        const el = document.getElementById('last-saved');
+        if (!el) return;
+        const t = new Date().toLocaleString();
+        el.textContent = `Saved ${t}`;
       }
 
-      function renderWorkouts() {
+      /* ---------- Render ---------- */
+      function renderWorkouts(filter) {
         const container = document.getElementById('workouts-list');
         container.innerHTML = '';
         const list = loadWorkouts();
-        if (list.length === 0) {
+        const filtered = (filter && filter.trim()) ? list.filter(i => i.toLowerCase().includes(filter.trim().toLowerCase())) : list;
+        if (filtered.length === 0) {
           const p = document.createElement('p');
           p.className = 'muted';
           p.textContent = 'No workouts yet. Add one below.';
           container.appendChild(p);
           return;
         }
-        list.forEach((text, idx) => {
+        filtered.forEach((text, idx) => {
           const row = document.createElement('div');
           row.className = 'workout-item';
           row.setAttribute('data-index', idx);
@@ -247,12 +310,13 @@
         });
       }
 
+      /* ---------- CRUD ---------- */
       function addWorkout(text) {
         if (!text || !text.trim()) return;
         const list = loadWorkouts();
         list.unshift(text.trim());
         saveWorkouts(list);
-        renderWorkouts();
+        renderWorkouts(document.getElementById('filter').value);
       }
 
       function removeItem(index) {
@@ -260,7 +324,7 @@
         if (index < 0 || index >= list.length) return;
         list.splice(index, 1);
         saveWorkouts(list);
-        renderWorkouts();
+        renderWorkouts(document.getElementById('filter').value);
       }
 
       function moveItem(index, delta) {
@@ -270,7 +334,7 @@
         const [item] = list.splice(index, 1);
         list.splice(to, 0, item);
         saveWorkouts(list);
-        renderWorkouts();
+        renderWorkouts(document.getElementById('filter').value);
       }
 
       function clearAll() {
@@ -279,13 +343,82 @@
         renderWorkouts();
       }
 
+      function resetDefaults() {
+        if (!confirm('Reset to default workouts?')) return;
+        saveWorkouts(DEFAULTS.slice());
+        renderWorkouts();
+      }
+
+      /* ---------- Export / Import ---------- */
+      function exportJSON() {
+        const data = loadWorkouts();
+        const blob = new Blob([JSON.stringify({ workouts: data, exportedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'fieldiron-workouts.json';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      function importJSONFile(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          try {
+            const parsed = JSON.parse(e.target.result);
+            if (Array.isArray(parsed.workouts)) {
+              saveWorkouts(parsed.workouts);
+              renderWorkouts();
+              alert('Imported workouts.');
+            } else {
+              alert('Invalid file format.');
+            }
+          } catch (err) {
+            alert('Failed to parse file.');
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      /* ---------- Service Worker (optional) ---------- */
+      function registerServiceWorker() {
+        if (!('serviceWorker' in navigator)) return;
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+          console.log('SW registered', reg);
+        }).catch(err => {
+          console.warn('SW registration failed', err);
+        });
+      }
+
+      function unregisterServiceWorker() {
+        if (!('serviceWorker' in navigator)) return;
+        navigator.serviceWorker.getRegistrations().then(regs => {
+          regs.forEach(r => r.unregister());
+        });
+      }
+
       /* ---------- Wire up UI ---------- */
       document.addEventListener('DOMContentLoaded', function () {
+        // initial render
+        const settings = loadSettings();
+        document.getElementById('show-timezone').checked = !!settings.showTimezone;
+        document.getElementById('use-short-day').checked = !!settings.useShortDay;
+        document.getElementById('enable-sw').checked = !!settings.enableSW;
+
         renderWorkouts();
+        updateLastSaved();
+        updateCurrentDay();
 
         const input = document.getElementById('new-workout');
         const addBtn = document.getElementById('add-workout');
         const clearBtn = document.getElementById('clear-all');
+        const resetBtn = document.getElementById('reset-defaults');
+        const exportBtn = document.getElementById('export-json');
+        const importFile = document.getElementById('import-file');
+        const filter = document.getElementById('filter');
 
         addBtn.addEventListener('click', function () {
           addWorkout(input.value);
@@ -302,15 +435,50 @@
         });
 
         clearBtn.addEventListener('click', clearAll);
+        resetBtn.addEventListener('click', resetDefaults);
+        exportBtn.addEventListener('click', exportJSON);
 
-        // Accessibility: focus the input on first load
+        importFile.addEventListener('change', function (e) {
+          const f = e.target.files && e.target.files[0];
+          if (f) importJSONFile(f);
+          importFile.value = '';
+        });
+
+        filter.addEventListener('input', function () {
+          renderWorkouts(filter.value);
+        });
+
+        // settings toggles
+        document.getElementById('show-timezone').addEventListener('change', function (e) {
+          const s = loadSettings();
+          s.showTimezone = !!e.target.checked;
+          saveSettings(s);
+          updateCurrentDay();
+        });
+        document.getElementById('use-short-day').addEventListener('change', function (e) {
+          const s = loadSettings();
+          s.useShortDay = !!e.target.checked;
+          saveSettings(s);
+          updateCurrentDay();
+        });
+        document.getElementById('enable-sw').addEventListener('change', function (e) {
+          const s = loadSettings();
+          s.enableSW = !!e.target.checked;
+          saveSettings(s);
+          if (s.enableSW) registerServiceWorker(); else unregisterServiceWorker();
+        });
+
+        // focus input
         setTimeout(() => input.focus(), 300);
       });
 
-      /* ---------- Optional: handle visibility change to refresh day label ---------- */
+      // refresh day label when tab becomes visible
       document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'visible') updateCurrentDay();
       });
+
+      // expose a small debug API on window for recovery
+      try { window.__FieldIron = { loadWorkouts, saveWorkouts, loadSettings, saveSettings }; } catch (e) { /* ignore */ }
 
     })();
   </script>
