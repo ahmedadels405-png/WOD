@@ -1,0 +1,42 @@
+*** Begin Patch
+*** Update File: index.html
+@@
+-  <div class="day-header">Monday</div>
++  <div class="day-header"><span id="current-day">Loading…</span></div>
+@@
+-</body>
++<!-- Day update script: shows local weekday and rolls over at midnight -->
++<script>
++  (function () {
++    function getLocalWeekday() {
++      return new Date().toLocaleDateString(undefined, { weekday: 'long' });
++    }
++
++    function updateCurrentDay() {
++      const el = document.getElementById('current-day');
++      if (!el) return;
++      el.textContent = getLocalWeekday();
++    }
++
++    // Update immediately on load
++    if (document.readyState === 'loading') {
++      document.addEventListener('DOMContentLoaded', updateCurrentDay);
++    } else {
++      updateCurrentDay();
++    }
++
++    // Schedule an update at the next local midnight, then every 24 hours
++    (function scheduleMidnightUpdate() {
++      const now = new Date();
++      const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
++      const msUntilMidnight = nextMidnight - now;
++
++      setTimeout(() => {
++        updateCurrentDay();
++        setInterval(updateCurrentDay, 24 * 60 * 60 * 1000);
++      }, msUntilMidnight);
++    })();
++  })();
++</script>
++</body>
+*** End Patch
