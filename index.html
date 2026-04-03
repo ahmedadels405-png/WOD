@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Field+Iron — WOD & Progress</title>
+<title>Field+Iron — WOD & Progress (Fixed)</title>
 <style>
 /* =========================
-   Core variables (base)
+   Theme variables (swappable)
    ========================= */
 :root{
   --bg-1:#071018;
@@ -19,8 +19,8 @@
   --accent:#ff8a00;
   --accent-2:#00c2a8;
   --glass:rgba(255,255,255,0.03);
-  --radius:14px;
-  --shadow:0 12px 36px rgba(2,6,23,0.6);
+  --radius:12px;
+  --shadow:0 10px 30px rgba(2,6,23,0.5);
   --card-border:rgba(255,255,255,0.04);
 }
 
@@ -61,11 +61,11 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-1),var
 
 /* Main layout */
 .main{display:flex;flex:1;gap:12px;padding:12px;min-height:0}
-.left{width:320px;display:flex;flex-direction:column;gap:12px}
-.right{flex:1;display:flex;flex-direction:column;gap:12px;min-height:0;overflow:auto}
+.left{width:320px;display:flex;flex-direction:column;gap:12px;min-height:0}
+.right{flex:1;display:flex;flex-direction:column;gap:12px;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch}
 
 /* Cards */
-.card{background:var(--card);padding:12px;border-radius:var(--radius);border:1px solid var(--card-border);box-shadow:var(--shadow)}
+.card{background:var(--card);padding:12px;border-radius:12px;border:1px solid var(--card-border);box-shadow:var(--shadow)}
 .small-muted{font-size:12px;color:var(--muted-3)}
 .kv{font-size:12px;color:var(--muted-2)}
 
@@ -78,7 +78,7 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-1),var
 
 /* Workout list */
 .workout{display:flex;flex-direction:column;gap:12px}
-.exercise{display:flex;align-items:center;gap:14px;padding:14px;border-radius:14px;background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.005));border:1px solid rgba(255,255,255,0.02)}
+.exercise{display:flex;align-items:center;gap:14px;padding:14px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.005));border:1px solid rgba(255,255,255,0.02)}
 .exercise .meta{flex:1}
 .actions{display:flex;gap:8px}
 
@@ -97,6 +97,12 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-1),var
 .measure-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0}
 .measure-row input{width:110px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)}
 
+/* Responsive: hide left column on small screens */
+@media(max-width:900px){
+  .left{display:none}
+  .main{padding-bottom:72px}
+}
+
 /* Footer */
 .footer{display:flex;justify-content:center;padding:12px;gap:8px}
 
@@ -104,12 +110,10 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-1),var
 .hidden{display:none!important}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;background:rgba(0,0,0,0.8);color:#fff;padding:12px 16px;border-radius:12px;z-index:200;display:flex;gap:12px;align-items:center}
 .canvas-spark{width:100%;height:36px}
-.theme-swatch{width:28px;height:20px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);display:inline-block;margin-right:6px;vertical-align:middle}
-.custom-color{width:44px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);padding:2px;background:#fff}
 </style>
 </head>
 <body>
-<div class="app" id="appRoot" data-theme="lively">
+<div id="appRoot" class="app" data-theme="lively">
   <header class="header">
     <div class="brand">
       <div class="logo">FI</div>
@@ -128,9 +132,8 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-1),var
     <input id="search" class="input" placeholder="Search exercises or days..." style="flex:1;margin-left:12px" />
 
     <div class="header-controls">
-      <div class="kv">Pool <span id="cntPool" class="tag">0</span></div>
+      <div class="kv">Pool <span id="cntPool" class="kv">0</span></div>
 
-      <!-- Theme picker with preview -->
       <select id="themePicker" class="select" title="Choose UI theme">
         <option value="lively">Lively</option>
         <option value="sporty">Sporty</option>
@@ -148,9 +151,7 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-1),var
   </header>
 
   <main class="main" id="mainRoot">
-    <!-- Left column (visible on wide screens) -->
     <aside class="left" id="leftColumn">
-      <!-- Quick measurements summary (mirrors Progress tab) -->
       <section class="card" id="quickMeasures">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div>
@@ -170,7 +171,6 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-1),var
         </div>
       </section>
 
-      <!-- Weekly schedule -->
       <section class="card">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div>
@@ -184,11 +184,10 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-1),var
         <div id="weekDays" class="week"></div>
         <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center">
           <div class="small-muted">Workout Theme</div>
-          <div id="currentTheme" class="tag">—</div>
+          <div id="currentTheme" class="kv">—</div>
         </div>
       </section>
 
-      <!-- History quick -->
       <section class="card">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div>
@@ -201,7 +200,6 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-1),var
       </section>
     </aside>
 
-    <!-- Right area: dynamic content (Workouts / Progress / Library) -->
     <section class="right" id="contentArea">
       <!-- Workouts view -->
       <div id="view-workouts" class="view" role="region">
@@ -284,7 +282,7 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-1),var
         </div>
       </div>
 
-      <!-- Library view (placeholder, opens sheet overlay) -->
+      <!-- Library view (opens sheet overlay) -->
       <div id="view-library" class="view hidden" role="region">
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:center">
@@ -343,61 +341,37 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-1),var
   </div>
 </div>
 
-<!-- Modals and roots -->
+<!-- Modal roots -->
 <div id="modalRoot" class="hidden"></div>
 <div id="calendarModalRoot" class="hidden"></div>
 <div id="toastRoot" style="display:none"></div>
 
-<!-- Custom theme editor modal -->
-<div id="customThemeModal" class="hidden"></div>
-
 <script>
 /* =========================
-   Config & persistence keys
+   Lightweight data & helpers
    ========================= */
 const DEFAULT_EX_COUNT_KEY = 'fi_default_ex_count';
-const THEME_KEY = 'fi_theme';
-const TARGET_BF_KEY = 'fi_target_bf';
 let DEFAULT_EX_COUNT_CURRENT = parseInt(localStorage.getItem(DEFAULT_EX_COUNT_KEY) || '5', 10);
 if(isNaN(DEFAULT_EX_COUNT_CURRENT)) DEFAULT_EX_COUNT_CURRENT = 5;
-const SAVED_THEME = localStorage.getItem(THEME_KEY) || 'lively';
-const SAVED_TARGET_BF = parseFloat(localStorage.getItem(TARGET_BF_KEY) || '12');
+const THEME_KEY = 'fi_theme';
+const TARGET_BF_KEY = 'fi_target_bf';
 
-/* =========================
-   Default measures (from screenshot)
-   ========================= */
 const DEFAULT_MEASURES = {
-  weight: 81.70,
-  weightUnit: 'kg',
-  height: 180,
-  heightUnit: 'cm',
-  bmi: 24.4,
-  bodyFat: 15.2,
-  skeletalMuscle: 54.8,
-  fatFreeMass: 69.28,
-  subcutaneousFat: 13.1,
-  visceralFat: 7,
-  bodyWater: 61.2,
-  muscleMass: 65.85,
-  boneMass: 3.43,
-  protein: 19.3,
-  bmr: 1851,
-  metabolicAge: 41,
-  history: []
+  weight: 81.70, weightUnit:'kg', height:180, heightUnit:'cm',
+  bmi:24.4, bodyFat:15.2, skeletalMuscle:54.8, fatFreeMass:69.28,
+  visceralFat:7, bodyWater:61.2, muscleMass:65.85, boneMass:3.43,
+  protein:19.3, bmr:1851, metabolicAge:41, history:[]
 };
 
-/* =========================
-   App data model
-   ========================= */
 const DEFAULT_DATA = {
   days: [
-    { id: 'mon', name: 'Monday', type:'workout', theme:'Power', allowWorkoutOnSoccer:false, exercises: []},
-    { id: 'tue', name: 'Tuesday', type:'workout', theme:'Strength', allowWorkoutOnSoccer:false, exercises: []},
-    { id: 'wed', name: 'Wednesday', type:'workout', theme:'Hypertrophy', allowWorkoutOnSoccer:false, exercises: []},
-    { id: 'thu', name: 'Thursday', type:'workout', theme:'Mix', allowWorkoutOnSoccer:false, exercises: []},
-    { id: 'fri', name: 'Friday', type:'workout', theme:'Strength', allowWorkoutOnSoccer:false, exercises: []},
-    { id: 'sat', name: 'Saturday', type:'soccer', theme:'Mix', allowWorkoutOnSoccer:false, exercises: []},
-    { id: 'sun', name: 'Sunday', type:'rest', theme:'Mix', allowWorkoutOnSoccer:false, exercises: []}
+    { id: 'mon', name: 'Monday', type:'workout', theme:'Power', exercises: []},
+    { id: 'tue', name: 'Tuesday', type:'workout', theme:'Strength', exercises: []},
+    { id: 'wed', name: 'Wednesday', type:'workout', theme:'Hypertrophy', exercises: []},
+    { id: 'thu', name: 'Thursday', type:'workout', theme:'Mix', exercises: []},
+    { id: 'fri', name: 'Friday', type:'workout', theme:'Strength', exercises: []},
+    { id: 'sat', name: 'Saturday', type:'soccer', theme:'Mix', exercises: []},
+    { id: 'sun', name: 'Sunday', type:'rest', theme:'Mix', exercises: []}
   ],
   stats: { weight: DEFAULT_MEASURES.weight, bodyfat: DEFAULT_MEASURES.bodyFat },
   history: [],
@@ -427,9 +401,6 @@ function saveData(){
   }
 }
 
-/* =========================
-   App state & helpers
-   ========================= */
 let DATA = loadData();
 let currentDayId = DATA.days[0].id;
 let GLOBAL_ALLOW_SOCCER_WORKOUTS = JSON.parse(localStorage.getItem('fi_global_allow') || 'false');
@@ -453,43 +424,16 @@ function el(tag, props={}, ...children){
 function findDay(id){ return DATA.days.find(d=>d.id===id) }
 
 /* =========================
-   Optimized exercise pool (annotated for fat loss)
-   - name, sets, reps, rest, cues, equipment, theme, tags, goal
+   Small exercise pool (kept minimal for demo)
    ========================= */
 const EXERCISES = [
-  {name:"Back Squat",sets:4,reps:"5",rest:"2min",cues:"Chest up, drive knees out, explode.",equipment:"Barbell",theme:"Strength",tags:["compound","lower"],goal:"strength"},
-  {name:"Trap Bar Deadlift",sets:4,reps:"5",rest:"2min",cues:"Sit into it, drive floor away.",equipment:"Barbell",theme:"Strength",tags:["compound","posterior"],goal:"fat_loss"},
-  {name:"Conventional Deadlift",sets:4,reps:"5",rest:"3min",cues:"Bar over mid-foot, lat squeeze.",equipment:"Barbell",theme:"Strength",tags:["compound","posterior"],goal:"strength"},
-  {name:"Bench Press",sets:4,reps:"5",rest:"2min",cues:"Retract scapulae, drive bar up.",equipment:"Barbell",theme:"Strength",tags:["compound","upper"],goal:"strength"},
-  {name:"Overhead Press",sets:4,reps:"5",rest:"2min",cues:"Press straight overhead, braced core.",equipment:"Barbell",theme:"Strength",tags:["upper"],goal:"strength"},
-  {name:"Weighted Pull-Up",sets:4,reps:"5",rest:"2min",cues:"Full range, control descent.",equipment:"Bodyweight",theme:"Strength",tags:["pull","upper"],goal:"strength"},
-  {name:"Barbell Hip Thrust",sets:4,reps:"6",rest:"90s",cues:"Drive hips to ceiling, squeeze glutes.",equipment:"Barbell",theme:"Hypertrophy",tags:["glute"],goal:"fat_loss"},
-  {name:"Romanian Deadlift",sets:3,reps:"8",rest:"90s",cues:"Hinge deep, bar close to legs.",equipment:"Barbell",theme:"Hypertrophy",tags:["hamstring"],goal:"fat_loss"},
-  {name:"DB Row",sets:3,reps:"10 ea",rest:"60s",cues:"Elbow to hip, full stretch.",equipment:"Dumbbell",theme:"Hypertrophy",tags:["pull"],goal:"fat_loss"},
-  {name:"Bulgarian Split Squat",sets:3,reps:"8 ea",rest:"90s",cues:"Front shin vertical, drive through heel.",equipment:"Dumbbell",theme:"Hypertrophy",tags:["unilateral"],goal:"fat_loss"},
-  {name:"Box Jump",sets:4,reps:"5",rest:"90s",cues:"Full hip extension, land soft.",equipment:"Bodyweight",theme:"Power",tags:["plyo"],goal:"fat_loss"},
-  {name:"Kettlebell Swing",sets:4,reps:"12",rest:"60s",cues:"Hinge hard, snap hips.",equipment:"Kettlebell",theme:"Power",tags:["hip","conditioning"],goal:"fat_loss"},
-  {name:"Sled Push",sets:6,reps:"20-30m",rest:"90s",cues:"Low hips, drive through legs.",equipment:"Sled",theme:"Conditioning",tags:["sprint","power"],goal:"fat_loss"},
-  {name:"Rowing Intervals",sets:8,reps:"500m",rest:"90s",cues:"Consistent split, strong finish.",equipment:"Row",theme:"Conditioning",tags:["cardio","interval"],goal:"fat_loss"},
-  {name:"Battle Ropes",sets:6,reps:"30s",rest:"45s",cues:"Explosive waves, keep core tight.",equipment:"Ropes",theme:"Conditioning",tags:["hiit"],goal:"fat_loss"},
-  {name:"Hill Sprints",sets:8,reps:"20s",rest:"90s",cues:"Max effort, full recovery.",equipment:"Bodyweight",theme:"Speed",tags:["sprint"],goal:"fat_loss"},
-  {name:"Prowler Push",sets:6,reps:"30m",rest:"90s",cues:"Low drive, short steps.",equipment:"Prowler",theme:"Conditioning",tags:["sprint"],goal:"fat_loss"},
-  {name:"AMRAP 12 (3 rounds)",sets:1,reps:"AMRAP",rest:"-",cues:"3 rounds of 6 exercises, 40s work/20s rest",equipment:"Mixed",theme:"Conditioning",tags:["circuit","hiit"],goal:"fat_loss"},
-  {name:"EMOM 20 (strength + cardio)",sets:1,reps:"EMOM",rest:"-",cues:"Alternate strength and cardio each minute",equipment:"Mixed",theme:"Conditioning",tags:["emom","hybrid"],goal:"fat_loss"},
-  {name:"Farmer Carry Heavy",sets:4,reps:"40m",rest:"90s",cues:"Tall posture, tight grip.",equipment:"Dumbbell",theme:"Strength",tags:["carry","core"],goal:"fat_loss"},
-  {name:"Pigeon Stretch",sets:2,reps:"30s ea",rest:"-",cues:"Square hips, lean forward.",equipment:"Bodyweight",theme:"Stretch",tags:["mobility"],goal:"mobility"},
-  {name:"Child's Pose",sets:1,reps:"60s",rest:"-",cues:"Relax hips back, breathe.",equipment:"Bodyweight",theme:"Stretch",tags:["mobility"],goal:"mobility"},
-  {name:"DB Thruster",sets:4,reps:"6",rest:"90s",cues:"Squat deep, explode up, press.",equipment:"Dumbbell",theme:"Power",tags:["compound"],goal:"fat_loss"},
-  {name:"Burpee + Sprint 100m",sets:4,reps:"6",rest:"90s",cues:"Burpee then immediate sprint.",equipment:"Bodyweight",theme:"Conditioning",tags:["hiit","sprint"],goal:"fat_loss"}
+  {name:"Back Squat",sets:4,reps:"5",rest:"2min",equipment:"Barbell",theme:"Strength",tags:["compound"],goal:"strength"},
+  {name:"Trap Bar Deadlift",sets:4,reps:"5",rest:"2min",equipment:"Barbell",theme:"Strength",tags:["compound"],goal:"fat_loss"},
+  {name:"Kettlebell Swing",sets:4,reps:"12",rest:"60s",equipment:"Kettlebell",theme:"Power",tags:["conditioning"],goal:"fat_loss"},
+  {name:"Sled Push",sets:6,reps:"20-30m",rest:"90s",equipment:"Sled",theme:"Conditioning",tags:["sprint"],goal:"fat_loss"},
+  {name:"Rowing Intervals",sets:8,reps:"500m",rest:"90s",equipment:"Row",theme:"Conditioning",tags:["interval"],goal:"fat_loss"},
+  {name:"Pigeon Stretch",sets:2,reps:"30s ea",rest:"-",equipment:"Bodyweight",theme:"Stretch",tags:["mobility"],goal:"mobility"}
 ];
-
-/* Precompute indexes */
-const INDEX_BY_THEME = {};
-const INDEX_BY_GOAL = {};
-EXERCISES.forEach((ex,i)=>{
-  if(ex.theme){ INDEX_BY_THEME[ex.theme] = INDEX_BY_THEME[ex.theme] || []; INDEX_BY_THEME[ex.theme].push(i); }
-  if(ex.goal){ INDEX_BY_GOAL[ex.goal] = INDEX_BY_GOAL[ex.goal] || []; INDEX_BY_GOAL[ex.goal].push(i); }
-});
 
 /* =========================
    DOM refs
@@ -509,21 +453,19 @@ function ensureDayFields(){
   DATA.days.forEach(d=>{
     if(!('type' in d)) d.type = 'workout';
     if(!('theme' in d)) d.theme = 'Mix';
-    if(!('allowWorkoutOnSoccer' in d)) d.allowWorkoutOnSoccer = false;
     if(!Array.isArray(d.exercises)) d.exercises = [];
-    if(!Array.isArray(d.stretches)) d.stretches = [];
     if(!('userEdited' in d)) d.userEdited = false;
     if(!('_autoFilled' in d)) d._autoFilled = false;
     if(!('_locked' in d)) d._locked = false;
   });
 
-  // Auto-fill logic tuned for fat loss: prefer fat_loss exercises while keeping strength anchors
+  // Auto-fill: keep it simple and predictable
   DATA.days.forEach(d=>{
     if(d.type === 'workout' && !d.userEdited && !d._autoFilled && !d._locked){
       if((d.exercises?.length || 0) < DEFAULT_EX_COUNT_CURRENT){
-        const anchors = EXERCISES.filter(e => e.goal === 'strength' || (e.tags && e.tags.includes('compound'))).slice();
-        const fatPool = EXERCISES.filter(e => e.goal === 'fat_loss' || e.theme === 'Conditioning' || (e.tags && e.tags.includes('hiit'))).slice();
         const picks = [];
+        const anchors = EXERCISES.filter(e => e.goal === 'strength' || (e.tags && e.tags.includes('compound'))).slice();
+        const fatPool = EXERCISES.filter(e => e.goal === 'fat_loss' || e.theme === 'Conditioning').slice();
         shuffleArray(anchors);
         while(picks.length < 2 && anchors.length) picks.push(anchors.shift());
         shuffleArray(fatPool);
@@ -549,9 +491,7 @@ function ensureDayFields(){
 /* =========================
    Rendering & UI
    ========================= */
-function updateCounters(){
-  cntPool.textContent = EXERCISES.length;
-}
+function updateCounters(){ cntPool.textContent = EXERCISES.length; }
 function renderWeek(){
   weekRoot.innerHTML = '';
   DATA.days.forEach(d=>{
@@ -586,17 +526,6 @@ function renderWorkout(){
   currentDayTitle.textContent = day.name;
   document.getElementById('currentTheme').textContent = day.theme || '—';
 
-  const effectiveAllow = GLOBAL_ALLOW_SOCCER_WORKOUTS || day.allowWorkoutOnSoccer;
-  if(day.type === 'soccer' && !effectiveAllow){
-    workoutList.appendChild(el('div',{class:'card'}, el('div',{class:'small-muted'}, 'This is a Soccer day. Workouts are hidden by default.'), el('div',{style:'height:8px'}), el('div',{style:'display:flex;gap:8px;justify-content:center'},
-      el('button',{class:'btn primary', onClick:()=>{
-        day.allowWorkoutOnSoccer = true; saveData(); renderAll();
-      }}, 'Allow Workout Today'),
-      el('button',{class:'btn', onClick:()=>openDaySettings(day.id)}, 'Edit Day')
-    )));
-    return;
-  }
-
   if(day.exercises.length === 0){
     workoutList.appendChild(el('div',{class:'card'}, el('div',{class:'small-muted'}, 'No exercises yet. Use Library to add or press Shuffle to auto-fill.')));
   }
@@ -622,19 +551,6 @@ function renderWorkout(){
       el('button',{class:'btn', onClick:()=>openSheet()}, 'Open Library')
     ));
   }
-
-  const stretches = day.stretches || [];
-  const stretchEl = el('div',{class:'stretch'},
-    el('h4',{}, 'Stretch / Cooldown'),
-    ...stretches.map(s => el('div',{}, el('strong',{}, s.name || s), ' · ', el('span',{class:'small-muted'}, s.meta || '')))
-  );
-  const stretchActions = el('div',{style:'display:flex;gap:8px;margin-top:8px'},
-    el('button',{class:'btn', onClick:()=>openEditStretches(day.id)}, 'Edit Stretches'),
-    el('button',{class:'btn ghost', onClick:()=>addDefaultStretches(day.id)}, 'Add Defaults'),
-    el('button',{class:'btn ghost', onClick:()=>toggleLockDay(day.id)}, day._locked ? 'Unlock' : 'Lock Auto')
-  );
-  workoutList.appendChild(stretchEl);
-  workoutList.appendChild(stretchActions);
 }
 
 /* =========================
@@ -707,44 +623,7 @@ function closeModal(){
 }
 
 /* =========================
-   Specific modals
-   ========================= */
-function openReplaceModal(dayId, index){
-  const day = findDay(dayId);
-  if(!day || index<0 || index>=day.exercises.length) return;
-  const current = day.exercises[index];
-  const title = el('h3',{}, 'Replace Exercise');
-  const nameInput = el('input',{class:'input', value:current.name, placeholder:'Exercise name', style:'margin-top:8px'});
-  const metaInput = el('input',{class:'input', value:current.meta||'', placeholder:'Meta (sets x reps)', style:'margin-top:8px'});
-  const save = el('button',{class:'btn primary', onClick:()=>{
-    const newName = nameInput.value.trim();
-    if(!newName){ alert('Enter a name'); return; }
-    replaceExercise(dayId, index, {name:newName, meta:metaInput.value.trim()});
-    closeModal();
-  }}, 'Replace');
-  const cancel = el('button',{class:'btn', onClick:()=>closeModal()}, 'Cancel');
-  openModal(el('div',{}, title, nameInput, metaInput, el('div',{style:'height:10px'}), el('div',{class:'row'}, save, cancel)));
-}
-
-function openEditModal(dayId, index){
-  const day = findDay(dayId);
-  if(!day || index<0 || index>=day.exercises.length) return;
-  const current = day.exercises[index];
-  const title = el('h3',{}, 'Edit Exercise');
-  const nameInput = el('input',{class:'input', value:current.name, placeholder:'Exercise name', style:'margin-top:8px'});
-  const metaInput = el('input',{class:'input', value:current.meta||'', placeholder:'Meta (sets x reps)', style:'margin-top:8px'});
-  const save = el('button',{class:'btn primary', onClick:()=>{
-    const newName = nameInput.value.trim();
-    if(!newName){ alert('Enter a name'); return; }
-    editExercise(dayId, index, {name:newName, meta:metaInput.value.trim()});
-    closeModal();
-  }}, 'Save');
-  const cancel = el('button',{class:'btn', onClick:()=>closeModal()}, 'Cancel');
-  openModal(el('div',{}, title, nameInput, metaInput, el('div',{style:'height:10px'}), el('div',{class:'row'}, save, cancel)));
-}
-
-/* =========================
-   Day settings + stretches + lock + versions
+   Day settings + versions
    ========================= */
 function openDaySettings(dayId){
   const day = findDay(dayId);
@@ -754,36 +633,17 @@ function openDaySettings(dayId){
   typeSelect.value = day.type || 'workout';
   const themeSelect = el('select',{class:'select', style:'margin-top:8px;padding:8px'}, el('option',{value:'Power'}, 'Power'), el('option',{value:'Strength'}, 'Strength'), el('option',{value:'Hypertrophy'}, 'Hypertrophy'), el('option',{value:'Mix'}, 'Mix'));
   themeSelect.value = day.theme || 'Mix';
-  const overrideRow = el('div',{style:'margin-top:10px;display:flex;align-items:center;gap:8px'}, el('input',{type:'checkbox', id:'overrideChk', checked: day.allowWorkoutOnSoccer}), el('label',{for:'overrideChk'}, 'Allow workouts on soccer days (override)'));
   const lockRow = el('div',{style:'margin-top:10px;display:flex;align-items:center;gap:8px'}, el('input',{type:'checkbox', id:'lockChk', checked: day._locked}), el('label',{for:'lockChk'}, 'Lock auto-fill (prevent auto changes)'));
-  const versions = DATA.dayVersions[dayId] || [];
-  const versionsList = el('div',{style:'margin-top:10px;display:flex;flex-direction:column;gap:6px'});
-  versions.slice().reverse().forEach((v, idx)=>{
-    const d = new Date(v.ts);
-    const label = `${d.toLocaleString()} — ${v.exercises.length} ex`;
-    const restoreBtn = el('button',{class:'btn', onClick:()=>{ if(confirm('Restore this version?')){ DATA.days = DATA.days.map(dd => dd.id===dayId ? structuredClone(v) : dd); saveData(); closeModal(); renderAll(); } }}, 'Restore');
-    versionsList.appendChild(el('div',{style:'display:flex;justify-content:space-between;align-items:center'}, el('div',{}, label), restoreBtn));
-  });
   const save = el('button',{class:'btn primary', onClick:()=>{
     day.type = typeSelect.value;
     day.theme = themeSelect.value;
-    day.allowWorkoutOnSoccer = document.getElementById('overrideChk').checked;
     day._locked = document.getElementById('lockChk').checked;
     day.userEdited = true;
     saveDayVersion(dayId);
     saveData(); closeModal(); renderAll();
   }}, 'Save');
   const cancel = el('button',{class:'btn', onClick:()=>closeModal()}, 'Cancel');
-  openModal(el('div',{}, title, el('div',{class:'small-muted'}, 'Type'), typeSelect, el('div',{class:'small-muted', style:'margin-top:8px'}, 'Theme'), themeSelect, overrideRow, lockRow, el('div',{style:'height:10px'}), el('div',{class:'small-muted'}, 'Recent versions'), versionsList, el('div',{style:'height:10px'}), el('div',{class:'row'}, save, cancel)));
-}
-
-function toggleLockDay(dayId){
-  const day = findDay(dayId);
-  if(!day) return;
-  day._locked = !day._locked;
-  day.userEdited = true;
-  saveDayVersion(dayId);
-  saveData(); renderAll();
+  openModal(el('div',{}, title, el('div',{class:'small-muted'}, 'Type'), typeSelect, el('div',{class:'small-muted', style:'margin-top:8px'}, 'Theme'), themeSelect, lockRow, el('div',{style:'height:10px'}), el('div',{class:'row'}, save, cancel)));
 }
 
 /* Save a day snapshot (keep last 3) */
@@ -799,55 +659,6 @@ function saveDayVersion(dayId){
 }
 
 /* =========================
-   Stretches
-   ========================= */
-function openEditStretches(dayId){
-  const day = findDay(dayId);
-  if(!day) return;
-  const title = el('h3',{}, `Edit Stretches for ${day.name}`);
-  const list = el('div',{style:'display:flex;flex-direction:column;gap:8px;margin-top:8px'});
-  (day.stretches || []).forEach((s, i)=>{
-    const name = el('input',{value:s.name || s, style:'padding:8px', placeholder:'Stretch name'});
-    const meta = el('input',{value:s.meta||'', style:'padding:8px', placeholder:'Duration / notes'});
-    const row = el('div',{style:'display:flex;gap:8px;align-items:center'}, name, meta, el('button',{class:'btn', onClick:()=>row.remove()}, 'Remove'));
-    list.appendChild(row);
-  });
-  const addRow = el('div',{style:'margin-top:8px;display:flex;gap:8px'}, el('button',{class:'btn', onClick:()=>{
-      const n = el('input',{placeholder:'Stretch name', style:'padding:8px'});
-      const m = el('input',{placeholder:'Duration', style:'padding:8px'});
-      const row = el('div',{style:'display:flex;gap:8px;align-items:center'}, n, m, el('button',{class:'btn', onClick:()=>row.remove()}, 'Remove'));
-      list.appendChild(row);
-    }}, 'Add Stretch'));
-  const save = el('button',{class:'btn primary', onClick:()=>{
-    const newSt = [];
-    Array.from(list.children).forEach(row=>{
-      const inputs = row.querySelectorAll('input');
-      if(inputs && inputs[0] && inputs[0].value.trim()){
-        newSt.push({name:inputs[0].value.trim(), meta: inputs[1] ? inputs[1].value.trim() : ''});
-      }
-    });
-    day.stretches = newSt;
-    day.userEdited = true;
-    saveDayVersion(dayId);
-    saveData(); closeModal(); renderAll();
-  }}, 'Save');
-  const cancel = el('button',{class:'btn', onClick:()=>closeModal()}, 'Cancel');
-  openModal(el('div',{}, title, list, addRow, el('div',{style:'height:10px'}), el('div',{class:'row'}, save, cancel)));
-}
-function addDefaultStretches(dayId){
-  const day = findDay(dayId);
-  if(!day) return;
-  day.stretches = [
-    {name:'Hamstring Stretch', meta:'2 x 30s each'},
-    {name:'Hip Flexor Stretch', meta:'2 x 30s each'},
-    {name:'Child Pose', meta:'60s'}
-  ];
-  day.userEdited = true;
-  saveDayVersion(dayId);
-  saveData(); renderAll();
-}
-
-/* =========================
    Library virtualized rendering
    ========================= */
 function openSheet(){
@@ -856,8 +667,8 @@ function openSheet(){
   document.getElementById('sheetThemeFilter').value = '';
   document.getElementById('sheetGoalFilter').value = '';
   virtualUpdateFiltered();
-  sheetList.scrollTop = 0;
-  virtualRender();
+  // ensure measurement of container after layout
+  requestAnimationFrame(()=>{ sheetList.scrollTop = 0; virtualRender(); });
 }
 function closeSheet(){ sheetOverlay.classList.remove('open'); }
 function virtualUpdateFiltered(){
@@ -867,7 +678,7 @@ function virtualUpdateFiltered(){
   virtualState.filtered = EXERCISES.filter(ex=>{
     if(theme && ex.theme !== theme) return false;
     if(goal && ex.goal !== goal) return false;
-    if(q && !(ex.name.toLowerCase().includes(q) || (ex.cues||'').toLowerCase().includes(q) || (ex.tags||[]).join(' ').toLowerCase().includes(q))) return false;
+    if(q && !(ex.name.toLowerCase().includes(q) || (ex.tags||[]).join(' ').toLowerCase().includes(q))) return false;
     return true;
   });
   document.getElementById('sheet-loading').style.display = virtualState.filtered.length > 80 ? 'block' : 'none';
@@ -893,7 +704,7 @@ function virtualRender(){
   for(let i=start;i<end;i++){
     const ex = virtualState.filtered[i];
     const item = el('div',{style:'display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.02);height:'+ (rowH-2) +'px;box-sizing:border-box'},
-      el('div',{}, el('div',{style:'font-weight:700'}, ex.name), el('div',{class:'small-muted'}, ex.cues || `${ex.sets || ''} ${ex.reps || ''}`)),
+      el('div',{}, el('div',{style:'font-weight:700'}, ex.name), el('div',{class:'small-muted'}, ex.sets ? `${ex.sets} x ${ex.reps}` : ex.reps || '')),
       el('div',{}, el('button',{class:'btn', onClick:()=>addExerciseToCurrentDay(ex)}, 'Add'))
     );
     inner.appendChild(item);
@@ -983,7 +794,6 @@ function populateMeasureFields(){
   document.getElementById('m_ffm').value = measures.fatFreeMass || '';
   document.getElementById('m_vfat').value = measures.visceralFat || '';
   document.getElementById('m_water').value = measures.bodyWater || '';
-  // quick view
   document.getElementById('q_weight').textContent = (measures.weight || '—') + ' ' + (measures.weightUnit || 'kg');
   document.getElementById('q_bf').textContent = (measures.bodyFat || '—') + '%';
   document.getElementById('q_bmi').textContent = (measures.bmi || '—');
@@ -1023,8 +833,6 @@ function snapshotMeasures(){
 document.getElementById('saveMeasures').addEventListener('click', saveMeasures);
 document.getElementById('snapshotMeasure').addEventListener('click', snapshotMeasures);
 document.getElementById('snapshotMeasureQuick').addEventListener('click', snapshotMeasures);
-document.getElementById('openMeasureHistoryQuick').addEventListener('click', ()=>openMeasureHistory());
-document.getElementById('openMeasureHistory').addEventListener('click', ()=>openMeasureHistory());
 
 /* Sparklines */
 function drawSparklines(){
@@ -1050,7 +858,7 @@ function drawSpark(canvas, arr){
   const range = Math.max(1, max - min);
   ctx.beginPath();
   arr.forEach((v,i)=>{
-    const x = (i/(arr.length-1)) * w;
+    const x = (i/(arr.length-1 || 1)) * w;
     const y = h - ((v - min)/range) * h;
     if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
   });
@@ -1066,24 +874,6 @@ function exportAppData(){
   const payload = JSON.stringify(DATA, null, 2);
   downloadTextFile(payload, `field-iron-data-${new Date().toISOString().slice(0,10)}.json`);
 }
-function importAppData(file){
-  const reader = new FileReader();
-  reader.onload = (e)=>{
-    try{
-      const parsed = JSON.parse(e.target.result);
-      if(!parsed || !parsed.days) throw new Error('Invalid file');
-      if(!confirm('Importing will overwrite current data. Continue?')) return;
-      DATA = parsed;
-      saveData();
-      ensureDayFields();
-      renderAll();
-      showToast('Data imported', 'OK', ()=>{}, 2000);
-    }catch(err){
-      alert('Import failed: ' + err.message);
-    }
-  };
-  reader.readAsText(file);
-}
 function downloadTextFile(text, filename){
   const blob = new Blob([text], {type:'application/json'});
   const url = URL.createObjectURL(blob);
@@ -1091,16 +881,6 @@ function downloadTextFile(text, filename){
   a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url), 5000);
 }
-document.getElementById('exportMeasuresBtn').addEventListener('click', ()=>{ downloadTextFile(JSON.stringify(DATA.measures||{},null,2), `measures-${new Date().toISOString().slice(0,10)}.json`); });
-document.getElementById('importMeasuresBtn').addEventListener('click', ()=>{
-  const input = document.createElement('input'); input.type='file'; input.accept='.json';
-  input.onchange = (e)=>{ if(e.target.files && e.target.files[0]) {
-    const reader = new FileReader();
-    reader.onload = (ev)=>{ try{ const parsed = JSON.parse(ev.target.result); if(parsed.weight==null) throw new Error('Invalid measures file'); DATA.measures = parsed; saveData(); populateMeasureFields(); showToast('Measures imported', 'OK', ()=>{}, 1600); }catch(err){ alert('Import failed: '+err.message); } };
-    reader.readAsText(e.target.files[0]);
-  } };
-  input.click();
-});
 
 /* =========================
    History & snapshots
@@ -1134,12 +914,7 @@ function showToast(message, actionText, actionFn, duration=7000){
   toastRoot.style.display = 'block';
   toastTimer = setTimeout(()=>{ hideToast(); }, duration);
 }
-function hideToast(){
-  clearTimeout(toastTimer);
-  const toastRoot = document.getElementById('toastRoot');
-  toastRoot.innerHTML = '';
-  toastRoot.style.display = 'none';
-}
+function hideToast(){ clearTimeout(toastTimer); const toastRoot = document.getElementById('toastRoot'); toastRoot.innerHTML = ''; toastRoot.style.display = 'none'; }
 
 /* =========================
    Utilities
@@ -1151,10 +926,11 @@ function renderAll(){
   renderWorkout();
   renderHistory();
   virtualUpdateFiltered();
-  virtualRender();
+  // ensure virtualRender runs after layout
+  requestAnimationFrame(()=>{ virtualRender(); });
   updateCounters();
   populateMeasureFields();
-  document.getElementById('targetBF').textContent = (localStorage.getItem(TARGET_BF_KEY) || SAVED_TARGET_BF) + '%';
+  document.getElementById('targetBF').textContent = (localStorage.getItem(TARGET_BF_KEY) || '12') + '%';
 }
 
 /* =========================
@@ -1174,13 +950,14 @@ document.getElementById('openProgressFromQuick').addEventListener('click', ()=>s
 
 /* Theme picker */
 const themePicker = document.getElementById('themePicker');
-themePicker.value = localStorage.getItem(THEME_KEY) || SAVED_THEME;
+themePicker.value = localStorage.getItem(THEME_KEY) || 'lively';
 applyTheme(themePicker.value);
 themePicker.addEventListener('change', (e)=>{ if(e.target.value === 'custom'){ openCustomThemeEditor(); } else { applyTheme(e.target.value); } });
 
 function applyTheme(name){
   if(!name) name = 'lively';
-  document.getElementById('appRoot').setAttribute('data-theme', name);
+  const root = document.getElementById('appRoot') || document.documentElement;
+  root.setAttribute('data-theme', name);
   localStorage.setItem(THEME_KEY, name);
   themePicker.value = name;
 }
@@ -1246,55 +1023,6 @@ function openSettings(){
 }
 
 /* =========================
-   Measure history modal
-   ========================= */
-function openMeasureHistory(){
-  const title = el('h3',{}, 'Measurement History');
-  const list = el('div',{style:'display:flex;flex-direction:column;gap:8px;margin-top:8px'});
-  (measures.history || []).slice().reverse().forEach(h=>{
-    const d = new Date(h.ts);
-    const label = `${d.toLocaleString()} — ${h.weight} ${measures.weightUnit} · ${h.bodyFat}%`;
-    const restoreBtn = el('button',{class:'btn', onClick:()=>{ if(confirm('Restore this measurement snapshot?')){ measures.weight = h.weight; measures.bodyFat = h.bodyFat; DATA.measures = measures; saveData(); populateMeasureFields(); closeModal(); } }}, 'Restore');
-    list.appendChild(el('div',{style:'display:flex;justify-content:space-between;align-items:center'}, el('div',{}, label), restoreBtn));
-  });
-  openModal(el('div',{}, title, list, el('div',{style:'height:8px'}), el('div',{style:'display:flex;justify-content:flex-end'}, el('button',{class:'btn', onClick:()=>closeModal()}, 'Close'))));
-}
-
-/* =========================
-   Custom theme editor
-   ========================= */
-function openCustomThemeEditor(){
-  const title = el('h3',{}, 'Custom Theme');
-  const accent = el('input',{type:'color', value:'#ff8a00', class:'custom-color'});
-  const accent2 = el('input',{type:'color', value:'#00c2a8', class:'custom-color'});
-  const bg1 = el('input',{type:'color', value:'#071018', class:'custom-color'});
-  const bg2 = el('input',{type:'color', value:'#081827', class:'custom-color'});
-  const save = el('button',{class:'btn primary', onClick:()=>{
-    const name = prompt('Name this custom theme (e.g., My Sunset):','custom');
-    if(!name) return;
-    // apply as inline custom theme by setting CSS variables on :root and saving name
-    document.documentElement.style.setProperty('--accent', accent.value);
-    document.documentElement.style.setProperty('--accent-2', accent2.value);
-    document.documentElement.style.setProperty('--bg-1', bg1.value);
-    document.documentElement.style.setProperty('--bg-2', bg2.value);
-    applyTheme('custom');
-    localStorage.setItem('fi_custom_theme', JSON.stringify({name,accent:accent.value,accent2:accent2.value,bg1:bg1.value,bg2:bg2.value}));
-    closeModal();
-    showToast('Custom theme applied', 'OK', ()=>{}, 1600);
-  }}, 'Apply');
-  const cancel = el('button',{class:'btn', onClick:()=>closeModal()}, 'Cancel');
-  openModal(el('div',{}, title, el('div',{style:'display:flex;gap:8px;align-items:center;margin-top:8px'}, el('div',{}, 'Accent'), accent), el('div',{style:'display:flex;gap:8px;align-items:center;margin-top:8px'}, el('div',{}, 'Accent 2'), accent2), el('div',{style:'display:flex;gap:8px;align-items:center;margin-top:8px'}, el('div',{}, 'Background 1'), bg1), el('div',{style:'display:flex;gap:8px;align-items:center;margin-top:8px'}, el('div',{}, 'Background 2'), bg2), el('div',{style:'height:10px'}), el('div',{class:'row'}, save, cancel)));
-}
-
-/* =========================
-   Export / Import JSON (full app)
-   ========================= */
-function exportAppData(){
-  const payload = JSON.stringify(DATA, null, 2);
-  downloadTextFile(payload, `field-iron-data-${new Date().toISOString().slice(0,10)}.json`);
-}
-
-/* =========================
    Init
    ========================= */
 ensureDayFields();
@@ -1304,8 +1032,6 @@ populateMeasureFields();
 
 /* Expose for debugging */
 window.FI = { DATA, EXERCISES, saveData, renderAll, openDaySettings, openSheet, shuffleDay, newWorkoutForDay, exportAppData };
-
 </script>
 </body>
 </html>
-       
