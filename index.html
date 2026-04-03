@@ -1,369 +1,770 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Field+Iron — Fixed</title>
-  <meta name="theme-color" content="#071018">
-  <style>
-    :root{
-      --radius:12px; --max-width:1200px; --ui-transition:180ms; --muted:#9fb3c8; --text:#e6eef6; --accent:#ff6a00;
-      --bg: linear-gradient(180deg,#071018,#071827); --card: rgba(255,255,255,0.02);
-    }
-    body{margin:0;font-family:Inter,system-ui, -apple-system, "Segoe UI", Roboto, Arial; background:var(--bg); color:var(--text); padding:18px; box-sizing:border-box;}
-    .wrap{max-width:var(--max-width);margin:0 auto;display:flex;flex-direction:column;gap:18px;min-height:100vh;}
-    header{display:flex;align-items:center;justify-content:space-between;gap:12px;}
-    .brand{display:flex;align-items:center;gap:12px;}
-    .logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(90deg,var(--accent),rgba(255,255,255,0.06));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;}
-    .title{display:flex;flex-direction:column;}
-    .title h1{margin:0;font-size:18px;}
-    .subtitle{margin:0;color:var(--muted);font-size:13px;}
-    main{display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start;}
-    @media (max-width:980px){ main{grid-template-columns:1fr;} }
-    .panel{background:var(--card);border-radius:10px;padding:14px;}
-    .section-title{margin:0 0 8px 0;color:var(--muted);font-size:15px;}
-    .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-    .btn{border:none;padding:9px 12px;border-radius:10px;cursor:pointer;background:transparent;color:var(--text);border:1px solid rgba(255,255,255,0.02);}
-    .btn-primary{background:linear-gradient(90deg,var(--accent),rgba(255,255,255,0.04));color:#fff;border:none;}
-    .input{padding:9px 10px;border-radius:10px;background:transparent;color:var(--text);border:1px solid rgba(255,255,255,0.02);}
-    #workouts-list{display:flex;flex-direction:column;gap:8px;margin-top:8px;}
-    .workout-item{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.01);}
-    .workout-title{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .muted{color:var(--muted);font-size:13px;}
-    .hr{height:1px;background:rgba(255,255,255,0.03);margin:12px 0;border-radius:2px;}
-    .empty{color:var(--muted);padding:12px 0;text-align:center;}
-    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:28px;background:rgba(0,0,0,0.6);color:#fff;padding:10px 14px;border-radius:10px;display:none;z-index:9999;}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Field+Iron — Fresh Start</title>
+<meta name="theme-color" content="#0b1720">
+<style>
+  /* Design tokens */
+  :root{
+    --bg:#071018;
+    --panel:#0b1a24;
+    --muted:#9fb3c8;
+    --text:#e6eef6;
+    --accent:#00d4a6;
+    --accent-2:#3b82f6;
+    --radius:12px;
+    --glass: rgba(255,255,255,0.03);
+    --ui: 220ms cubic-bezier(.2,.9,.2,1);
+    --max-width:1100px;
+  }
+  /* Light preset */
+  body[data-theme="light"]{ --bg:#f6f8fa; --panel:#ffffff; --muted:#6b7f8f; --text:#0b1a24; --accent:#ff6a00; --glass: rgba(0,0,0,0.04); }
+
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;box-sizing:border-box;}
+  .wrap{max-width:var(--max-width);margin:18px auto;padding:18px;display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start;}
+  @media (max-width:980px){ .wrap{grid-template-columns:1fr; padding:12px;} .right-col{order:2;} .left-col{order:1;} }
+
+  header{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+  .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(90deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:18px;box-shadow:0 8px 30px rgba(0,0,0,0.35);}
+  .brand{display:flex;flex-direction:column;}
+  .brand h1{margin:0;font-size:18px;}
+  .brand p{margin:0;color:var(--muted);font-size:13px;}
+
+  /* Panels */
+  .panel{background:var(--panel);border-radius:var(--radius);padding:14px;border:1px solid var(--glass);transition:box-shadow var(--ui), transform var(--ui);}
+  .panel:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(0,0,0,0.45);}
+
+  /* Controls */
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .btn{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text);padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:700;transition:transform var(--ui);}
+  .btn:active{transform:scale(.98);}
+  .btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,0.2);}
+  .small{font-size:13px;color:var(--muted);}
+
+  /* Exercise list */
+  .ex-list{display:flex;flex-direction:column;gap:10px;margin-top:12px;}
+  .ex-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border:1px solid rgba(255,255,255,0.02);}
+  .ex-left{flex:1;min-width:0;}
+  .ex-title{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ex-meta{color:var(--muted);font-size:13px;margin-top:6px;}
+  .ex-actions{display:flex;gap:8px;align-items:center;}
+
+  /* Swap UI */
+  .swap-select{padding:8px;border-radius:8px;border:1px solid var(--glass);background:transparent;color:var(--text);min-width:220px;}
+  .search{padding:8px;border-radius:8px;border:1px solid var(--glass);background:transparent;color:var(--text);width:100%;}
+
+  /* Right column */
+  .stat{display:flex;flex-direction:column;gap:6px;}
+  .stat-row{display:flex;justify-content:space-between;align-items:center;}
+  .progress{height:12px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden;}
+  .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;transition:width 600ms var(--ui);}
+
+  /* Database modal */
+  .modal{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;}
+  .modal-card{width:920px;max-width:96%;max-height:86vh;overflow:auto;border-radius:12px;padding:14px;background:var(--panel);border:1px solid var(--glass);}
+
+  /* Footer */
+  footer{grid-column:1/-1;margin-top:6px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;align-items:center;}
+  .kbd{background:rgba(255,255,255,0.03);padding:4px 8px;border-radius:6px;font-weight:700;font-size:12px;color:var(--muted);}
+
+  /* Tiny helpers */
+  .muted{color:var(--muted);}
+  .hidden{display:none !important;}
+</style>
 </head>
-<body>
+<body data-theme="dark">
   <div class="wrap" id="app">
-    <header>
-      <div class="brand">
-        <div class="logo" id="logo">FI</div>
-        <div class="title">
+    <div class="left-col">
+      <header>
+        <div class="logo">FI</div>
+        <div class="brand">
           <h1>Field+Iron</h1>
-          <div class="subtitle">Daily & Weekly workouts — simplified</div>
+          <p class="small">5‑exercise daily set • swap any exercise • professional UI</p>
         </div>
-      </div>
-      <!-- top boxes removed as requested -->
-      <div class="muted">v2.1</div>
-    </header>
+        <div style="flex:1"></div>
+        <div class="controls">
+          <button id="shuffle-btn" class="btn">Shuffle</button>
+          <button id="open-db" class="btn">Browse DB</button>
+          <button id="export-btn" class="btn">Export</button>
+          <button id="import-btn" class="btn">Import</button>
+        </div>
+      </header>
 
-    <main>
-      <section class="panel" aria-labelledby="view-heading">
+      <section class="panel" aria-labelledby="today">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <div>
-            <h2 id="view-heading" class="section-title">Planner</h2>
-            <div class="muted" id="current-day-label">Loading…</div>
+            <div class="small">Today</div>
+            <div style="font-weight:900;font-size:20px" id="date-label"></div>
+            <div class="small muted" id="routine-name">Random set</div>
           </div>
-
-          <div class="controls" role="tablist" aria-label="View toggle">
-            <button id="view-daily" class="btn">Daily</button>
-            <button id="view-weekly" class="btn">Weekly</button>
+          <div style="text-align:right">
+            <div class="small">Default exercises</div>
+            <div style="font-weight:900;font-size:20px" id="default-count-label">5</div>
+            <div class="small muted">Swap any item</div>
           </div>
         </div>
 
-        <div style="display:flex;gap:10px;align-items:center;margin-top:12px;">
-          <div class="controls">
-            <button id="prev" class="btn">◀</button>
-            <button id="next" class="btn">▶</button>
-            <button id="today-btn" class="btn">Today</button>
-          </div>
+        <div class="ex-list" id="ex-list" aria-live="polite"></div>
+
+        <div style="display:flex;gap:8px;margin-top:12px;align-items:center;">
+          <input id="quick-add" class="search" placeholder="Add custom exercise (press Enter)" />
+          <button id="add-custom" class="btn">Add</button>
           <div style="flex:1"></div>
-          <div class="muted">Default exercises: <strong id="default-count-label">5</strong></div>
+          <button id="save-routine" class="btn-primary btn">Save Routine</button>
         </div>
+      </section>
 
-        <div style="display:flex;gap:10px;align-items:center;margin-top:12px;">
-          <input id="quick-add" class="input" type="text" placeholder="Quick add (Enter)" />
-          <button id="quick-add-btn" class="btn-primary btn">Add</button>
-          <button id="templates-btn" class="btn">Templates</button>
-        </div>
-
-        <div class="hr"></div>
-
-        <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px;">
-          <input id="filter" class="input" type="text" placeholder="Filter workouts" />
-          <div style="flex:1"></div>
-          <button id="export-json" class="btn">Export</button>
-          <label for="import-file" class="btn" style="cursor:pointer;">Import</label>
-          <input id="import-file" type="file" accept="application/json" style="display:none" />
-        </div>
-
-        <div id="daily-view">
-          <div id="workouts-list" aria-live="polite"></div>
-        </div>
-
-        <div id="weekly-view" class="hidden">
-          <div id="week-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;"></div>
-        </div>
-
-        <div class="hr"></div>
-
+      <section class="panel" style="margin-top:12px;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div class="controls">
-            <button id="clear-all" class="btn">Clear Day</button>
-            <button id="reset-defaults" class="btn">Reset Defaults</button>
-            <button id="undo-btn" class="btn">Undo</button>
-          </div>
-          <div class="muted">Saved locally</div>
+          <div><strong>Swap Controls</strong><div class="small muted">Replace a slot with any DB exercise</div></div>
+          <div class="small muted">Tip: double‑click an exercise to quick replace</div>
         </div>
 
-        <div class="hr"></div>
+        <div style="display:flex;gap:8px;margin-top:10px;align-items:center;">
+          <select id="swap-target" class="swap-select"></select>
+          <input id="swap-search" class="search" placeholder="Search DB to swap" />
+          <button id="swap-btn" class="btn-primary btn">Replace</button>
+        </div>
+      </section>
+    </div>
 
+    <div class="right-col">
+      <section class="panel stat">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div>
-            <strong>Session</strong>
-            <div class="muted" id="session-status">Idle</div>
+          <div><strong>Profile</strong><div class="small muted">Track bodyfat progress</div></div>
+          <div class="small muted">v1.0</div>
+        </div>
+
+        <div style="margin-top:10px;">
+          <div class="stat-row"><div class="small">Weight</div><div><input id="weight" type="number" style="width:90px;padding:6px;border-radius:8px;border:1px solid var(--glass);background:transparent;color:var(--text)" /></div></div>
+          <div class="stat-row" style="margin-top:8px;"><div class="small">Bodyfat</div><div><input id="bf" type="number" step="0.1" style="width:90px;padding:6px;border-radius:8px;border:1px solid var(--glass);background:transparent;color:var(--text)" /></div></div>
+          <div class="stat-row" style="margin-top:8px;"><div class="small">Target BF</div><div><input id="bf-target" type="number" step="0.1" style="width:90px;padding:6px;border-radius:8px;border:1px solid var(--glass);background:transparent;color:var(--text)" /></div></div>
+          <div style="margin-top:12px;">
+            <div class="small">Progress to target</div>
+            <div class="progress" style="margin-top:8px;"><i id="progress-bar"></i></div>
+            <div class="small muted" id="progress-text" style="margin-top:8px"></div>
           </div>
-          <div style="display:flex;align-items:center;gap:12px;">
-            <div id="session-timer" class="muted">00:00</div>
-            <div class="controls">
-              <button id="start-session" class="btn-primary btn">Start</button>
-              <button id="pause-session" class="btn">Pause</button>
-              <button id="stop-session" class="btn">Stop</button>
-            </div>
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <button id="apply-profile" class="btn-primary btn">Apply</button>
+            <button id="reset-profile" class="btn">Reset</button>
           </div>
         </div>
       </section>
 
-      <aside>
-        <section class="panel">
-          <h3 class="section-title">Settings</h3>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-            <label class="muted">Show timezone <div id="show-timezone" class="btn" style="display:inline-block;margin-left:8px;">On</div></label>
-            <label class="muted">Short weekday <div id="use-short-day" class="btn" style="display:inline-block;margin-left:8px;">Off</div></label>
-            <label class="muted">Enable offline <div id="enable-sw" class="btn" style="display:inline-block;margin-left:8px;">Off</div></label>
-            <label class="muted">Vibrate <div id="vibrate" class="btn" style="display:inline-block;margin-left:8px;">On</div></label>
+      <section class="panel" style="margin-top:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div><strong>Theme</strong><div class="small muted">Pick a look</div></div>
+          <div class="controls">
+            <button id="theme-dark" class="btn">Dark</button>
+            <button id="theme-light" class="btn">Light</button>
           </div>
+        </div>
 
-          <div class="hr"></div>
+        <div style="margin-top:12px;">
+          <div><strong>Routines</strong></div>
+          <div class="small muted" id="saved-list" style="margin-top:8px"></div>
+        </div>
+      </section>
+    </div>
 
-          <div style="display:flex;flex-direction:column;gap:8px;">
-            <label class="muted">Default exercise count
-              <input id="default-count" class="input" type="number" min="1" max="12" value="5" />
-            </label>
-            <label class="muted">Base exercises (comma separated)
-              <textarea id="base-exercises" class="input" rows="3">Reverse Lunge — 4 sets × 8 ea, Kettlebell Farmer Carry — 4 sets × 50m, DB Bulgarian Split — 3 sets × 8 ea, Goblet Squat — 3 sets × 10, Push Up — 3 sets × 12</textarea>
-            </label>
-            <div style="display:flex;gap:8px;">
-              <button id="save-settings" class="btn-primary btn">Save</button>
-              <button id="reset-settings" class="btn">Reset</button>
-            </div>
-          </div>
-        </section>
-
-        <section class="panel" style="margin-top:12px;">
-          <h3 class="section-title">Session Log</h3>
-          <div id="session-log" class="empty">No sessions yet.</div>
-          <div style="display:flex;gap:8px;align-items:center;margin-top:12px;">
-            <button id="download-log" class="btn">Download Log</button>
-            <button id="clear-log" class="btn">Clear Log</button>
-            <div style="flex:1"></div>
-            <span class="muted">Local only</span>
-          </div>
-        </section>
-      </aside>
-    </main>
-
-    <footer style="display:flex;justify-content:space-between;align-items:center;">
-      <small class="muted">Field+Iron • Local only</small>
-      <div class="muted">v2.1</div>
+    <footer>
+      <div class="small muted">Professional prototype • swap, save, export • 125 exercise DB</div>
+      <div class="small muted">Shortcuts: <span class="kbd">S</span> shuffle <span class="kbd">D</span> open DB</div>
     </footer>
   </div>
 
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <!-- Database modal -->
+  <div id="db-modal" class="modal hidden" aria-hidden="true">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div><strong>Exercise Database</strong><div class="small muted">125 exercises — click to preview or add</div></div>
+        <div><button id="close-db" class="btn">Close</button></div>
+      </div>
+      <div style="margin-top:12px;">
+        <input id="db-filter" class="search" placeholder="Filter exercises by name or tag" />
+      </div>
+      <div id="db-list" style="margin-top:12px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;"></div>
+    </div>
+  </div>
 
-  <script>
-  (function(){
-    'use strict';
+<script>
+(() => {
+  'use strict';
 
-    const STORAGE_BY_DATE = 'fieldiron.byDate.v2';
-    const SETTINGS_KEY = 'fieldiron.settings.v8';
-    const LOG_KEY = 'fieldiron.sessions.v1';
-    const DEFAULTS = {
-      defaultExerciseCount: 5,
-      baseExercises: [
-        'Reverse Lunge — 4 sets × 8 ea',
-        'Kettlebell Farmer Carry — 4 sets × 50m',
-        'DB Bulgarian Split — 3 sets × 8 ea',
-        'Goblet Squat — 3 sets × 10',
-        'Push Up — 3 sets × 12'
-      ],
-      dailyStretches: [
-        'Kneeling Hip Flexor Stretch — 2 sets × 30s ea',
-        'Standing Hamstring Stretch — 2 sets × 30s ea',
-        'Child Pose Hold — 1 × 60s'
-      ]
-    };
+  /* -------------------------
+     Exercise database (125 items)
+     ------------------------- */
+  const EXERCISES = [
+    "Goblet Squat — 3 sets × 10",
+    "Back Squat — 5 sets × 5",
+    "Front Squat — 4 sets × 6",
+    "Romanian Deadlift — 4 sets × 8",
+    "Conventional Deadlift — 5 sets × 3",
+    "Sumo Deadlift — 4 sets × 5",
+    "Trap Bar Deadlift — 4 sets × 6",
+    "Kettlebell Swing — 4 sets × 12",
+    "Kettlebell Farmer Carry — 4 sets × 50m",
+    "DB Bulgarian Split — 3 sets × 8 ea",
+    "Reverse Lunge — 4 sets × 8 ea",
+    "Walking Lunge — 3 sets × 12 steps",
+    "Step Up — 3 sets × 10 ea",
+    "Leg Press — 4 sets × 10",
+    "Hamstring Curl — 3 sets × 12",
+    "Nordic Hamstring Curl — 3 sets × 6",
+    "Glute Bridge — 4 sets × 12",
+    "Hip Thrust — 4 sets × 8",
+    "Calf Raise Standing — 4 sets × 15",
+    "Calf Raise Seated — 3 sets × 15",
+    "Pull Up — 4 sets × 6-10",
+    "Chin Up — 4 sets × 6-10",
+    "Lat Pulldown — 4 sets × 10",
+    "Bent Over Row — 4 sets × 8",
+    "Single Arm DB Row — 3 sets × 10 ea",
+    "T Bar Row — 4 sets × 8",
+    "Inverted Row — 3 sets × 10",
+    "Seated Cable Row — 4 sets × 10",
+    "Face Pull — 3 sets × 15",
+    "Barbell Row Pendlay — 4 sets × 6",
+    "Chest Press Barbell — 4 sets × 6-8",
+    "Bench Press — 5 sets × 5",
+    "Incline Bench — 4 sets × 8",
+    "Decline Bench — 3 sets × 8",
+    "Dumbbell Press — 4 sets × 10",
+    "Push Up — 3 sets × 12",
+    "Ring Dip — 3 sets × 8",
+    "Dip — 4 sets × 8",
+    "Overhead Press — 4 sets × 6",
+    "Seated DB Press — 3 sets × 10",
+    "Arnold Press — 3 sets × 10",
+    "Lateral Raise — 3 sets × 15",
+    "Front Raise — 3 sets × 12",
+    "Rear Delt Fly — 3 sets × 15",
+    "Shrug — 4 sets × 12",
+    "Farmer Carry Heavy — 4 sets × 40m",
+    "Suitcase Carry — 3 sets × 30m ea",
+    "Sled Push — 6 rounds × 20m",
+    "Sled Pull — 6 rounds × 20m",
+    "Battle Ropes — 6 rounds × 30s",
+    "Box Jump — 5 sets × 5",
+    "Broad Jump — 4 sets × 6",
+    "Plyo Push Up — 4 sets × 6",
+    "Medicine Ball Slam — 4 sets × 12",
+    "Sprint Intervals — 8 rounds × 20s",
+    "Rowing Intervals — 8 rounds × 30s",
+    "Bike Sprints — 10 rounds × 20s",
+    "Turkish Get Up — 3 sets × 4 ea",
+    "Clean and Jerk — 5 sets × 3",
+    "Power Clean — 4 sets × 3",
+    "Snatch — 4 sets × 3",
+    "Kettlebell Clean — 4 sets × 6",
+    "Kettlebell Snatch — 4 sets × 8",
+    "Windmill — 3 sets × 8 ea",
+    "Farmer Carry Suitcase — 4 sets × 40m",
+    "Single Leg RDL — 3 sets × 8 ea",
+    "Cable Woodchop — 3 sets × 12 ea",
+    "Hanging Leg Raise — 4 sets × 10",
+    "Plank — 3 sets × 60s",
+    "Side Plank — 3 sets × 45s ea",
+    "Ab Wheel Rollout — 3 sets × 10",
+    "Russian Twist — 3 sets × 20",
+    "Mountain Climbers — 4 sets × 30s",
+    "Farmer Carry Overhead — 3 sets × 30m",
+    "Sled Drag Backwards — 6 rounds × 20m",
+    "Incline Push Up — 3 sets × 15",
+    "Decline Push Up — 3 sets × 12",
+    "Cable Fly — 3 sets × 12",
+    "Chest Supported Row — 3 sets × 10",
+    "Zercher Squat — 4 sets × 6",
+    "Jefferson Deadlift — 3 sets × 5",
+    "Pistol Squat — 3 sets × 6 ea",
+    "Cossack Squat — 3 sets × 8 ea",
+    "Sissy Squat — 3 sets × 10",
+    "Weighted Step Down — 3 sets × 10 ea",
+    "Reverse Hyperextension — 3 sets × 12",
+    "Good Morning — 3 sets × 8",
+    "Cable Pull Through — 3 sets × 12",
+    "Incline DB Row — 3 sets × 10",
+    "One Arm Landmine Press — 3 sets × 8 ea",
+    "Landmine Row — 3 sets × 10 ea",
+    "Landmine Squat — 3 sets × 10",
+    "Kettlebell Figure 8 — 3 sets × 12",
+    "TRX Hamstring Curl — 3 sets × 12",
+    "TRX Row — 3 sets × 12",
+    "TRX Push Up — 3 sets × 12",
+    "Cable Lateral Raise — 3 sets × 15",
+    "Incline Hammer Curl — 3 sets × 10",
+    "Barbell Curl — 4 sets × 8",
+    "Hammer Curl — 3 sets × 10",
+    "Skull Crusher — 3 sets × 10",
+    "Overhead Triceps Extension — 3 sets × 12",
+    "Farmer Carry Single Arm — 3 sets × 30m ea",
+    "Sled Sprint — 6 rounds × 15m",
+    "Hill Sprint — 8 rounds × 20s",
+    "Bear Crawl — 4 rounds × 30m",
+    "Crab Walk — 4 rounds × 20m",
+    "Lateral Bounds — 4 sets × 8 ea",
+    "Single Arm KB Row — 3 sets × 10 ea",
+    "Weighted Chin Up — 4 sets × 6",
+    "Tempo Squat — 4 sets × 6 (3s down)",
+    "Tempo Bench — 4 sets × 6 (3s down)",
+    "Isometric Hold Squat — 3 sets × 45s",
+    "Isometric Hold Push — 3 sets × 45s",
+    "Band Pull Apart — 3 sets × 20",
+    "Face Pull High — 3 sets × 15",
+    "Cable External Rotation — 3 sets × 15",
+    "Scapular Pull Up — 3 sets × 12",
+    "Weighted Glute Bridge Single Leg — 3 sets × 8 ea",
+    "Farmer Carry with Pause — 4 sets × 30m",
+    "Sled Lateral Push — 6 rounds × 10m"
+  ];
 
-    function nowISO(){ return new Date().toISOString(); }
-    function todayISO(){ return new Date().toISOString().slice(0,10); }
-    function dateAdd(dateISO, days){ const d = new Date(dateISO + 'T00:00:00'); d.setDate(d.getDate() + days); return d.toISOString().slice(0,10); }
-    function showToast(msg, ms=1800){ const t = document.getElementById('toast'); t.textContent = msg; t.style.display='block'; clearTimeout(t._t); t._t = setTimeout(()=> t.style.display='none', ms); }
-    function safeParse(raw, fallback){ try{ return JSON.parse(raw); }catch(e){ return fallback; } }
+  /* -------------------------
+     Storage keys and defaults
+     ------------------------- */
+  const STORAGE = {
+    byDate: 'fi.byDate.v1',
+    routines: 'fi.routines.v1',
+    settings: 'fi.settings.v1'
+  };
 
-    function loadSettings(){
-      try{
-        const raw = localStorage.getItem(SETTINGS_KEY);
-        if(!raw) return { preset:'dark', accent:'orange', view:'daily', selectedDate: todayISO(), defaultExerciseCount: DEFAULTS.defaultExerciseCount, baseExercises: DEFAULTS.baseExercises.slice() };
-        return Object.assign({ preset:'dark', accent:'orange', view:'daily', selectedDate: todayISO(), defaultExerciseCount: DEFAULTS.defaultExerciseCount, baseExercises: DEFAULTS.baseExercises.slice() }, JSON.parse(raw));
-      }catch(e){ return { preset:'dark', accent:'orange', view:'daily', selectedDate: todayISO(), defaultExerciseCount: DEFAULTS.defaultExerciseCount, baseExercises: DEFAULTS.baseExercises.slice() }; }
+  const DEFAULTS = {
+    defaultCount: 5,
+    stretches: [
+      'Kneeling Hip Flexor Stretch — 2 sets × 30s ea',
+      'Standing Hamstring Stretch — 2 sets × 30s ea',
+      'Child Pose Hold — 1 × 60s'
+    ],
+    profile: { weight: 83, bf: 15.3, bfTarget: 12.0 }
+  };
+
+  /* -------------------------
+     Utilities
+     ------------------------- */
+  function nowISO(){ return new Date().toISOString(); }
+  function todayISO(){ return new Date().toISOString().slice(0,10); }
+  function loadJSON(key, fallback){ try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } }
+  function saveJSON(key, obj){ try{ localStorage.setItem(key, JSON.stringify(obj)); }catch(e){ console.warn('save failed', e); } }
+  function sampleShuffle(arr, n){ const copy = arr.slice(); for(let i=copy.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [copy[i],copy[j]]=[copy[j],copy[i]]; } return copy.slice(0,n); }
+
+  /* -------------------------
+     App state
+     ------------------------- */
+  let state = {
+    selectedDate: todayISO(),
+    exercises: [], // current 5 + stretches
+    defaultCount: DEFAULTS.defaultCount,
+    routines: loadJSON(STORAGE.routines, {}),
+    settings: loadJSON(STORAGE.settings, { profile: DEFAULTS.profile, theme: 'dark', defaultCount: DEFAULTS.defaultCount })
+  };
+
+  /* -------------------------
+     DOM refs
+     ------------------------- */
+  const refs = {
+    exList: document.getElementById('ex-list'),
+    dateLabel: document.getElementById('date-label'),
+    defaultCountLabel: document.getElementById('default-count-label'),
+    swapTarget: document.getElementById('swap-target'),
+    swapSearch: document.getElementById('swap-search'),
+    dbModal: document.getElementById('db-modal'),
+    dbList: document.getElementById('db-list'),
+    dbFilter: document.getElementById('db-filter'),
+    savedList: document.getElementById('saved-list'),
+    weightInput: document.getElementById('weight'),
+    bfInput: document.getElementById('bf'),
+    bfTargetInput: document.getElementById('bf-target'),
+    progressBar: document.getElementById('progress-bar'),
+    progressText: document.getElementById('progress-text')
+  };
+
+  /* -------------------------
+     Initialization
+     ------------------------- */
+  function init(){
+    // apply settings
+    if(state.settings.theme === 'light') document.body.setAttribute('data-theme','light');
+    state.defaultCount = state.settings.defaultCount || DEFAULTS.defaultCount;
+    refs.defaultCountLabel.textContent = state.defaultCount;
+
+    // set profile inputs
+    refs.weightInput.value = state.settings.profile.weight;
+    refs.bfInput.value = state.settings.profile.bf;
+    refs.bfTargetInput.value = state.settings.profile.bfTarget;
+
+    // ensure today's routine exists
+    const all = loadJSON(STORAGE.byDate, {});
+    if(!Array.isArray(all[state.selectedDate]) || all[state.selectedDate].length === 0){
+      const base = sampleShuffle(EXERCISES, state.defaultCount);
+      all[state.selectedDate] = base.concat(DEFAULTS.stretches);
+      saveJSON(STORAGE.byDate, all);
     }
-    function saveSettings(s){ try{ localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }catch(e){ console.warn(e); } }
+    state.exercises = loadJSON(STORAGE.byDate, {})[state.selectedDate] || [];
+    renderDate();
+    renderExercises();
+    populateSwapTarget();
+    renderDB();
+    renderSavedList();
+    computeProgress();
+  }
 
-    function loadAll(){ return safeParse(localStorage.getItem(STORAGE_BY_DATE), {}); }
-    function saveAll(obj){ try{ localStorage.setItem(STORAGE_BY_DATE, JSON.stringify(obj)); }catch(e){ console.warn(e); } }
+  /* -------------------------
+     Render helpers
+     ------------------------- */
+  function renderDate(){
+    refs.dateLabel.textContent = new Date(state.selectedDate + 'T00:00:00').toLocaleDateString(undefined, { weekday:'long', month:'short', day:'numeric' });
+  }
 
-    function ensureDate(dateISO){
-      const all = loadAll();
-      if(!Array.isArray(all[dateISO]) || all[dateISO].length===0){
-        const s = loadSettings();
-        const base = (s.baseExercises && s.baseExercises.length) ? s.baseExercises.slice() : DEFAULTS.baseExercises.slice();
-        const pre = base.slice(0, s.defaultExerciseCount || DEFAULTS.defaultExerciseCount);
-        all[dateISO] = pre.concat(DEFAULTS.dailyStretches);
-        saveAll(all);
-      }
-      return all[dateISO];
-    }
+  function renderExercises(){
+    refs.exList.innerHTML = '';
+    state.exercises.forEach((ex, idx) => {
+      const item = document.createElement('div'); item.className = 'ex-item';
+      const left = document.createElement('div'); left.className = 'ex-left';
+      const title = document.createElement('div'); title.className = 'ex-title'; title.textContent = ex;
+      const meta = document.createElement('div'); meta.className = 'ex-meta muted'; meta.textContent = (idx < state.defaultCount ? 'Core' : 'Stretch');
+      left.appendChild(title); left.appendChild(meta);
 
-    function loadFor(dateISO){ const all = loadAll(); return all[dateISO] ? all[dateISO] : ensureDate(dateISO); }
-    function saveFor(dateISO, list){ const all = loadAll(); all[dateISO] = list; saveAll(all); }
+      const actions = document.createElement('div'); actions.className = 'ex-actions';
+      const swapBtn = document.createElement('button'); swapBtn.className = 'btn'; swapBtn.textContent = 'Swap';
+      swapBtn.addEventListener('click', ()=> openSwapFor(idx));
+      const replaceBtn = document.createElement('button'); replaceBtn.className = 'btn'; replaceBtn.textContent = 'Replace';
+      replaceBtn.addEventListener('click', ()=> openDBAndReplace(idx));
+      const removeBtn = document.createElement('button'); removeBtn.className = 'btn'; removeBtn.textContent = 'Remove';
+      removeBtn.addEventListener('click', ()=> removeExercise(idx));
+      actions.appendChild(swapBtn); actions.appendChild(replaceBtn); actions.appendChild(removeBtn);
 
-    function renderWorkouts(filter){
-      const s = loadSettings();
-      const dateISO = s.selectedDate || todayISO();
-      document.getElementById('current-day-label').textContent = new Date(dateISO + 'T00:00:00').toLocaleDateString(undefined, { weekday:'long', month:'short', day:'numeric' });
-      ensureDate(dateISO); // guarantee population
-      const list = loadFor(dateISO);
-      const q = filter && filter.trim() ? filter.trim().toLowerCase() : '';
-      const container = document.getElementById('workouts-list');
-      container.innerHTML = '';
-      const filtered = q ? list.filter(i => i.toLowerCase().includes(q)) : list;
-      if(!filtered.length){ container.innerHTML = '<div class="empty">No workouts yet. Add one below.</div>'; return; }
-      filtered.forEach((text, idx) => {
-        const row = document.createElement('div'); row.className = 'workout-item';
-        const left = document.createElement('div'); left.style.flex='1';
-        const title = document.createElement('div'); title.className = 'workout-title'; title.textContent = text;
-        const meta = document.createElement('div'); meta.className = 'muted'; meta.textContent = `#${idx+1}`;
-        left.appendChild(title); left.appendChild(meta);
-        const actions = document.createElement('div');
-        const up = document.createElement('button'); up.className='btn'; up.textContent='↑'; up.onclick = ()=> moveItem(idx, -1, dateISO);
-        const down = document.createElement('button'); down.className='btn'; down.textContent='↓'; down.onclick = ()=> moveItem(idx, 1, dateISO);
-        const del = document.createElement('button'); del.className='btn'; del.textContent='✕'; del.onclick = ()=> removeItem(idx, dateISO);
-        actions.appendChild(up); actions.appendChild(down); actions.appendChild(del);
-        row.appendChild(left); row.appendChild(actions);
-        container.appendChild(row);
-      });
-    }
-
-    function addWorkoutTo(dateISO, text){
-      if(!text || !text.trim()) return;
-      const list = loadFor(dateISO);
-      list.unshift(text.trim());
-      saveFor(dateISO, list);
-      renderCurrentView();
-      showToast('Workout added');
-    }
-    function removeItem(index, dateISO){
-      const list = loadFor(dateISO);
-      if(index<0||index>=list.length) return;
-      list.splice(index,1);
-      saveFor(dateISO, list);
-      renderCurrentView();
-      showToast('Workout removed');
-    }
-    function moveItem(index, delta, dateISO){
-      const list = loadFor(dateISO);
-      const to = index + delta;
-      if(to<0||to>=list.length) return;
-      const [it] = list.splice(index,1);
-      list.splice(to,0,it);
-      saveFor(dateISO, list);
-      renderCurrentView();
-    }
-
-    function renderWeek(centerDate){
-      const start = getWeekStart(centerDate);
-      const grid = document.getElementById('week-grid'); grid.innerHTML = '';
-      for(let i=0;i<7;i++){
-        const dateISO = dateAdd(start, i);
-        const d = new Date(dateISO + 'T00:00:00');
-        const h = document.createElement('div'); h.style.fontWeight='700'; h.textContent = `${d.toLocaleDateString(undefined,{weekday:'short'})} • ${d.toLocaleDateString(undefined,{month:'short',day:'numeric'})}`;
-        const card = document.createElement('div'); card.className='workout-item'; card.style.flexDirection='column';
-        card.appendChild(h);
-        const list = loadFor(dateISO);
-        const preview = document.createElement('div'); preview.className='muted'; preview.style.marginTop='8px';
-        if(!list || !list.length) preview.textContent = '—';
-        else preview.textContent = list.slice(0,3).join(' • ');
-        card.appendChild(preview);
-        card.addEventListener('click', ()=> { const st = loadSettings(); st.selectedDate = dateISO; st.view = 'daily'; saveSettings(st); renderCurrentView(); });
-        grid.appendChild(card);
-      }
-    }
-
-    function getWeekStart(dateISO){ const d = new Date(dateISO + 'T00:00:00'); const day = d.getDay(); const diff = (day + 6) % 7; d.setDate(d.getDate() - diff); return d.toISOString().slice(0,10); }
-
-    // session (kept minimal)
-    let sessionTimer = null, sessionStart = null, sessionElapsed = 0;
-    function startSession(){ if(sessionTimer) return; sessionStart = Date.now() - sessionElapsed; sessionTimer = setInterval(()=>{ sessionElapsed = Date.now() - sessionStart; document.getElementById('session-timer').textContent = msToTime(sessionElapsed); }, 250); document.getElementById('session-status').textContent = 'Running'; showToast('Session started'); }
-    function pauseSession(){ if(!sessionTimer) return; clearInterval(sessionTimer); sessionTimer = null; document.getElementById('session-status').textContent = 'Paused'; showToast('Session paused'); }
-    function stopSession(){ if(sessionTimer){ clearInterval(sessionTimer); sessionTimer = null; } const duration = msToTime(sessionElapsed); const s = loadSettings(); const log = safeParse(localStorage.getItem(LOG_KEY), []); log.unshift({ title:`Session ${new Date().toLocaleString()}`, startedAt: sessionStart ? new Date(sessionStart).toISOString() : new Date().toISOString(), duration, notes:`Date: ${s.selectedDate || todayISO()}` }); localStorage.setItem(LOG_KEY, JSON.stringify(log)); sessionElapsed = 0; sessionStart = null; document.getElementById('session-status').textContent = 'Idle'; renderSessionLog(); showToast('Session stopped'); }
-    function msToTime(ms){ const s = Math.floor(ms/1000)%60; const m = Math.floor(ms/(60*1000))%60; const h = Math.floor(ms/(60*60*1000)); return (h? (h+':') : '') + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0'); }
-
-    function renderSessionLog(){ const el = document.getElementById('session-log'); const log = safeParse(localStorage.getItem(LOG_KEY), []); if(!el) return; if(!log.length){ el.className='empty'; el.textContent='No sessions yet.'; return; } el.className=''; el.innerHTML=''; log.forEach(entry=>{ const d = document.createElement('div'); d.style.padding='8px 0'; d.style.borderBottom='1px solid rgba(255,255,255,0.02)'; d.innerHTML = `<strong style="display:block;color:var(--text)">${entry.title}</strong><div class="muted">${new Date(entry.startedAt).toLocaleDateString()} — ${entry.duration}</div><div class="muted" style="margin-top:6px">${entry.notes||''}</div>`; el.appendChild(d); }); }
-
-    function renderCurrentView(){
-      const s = loadSettings();
-      document.getElementById('default-count-label').textContent = s.defaultExerciseCount || DEFAULTS.defaultExerciseCount;
-      document.getElementById('default-count').value = s.defaultExerciseCount || DEFAULTS.defaultExerciseCount;
-      document.getElementById('base-exercises').value = (s.baseExercises && s.baseExercises.length) ? s.baseExercises.join(', ') : DEFAULTS.baseExercises.join(', ');
-      if(s.view === 'weekly'){ document.getElementById('daily-view').classList.add('hidden'); document.getElementById('weekly-view').classList.remove('hidden'); renderWeek(s.selectedDate || todayISO()); }
-      else { document.getElementById('daily-view').classList.remove('hidden'); document.getElementById('weekly-view').classList.add('hidden'); renderWorkouts(document.getElementById('filter').value); }
-    }
-
-    // init wiring
-    document.addEventListener('DOMContentLoaded', ()=>{
-      const s = loadSettings();
-      if(!s.selectedDate) s.selectedDate = todayISO();
-      saveSettings(s);
-      // ensure the selected date is populated immediately
-      ensureDate(s.selectedDate);
-      renderCurrentView();
-      renderSessionLog();
-
-      // wire controls
-      document.getElementById('view-daily').addEventListener('click', ()=>{ const st = loadSettings(); st.view='daily'; saveSettings(st); renderCurrentView(); });
-      document.getElementById('view-weekly').addEventListener('click', ()=>{ const st = loadSettings(); st.view='weekly'; saveSettings(st); renderCurrentView(); });
-      document.getElementById('prev').addEventListener('click', ()=>{ const st = loadSettings(); st.selectedDate = (st.view==='weekly') ? dateAdd(st.selectedDate, -7) : dateAdd(st.selectedDate, -1); saveSettings(st); renderCurrentView(); });
-      document.getElementById('next').addEventListener('click', ()=>{ const st = loadSettings(); st.selectedDate = (st.view==='weekly') ? dateAdd(st.selectedDate, 7) : dateAdd(st.selectedDate, 1); saveSettings(st); renderCurrentView(); });
-      document.getElementById('today-btn').addEventListener('click', ()=>{ const st = loadSettings(); st.selectedDate = todayISO(); saveSettings(st); renderCurrentView(); showToast('Jumped to today'); });
-
-      document.getElementById('quick-add-btn').addEventListener('click', ()=>{ const st = loadSettings(); addWorkoutTo(st.selectedDate || todayISO(), document.getElementById('quick-add').value); document.getElementById('quick-add').value=''; });
-      document.getElementById('quick-add').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ const st = loadSettings(); addWorkoutTo(st.selectedDate || todayISO(), document.getElementById('quick-add').value); document.getElementById('quick-add').value=''; } });
-
-      document.getElementById('filter').addEventListener('input', ()=> renderWorkouts(document.getElementById('filter').value));
-      document.getElementById('export-json').addEventListener('click', ()=>{ const payload = { byDate: loadAll(), exportedAt: nowISO() }; const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='fieldiron-by-date.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); showToast('Export started'); });
-      document.getElementById('import-file').addEventListener('change', (e)=>{ const f = e.target.files && e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = (ev)=>{ try{ const parsed = JSON.parse(ev.target.result); if(parsed && parsed.byDate){ saveAll(parsed.byDate); renderCurrentView(); showToast('Imported'); } else alert('Invalid file'); }catch(err){ alert('Failed to parse'); } }; r.readAsText(f); e.target.value=''; });
-
-      document.getElementById('clear-all').addEventListener('click', ()=>{ if(!confirm('Clear all workouts for selected day?')) return; const st = loadSettings(); saveFor(st.selectedDate || todayISO(), []); renderCurrentView(); showToast('Day cleared'); });
-      document.getElementById('reset-defaults').addEventListener('click', ()=>{ if(!confirm('Reset selected day to defaults?')) return; const st = loadSettings(); const base = st.baseExercises && st.baseExercises.length ? st.baseExercises.slice() : DEFAULTS.baseExercises.slice(); const pre = base.slice(0, st.defaultExerciseCount || DEFAULTS.defaultExerciseCount); saveFor(st.selectedDate || todayISO(), pre.concat(DEFAULTS.dailyStretches)); renderCurrentView(); showToast('Defaults restored'); });
-      document.getElementById('undo-btn').addEventListener('click', ()=>{ const stack = safeParse(localStorage.getItem('fieldiron.undo.v1'), []); if(!stack.length){ showToast('Nothing to undo'); return; } const snap = stack.shift(); localStorage.setItem('fieldiron.undo.v1', JSON.stringify(stack)); const all = loadAll(); all[snap.date] = snap.workouts; saveAll(all); renderCurrentView(); showToast('Undo applied'); });
-
-      document.getElementById('start-session').addEventListener('click', startSession);
-      document.getElementById('pause-session').addEventListener('click', pauseSession);
-      document.getElementById('stop-session').addEventListener('click', stopSession);
-
-      document.getElementById('save-settings').addEventListener('click', ()=>{ const st = loadSettings(); st.defaultExerciseCount = Math.max(1, Math.min(12, Number(document.getElementById('default-count').value) || DEFAULTS.defaultExerciseCount)); st.baseExercises = document.getElementById('base-exercises').value.split(',').map(s=>s.trim()).filter(Boolean); saveSettings(st); // ensure selected date uses new defaults next time
-        showToast('Settings saved'); renderCurrentView(); });
-
-      document.getElementById('reset-settings').addEventListener('click', ()=>{ const st = loadSettings(); st.defaultExerciseCount = DEFAULTS.defaultExerciseCount; st.baseExercises = DEFAULTS.baseExercises.slice(); saveSettings(st); document.getElementById('default-count').value = st.defaultExerciseCount; document.getElementById('base-exercises').value = st.baseExercises.join(', '); showToast('Settings reset'); renderCurrentView(); });
-
-      renderCurrentView();
+      item.appendChild(left); item.appendChild(actions);
+      // double click quick replace
+      item.addEventListener('dblclick', ()=> quickReplace(idx));
+      refs.exList.appendChild(item);
     });
+  }
 
-    // expose for debugging
-    try{ window.__FieldIron = { loadAll, saveAll, loadFor, saveFor, loadSettings, saveSettings, ensureDate }; }catch(e){}
-  })();
-  </script>
+  function populateSwapTarget(){
+    refs.swapTarget.innerHTML = '';
+    for(let i=0;i<state.defaultCount;i++){
+      const opt = document.createElement('option'); opt.value = i; opt.textContent = `Slot ${i+1} — ${state.exercises[i] || '—'}`;
+      refs.swapTarget.appendChild(opt);
+    }
+  }
+
+  function renderDB(filter=''){
+    refs.dbList.innerHTML = '';
+    const q = (filter||'').toLowerCase();
+    EXERCISES.forEach((ex, i) => {
+      if(q && !ex.toLowerCase().includes(q)) return;
+      const card = document.createElement('div'); card.className = 'ex-item';
+      card.style.cursor = 'pointer';
+      const left = document.createElement('div'); left.style.flex='1';
+      const t = document.createElement('div'); t.className='ex-title'; t.textContent = ex;
+      left.appendChild(t);
+      const btns = document.createElement('div');
+      const addBtn = document.createElement('button'); addBtn.className='btn'; addBtn.textContent='Add';
+      addBtn.addEventListener('click', (e)=>{ e.stopPropagation(); addToToday(ex); });
+      const previewBtn = document.createElement('button'); previewBtn.className='btn'; previewBtn.textContent='Preview';
+      previewBtn.addEventListener('click', (e)=>{ e.stopPropagation(); alert(ex); });
+      btns.appendChild(addBtn); btns.appendChild(previewBtn);
+      card.appendChild(left); card.appendChild(btns);
+      refs.dbList.appendChild(card);
+    });
+  }
+
+  function renderSavedList(){
+    const keys = Object.keys(state.routines || {});
+    if(!keys.length){ refs.savedList.textContent = 'No saved routines'; return; }
+    refs.savedList.innerHTML = keys.map(k => `<div style="margin-top:6px"><strong>${k}</strong> <span class="small muted">(${state.routines[k].length} items)</span> <button data-name="${k}" class="btn load-routine">Load</button> <button data-name="${k}" class="btn del-routine">Delete</button></div>`).join('');
+    // wire load/delete
+    document.querySelectorAll('.load-routine').forEach(b => b.addEventListener('click', (e)=> {
+      const name = e.target.dataset.name; loadRoutine(name);
+    }));
+    document.querySelectorAll('.del-routine').forEach(b => b.addEventListener('click', (e)=> {
+      const name = e.target.dataset.name; if(confirm('Delete routine '+name+'?')){ delete state.routines[name]; saveJSON(STORAGE.routines, state.routines); renderSavedList(); }
+    }));
+  }
+
+  /* -------------------------
+     Actions
+     ------------------------- */
+  function addToToday(ex){
+    state.exercises.splice(state.defaultCount, 0, ex); // insert before stretches
+    saveForDate();
+    renderExercises();
+    populateSwapTarget();
+  }
+
+  function addCustom(){
+    const v = document.getElementById('quick-add').value.trim();
+    if(!v) return;
+    EXERCISES.unshift(v); // add to DB top
+    addToToday(v);
+    document.getElementById('quick-add').value = '';
+    renderDB();
+    showToast('Custom exercise added');
+  }
+
+  function removeExercise(idx){
+    if(idx < state.defaultCount){
+      if(!confirm('Remove core exercise?')) return;
+    }
+    state.exercises.splice(idx,1);
+    saveForDate();
+    renderExercises();
+    populateSwapTarget();
+  }
+
+  function openSwapFor(idx){
+    // set swap target to idx and open DB modal
+    refs.swapTarget.value = Math.min(idx, state.defaultCount-1);
+    openDB();
+  }
+
+  function openDBAndReplace(idx){
+    openDB();
+    // when user clicks an exercise in DB, replace handler will check replaceIndex
+    dbReplaceIndex = idx;
+  }
+
+  let dbReplaceIndex = null;
+
+  function quickReplace(idx){
+    // replace with a random DB item not already in core slots
+    const pool = EXERCISES.filter(e => !state.exercises.slice(0,state.defaultCount).includes(e));
+    if(!pool.length) return;
+    const pick = pool[Math.floor(Math.random()*pool.length)];
+    state.exercises[idx] = pick;
+    saveForDate();
+    renderExercises();
+    showToast('Replaced with random DB exercise');
+  }
+
+  function replaceSlotWith(ex, slotIndex){
+    state.exercises[slotIndex] = ex;
+    saveForDate();
+    renderExercises();
+    populateSwapTarget();
+    showToast('Slot replaced');
+  }
+
+  function swapReplaceFromSearch(){
+    const q = refs.swapSearch.value.trim().toLowerCase();
+    if(!q) return alert('Search DB first');
+    const found = EXERCISES.find(e => e.toLowerCase().includes(q));
+    if(!found) return alert('No match');
+    const slot = Number(refs.swapTarget.value);
+    replaceSlotWith(found, slot);
+  }
+
+  function shuffleToday(){
+    const pool = EXERCISES.slice();
+    const picks = sampleShuffle(pool, state.defaultCount);
+    state.exercises = picks.concat(DEFAULTS.stretches);
+    saveForDate();
+    renderExercises();
+    populateSwapTarget();
+    showToast('Shuffled core exercises');
+  }
+
+  function saveForDate(){
+    const all = loadJSON(STORAGE.byDate, {});
+    all[state.selectedDate] = state.exercises.slice();
+    saveJSON(STORAGE.byDate, all);
+  }
+
+  function saveRoutine(){
+    const name = prompt('Name this routine');
+    if(!name) return;
+    state.routines[name] = state.exercises.slice();
+    saveJSON(STORAGE.routines, state.routines);
+    renderSavedList();
+    showToast('Routine saved');
+  }
+
+  function loadRoutine(name){
+    const r = state.routines[name];
+    if(!r) return;
+    state.exercises = r.slice();
+    saveForDate();
+    renderExercises();
+    populateSwapTarget();
+    showToast('Routine loaded');
+  }
+
+  function exportAll(){
+    const payload = {
+      byDate: loadJSON(STORAGE.byDate, {}),
+      routines: state.routines,
+      settings: state.settings,
+      exportedAt: nowISO()
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'fieldiron-export.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    showToast('Export ready');
+  }
+
+  function importFile(file){
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try{
+        const parsed = JSON.parse(e.target.result);
+        if(parsed.byDate) saveJSON(STORAGE.byDate, parsed.byDate);
+        if(parsed.routines) { state.routines = parsed.routines; saveJSON(STORAGE.routines, state.routines); }
+        if(parsed.settings) { state.settings = parsed.settings; saveJSON(STORAGE.settings, state.settings); }
+        // reload
+        state.exercises = loadJSON(STORAGE.byDate, {})[state.selectedDate] || state.exercises;
+        renderExercises(); renderSavedList(); showToast('Import complete');
+      }catch(err){ alert('Invalid file'); }
+    };
+    reader.readAsText(file);
+  }
+
+  /* -------------------------
+     Profile and progress
+     ------------------------- */
+  function applyProfile(){
+    const w = Number(refs.weightInput.value) || state.settings.profile.weight;
+    const bf = Number(refs.bfInput.value) || state.settings.profile.bf;
+    const target = Number(refs.bfTargetInput.value) || state.settings.profile.bfTarget;
+    state.settings.profile = { weight: w, bf: bf, bfTarget: target };
+    state.settings.defaultCount = state.defaultCount;
+    saveJSON(STORAGE.settings, state.settings);
+    computeProgress();
+    showToast('Profile applied');
+  }
+
+  function computeProgress(){
+    const p = state.settings.profile;
+    // assume lean mass constant: lean = weight * (1 - bf%)
+    const lean = p.weight * (1 - (p.bf/100));
+    const targetWeight = lean / (1 - (p.bfTarget/100));
+    const toLose = p.weight - targetWeight;
+    const progressPct = Math.max(0, Math.min(100, ((p.bf - p.bfTarget) / (p.bf - p.bfTarget + Math.abs(toLose))) * 100 ));
+    // simpler: percent toward BF target by BF difference
+    const bfRange = p.bf - p.bfTarget;
+    const currentProgress = bfRange <= 0 ? 100 : Math.max(0, Math.min(100, ((p.bf - p.bfTarget) / (p.bf - p.bfTarget)) * 100 ));
+    // We'll compute a direct BF progress: (current - target) relative to starting (use starting as current)
+    const pct = Math.max(0, Math.min(100, ((p.bf - p.bfTarget) / (p.bf - p.bfTarget)) * 100 ));
+    // But more useful: show estimated target weight and kg to lose
+    const estTarget = Number(targetWeight.toFixed(2));
+    const kgToLose = Number(toLose.toFixed(2));
+    refs.progressBar.style.width = Math.max(6, Math.min(100, ((p.bf - p.bfTarget) / (p.bf) * 100))) + '%';
+    refs.progressText.textContent = `Estimated target weight ${estTarget} kg • ${kgToLose > 0 ? kgToLose + ' kg to lose' : Math.abs(kgToLose) + ' kg to gain'}`;
+  }
+
+  /* -------------------------
+     Modal and DB interactions
+     ------------------------- */
+  function openDB(){
+    document.getElementById('db-modal').classList.remove('hidden');
+    document.getElementById('db-modal').setAttribute('aria-hidden','false');
+  }
+  function closeDB(){
+    document.getElementById('db-modal').classList.add('hidden');
+    document.getElementById('db-modal').setAttribute('aria-hidden','true');
+    dbReplaceIndex = null;
+  }
+
+  /* -------------------------
+     Quick UI helpers
+     ------------------------- */
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.style.display = 'block';
+    clearTimeout(t._t); t._t = setTimeout(()=> t.style.display = 'none', 1800);
+  }
+
+  /* -------------------------
+     Keyboard shortcuts
+     ------------------------- */
+  document.addEventListener('keydown', (e) => {
+    if(e.key.toLowerCase() === 's'){ shuffleToday(); }
+    if(e.key.toLowerCase() === 'd'){ openDB(); }
+  });
+
+  /* -------------------------
+     Wire DOM events
+     ------------------------- */
+  document.getElementById('shuffle-btn').addEventListener('click', shuffleToday);
+  document.getElementById('open-db').addEventListener('click', openDB);
+  document.getElementById('close-db').addEventListener('click', closeDB);
+  document.getElementById('db-filter').addEventListener('input', (e)=> renderDB(e.target.value));
+  document.getElementById('add-custom').addEventListener('click', addCustom);
+  document.getElementById('quick-add').addEventListener('keydown', (e)=> { if(e.key === 'Enter') addCustom(); });
+  document.getElementById('swap-btn').addEventListener('click', swapReplaceFromSearch);
+  document.getElementById('swap-search').addEventListener('keydown', (e)=> { if(e.key === 'Enter') swapReplaceFromSearch(); });
+  document.getElementById('save-routine').addEventListener('click', saveRoutine);
+  document.getElementById('export-btn').addEventListener('click', exportAll);
+  document.getElementById('import-btn').addEventListener('click', ()=> {
+    const f = document.createElement('input'); f.type='file'; f.accept='application/json'; f.onchange = (e)=> { const file = e.target.files[0]; if(file) importFile(file); }; f.click();
+  });
+
+  document.getElementById('apply-profile').addEventListener('click', applyProfile);
+  document.getElementById('reset-profile').addEventListener('click', ()=> {
+    state.settings.profile = DEFAULTS.profile;
+    refs.weightInput.value = DEFAULTS.profile.weight;
+    refs.bfInput.value = DEFAULTS.profile.bf;
+    refs.bfTargetInput.value = DEFAULTS.profile.bfTarget;
+    saveJSON(STORAGE.settings, state.settings);
+    computeProgress();
+    showToast('Profile reset');
+  });
+
+  document.getElementById('theme-dark').addEventListener('click', ()=> { document.body.removeAttribute('data-theme'); state.settings.theme = 'dark'; saveJSON(STORAGE.settings, state.settings); });
+  document.getElementById('theme-light').addEventListener('click', ()=> { document.body.setAttribute('data-theme','light'); state.settings.theme = 'light'; saveJSON(STORAGE.settings, state.settings); });
+
+  // DB modal replace click behavior
+  refs.dbList.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    const card = btn.closest('.ex-item');
+    if(!card) return;
+    const title = card.querySelector('.ex-title').textContent;
+    if(btn.textContent === 'Add'){ addToToday(title); }
+  });
+
+  // When DB modal is clicked on an item (not button), handle replace if dbReplaceIndex set
+  refs.dbList.addEventListener('click', (e) => {
+    const card = e.target.closest('.ex-item');
+    if(!card) return;
+    const title = card.querySelector('.ex-title').textContent;
+    if(dbReplaceIndex !== null){
+      replaceSlotWith(title, dbReplaceIndex);
+      dbReplaceIndex = null;
+      closeDB();
+    }
+  });
+
+  // initial render of DB
+  function populateSwapTargetSelect(){
+    const sel = document.getElementById('swap-target');
+    sel.innerHTML = '';
+    for(let i=0;i<state.defaultCount;i++){
+      const opt = document.createElement('option'); opt.value = i; opt.textContent = `Slot ${i+1}`;
+      sel.appendChild(opt);
+    }
+  }
+
+  // ensure DB list is clickable: renderDB initially
+  function renderDBInitial(){
+    renderDB('');
+    populateSwapTargetSelect();
+  }
+
+  // helper to load today's exercises into state
+  function loadToday(){
+    const all = loadJSON(STORAGE.byDate, {});
+    state.exercises = all[state.selectedDate] || [];
+  }
+
+  // expose some functions for debugging
+  window.__FieldIron = { EXERCISES, state, saveJSON, loadJSON, renderExercises, renderDB, openDB, closeDB };
+
+  // run init
+  renderDBInitial();
+  init();
+
+})();
+</script>
 </body>
 </html>
