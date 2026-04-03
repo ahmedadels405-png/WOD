@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Field+Iron — Daily & Weekly (Themes)</title>
+  <title>Field+Iron — Overhauled</title>
 
   <!-- Icons / Manifest -->
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -12,234 +12,140 @@
   <meta name="theme-color" content="#071018">
 
   <!--
-    Field+Iron — Single-file app
-    Enhancements in this build:
-      - Theme presets dropdown at top (Sporty, Calm, Vibrant, Minimal, Dark, Light, Solar, High Contrast)
-      - Accent palettes and live preview
-      - Smoother transitions, richer UI controls, improved spacing and micro-interactions
-      - Preserved features: daily/weekly views, per-date workouts, DEFAULT_EXERCISE_COUNT=5, daily stretches, undo, backups, export/import, session timer, SW hooks
+    Field+Iron — Overhauled single-file app
+    - Modern UI with theme presets and accents
+    - Daily + Weekly views, editable defaults, daily stretches
+    - Per-date storage, undo, backups, import/export
+    - Session timer + log, service worker hooks, recovery helper
+    - Accessibility, keyboard shortcuts, responsive & mobile-first
   -->
 
   <style>
+    /* -------------------------
+       Design tokens & base
+       ------------------------- */
     :root{
-      --bg:#071018;
-      --card:#0b1a24;
-      --muted:#9fb3c8;
-      --text:#e6eef6;
-      --accent:#ff6a00;
-      --glass: rgba(255,255,255,0.03);
-      --glass-2: rgba(255,255,255,0.02);
       --radius:14px;
-      --shadow: 0 12px 40px rgba(0,0,0,0.55);
-      --soft-shadow: 0 6px 18px rgba(0,0,0,0.35);
-      --success:#2ecc71;
-      --danger:#ff4d4f;
-      --ui-transition: 220ms cubic-bezier(.2,.9,.2,1);
       --max-width:1200px;
-    }
-
-    /* Theme presets (applied via data-preset on body) */
-    [data-preset="sporty"]{
-      --bg: linear-gradient(180deg,#071018 0%, #071827 100%);
-      --card: linear-gradient(180deg,#071827,#0b2a2a);
-      --muted:#bfeadf;
-      --text:#e6f9f3;
-      --accent:#00d4a6;
+      --ui-transition:200ms cubic-bezier(.2,.9,.2,1);
+      --card-elev: 0 10px 30px rgba(0,0,0,0.45);
       --glass: rgba(255,255,255,0.03);
       --glass-2: rgba(255,255,255,0.02);
-      --shadow: 0 12px 40px rgba(0,20,20,0.6);
-    }
-    [data-preset="calm"]{
-      --bg: linear-gradient(180deg,#f3f7fb 0%, #e9f1f6 100%);
-      --card: linear-gradient(180deg,#ffffff,#f7fbff);
-      --muted:#6b7f8f;
-      --text:#0b1a24;
-      --accent:#4f8cff;
-      --glass: rgba(11,26,36,0.03);
-      --glass-2: rgba(11,26,36,0.02);
-      --shadow: 0 10px 30px rgba(11,26,36,0.06);
-    }
-    [data-preset="vibrant"]{
-      --bg: linear-gradient(180deg,#fff0f6 0%, #fff7ed 100%);
-      --card: linear-gradient(180deg,#fff7f9,#fffdf6);
-      --muted:#6b3b6b;
-      --text:#2b2b2b;
-      --accent:#ff4d6d;
-      --glass: rgba(43,43,43,0.03);
-      --glass-2: rgba(43,43,43,0.02);
-      --shadow: 0 10px 30px rgba(43,43,43,0.06);
-    }
-    [data-preset="minimal"]{
-      --bg: #f7f7f7;
-      --card: #ffffff;
-      --muted:#8a8a8a;
-      --text:#111111;
-      --accent:#222222;
-      --glass: rgba(0,0,0,0.03);
-      --glass-2: rgba(0,0,0,0.02);
-      --shadow: 0 6px 18px rgba(0,0,0,0.04);
-    }
-    [data-preset="dark"]{ /* default dark */
+      --muted: #9fb3c8;
+      --text: #e6eef6;
+      --accent: #ff6a00;
       --bg: linear-gradient(180deg,#071018 0%, #071827 100%);
       --card: linear-gradient(180deg,#0b1a24,#071827);
-      --muted:#9fb3c8;
-      --text:#e6eef6;
-      --accent:#ff6a00;
-      --glass: rgba(255,255,255,0.03);
-      --glass-2: rgba(255,255,255,0.02);
-      --shadow: 0 12px 40px rgba(0,0,0,0.55);
-    }
-    [data-preset="light"]{
-      --bg: linear-gradient(180deg,#f6f8fa 0%, #eef6fb 100%);
-      --card: linear-gradient(180deg,#ffffff,#f7fbff);
-      --muted:#6b7f8f;
-      --text:#0b1a24;
-      --accent:#ff6a00;
-      --glass: rgba(11,26,36,0.03);
-      --glass-2: rgba(11,26,36,0.02);
-      --shadow: 0 8px 24px rgba(11,26,36,0.06);
-    }
-    [data-preset="solar"]{
-      --bg: linear-gradient(180deg,#fff8e6 0%, #fffdf6 100%);
-      --card: linear-gradient(180deg,#fffdf6,#fff8e6);
-      --muted:#6b4f1d;
-      --text:#2b2b2b;
-      --accent:#d97706;
-      --glass: rgba(43,43,43,0.03);
-      --glass-2: rgba(43,43,43,0.02);
-      --shadow: 0 8px 24px rgba(43,43,43,0.06);
-    }
-    [data-preset="hc"]{
-      --bg: #000000;
-      --card: #000000;
-      --muted: #ffffff;
-      --text: #ffffff;
-      --accent: #00ff7f;
-      --glass: rgba(255,255,255,0.06);
-      --glass-2: rgba(255,255,255,0.04);
-      --shadow: none;
+      --success: #2ecc71;
+      --danger: #ff4d4f;
     }
 
-    /* Accent palettes (data-accent) */
-    [data-accent="orange"]{ --accent:#ff6a00; }
-    [data-accent="teal"]{ --accent:#00d4a6; }
-    [data-accent="violet"]{ --accent:#8b5cf6; }
-    [data-accent="rose"]{ --accent:#fb7185; }
-    [data-accent="blue"]{ --accent:#3b82f6; }
-    [data-accent="lime"]{ --accent:#84cc16; }
+    /* Preset palettes (body[data-preset]) */
+    body[data-preset="dark"]{ --bg: linear-gradient(180deg,#071018 0%, #071827 100%); --card: linear-gradient(180deg,#0b1a24,#071827); --muted:#9fb3c8; --text:#e6eef6; }
+    body[data-preset="sporty"]{ --bg: linear-gradient(180deg,#021b1b,#002f2f); --card: linear-gradient(180deg,#002f2f,#003b3b); --muted:#bfeadf; --text:#e6fbf6; --accent:#00d4a6; }
+    body[data-preset="calm"]{ --bg: linear-gradient(180deg,#f3f7fb,#e9f1f6); --card: linear-gradient(180deg,#ffffff,#f7fbff); --muted:#6b7f8f; --text:#0b1a24; --accent:#4f8cff; }
+    body[data-preset="vibrant"]{ --bg: linear-gradient(180deg,#fff0f6,#fff7ed); --card: linear-gradient(180deg,#fff7f9,#fffdf6); --muted:#6b3b6b; --text:#2b2b2b; --accent:#ff4d6d; }
+    body[data-preset="minimal"]{ --bg:#f7f7f7; --card:#ffffff; --muted:#8a8a8a; --text:#111111; --accent:#222222; }
+    body[data-preset="light"]{ --bg: linear-gradient(180deg,#f6f8fa,#eef6fb); --card: linear-gradient(180deg,#ffffff,#f7fbff); --muted:#6b7f8f; --text:#0b1a24; --accent:#ff6a00; }
+    body[data-preset="solar"]{ --bg: linear-gradient(180deg,#fff8e6,#fffdf6); --card: linear-gradient(180deg,#fffdf6,#fff8e6); --muted:#6b4f1d; --text:#2b2b2b; --accent:#d97706; }
+    body[data-preset="hc"]{ --bg:#000; --card:#000; --muted:#fff; --text:#fff; --accent:#00ff7f; }
 
-    /* Base UI */
-    html,body{height:100%;margin:0;}
-    body{
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: var(--bg);
-      color:var(--text);
-      transition: background var(--ui-transition), color var(--ui-transition);
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      padding:20px;
-      box-sizing:border-box;
-    }
+    /* Accent overrides (body[data-accent]) */
+    body[data-accent="orange"]{ --accent:#ff6a00; }
+    body[data-accent="teal"]{ --accent:#00d4a6; }
+    body[data-accent="violet"]{ --accent:#8b5cf6; }
+    body[data-accent="rose"]{ --accent:#fb7185; }
+    body[data-accent="blue"]{ --accent:#3b82f6; }
+    body[data-accent="lime"]{ --accent:#84cc16; }
 
+    /* Base layout */
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+    body{background:var(--bg); color:var(--text); padding:18px; box-sizing:border-box; transition:background var(--ui-transition), color var(--ui-transition);}
     .wrap{max-width:var(--max-width);margin:0 auto;display:flex;flex-direction:column;gap:18px;min-height:100vh;}
-    header{margin-top:6px;display:flex;flex-direction:column;gap:12px;}
-    .topbar{display:flex;align-items:center;gap:12px;justify-content:space-between;}
-    .brand-row{display:flex;align-items:center;gap:12px;}
-    .logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(90deg,var(--accent),rgba(255,255,255,0.06));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;box-shadow:var(--soft-shadow);cursor:pointer;transition:transform var(--ui-transition);}
-    .logo:active{transform:scale(.98);}
-    .title-block{display:flex;flex-direction:column;}
-    .day-header{display:flex;align-items:baseline;gap:10px;margin:0;font-size:20px;font-weight:800;}
+
+    /* Header */
+    header{display:flex;flex-direction:column;gap:12px;}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .brand{display:flex;align-items:center;gap:12px;}
+    .logo{width:52px;height:52px;border-radius:12px;background:linear-gradient(90deg,var(--accent),rgba(255,255,255,0.06));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,0.2);cursor:pointer;}
+    .title{display:flex;flex-direction:column;}
+    .title h1{margin:0;font-size:18px;letter-spacing:-0.01em;}
     .subtitle{margin:0;color:var(--muted);font-size:13px;}
 
-    /* Theme selector at top */
+    /* Theme controls */
     .theme-controls{display:flex;gap:10px;align-items:center;}
-    .preset-select{appearance:none;padding:8px 12px;border-radius:10px;border:1px solid var(--glass-2);background:transparent;color:var(--text);cursor:pointer;transition:box-shadow var(--ui-transition);}
+    .preset-select{appearance:none;padding:8px 12px;border-radius:10px;border:1px solid var(--glass-2);background:transparent;color:var(--text);cursor:pointer;min-width:160px;}
     .accent-row{display:flex;gap:8px;align-items:center;}
-    .accent-swatch{width:28px;height:28px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.12);transition:transform var(--ui-transition);}
+    .accent-swatch{width:28px;height:28px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.12);}
 
+    /* Main layout */
     main{display:grid;grid-template-columns:1fr 380px;gap:18px;align-items:start;}
     @media (max-width:980px){ main{grid-template-columns:1fr;} }
 
-    .card{
-      background:var(--card);
-      border-radius:var(--radius);
-      padding:16px;
-      box-shadow:var(--shadow);
-      border:1px solid var(--glass-2);
-      transition:background var(--ui-transition), box-shadow var(--ui-transition), transform var(--ui-transition);
-    }
-    .card:hover{ transform: translateY(-4px); }
+    .card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--card-elev);border:1px solid var(--glass-2);transition:transform var(--ui-transition);}
+    .card:hover{transform:translateY(-4px);}
 
-    .section-title{margin:0 0 8px 0;color:var(--muted);font-size:15px;}
-    .muted{color:var(--muted);font-size:13px;}
+    /* Controls & buttons */
     .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-    .btn{border:none;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;background:transparent;color:var(--text);border:1px solid rgba(255,255,255,0.04);transition:transform var(--ui-transition), box-shadow var(--ui-transition);}
+    .btn{border:none;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;background:transparent;color:var(--text);border:1px solid rgba(255,255,255,0.04);transition:transform var(--ui-transition);}
     .btn:active{transform:scale(.99);}
     .btn-primary{background:linear-gradient(90deg,var(--accent),rgba(255,255,255,0.06));color:#fff;border:none;box-shadow:0 8px 24px rgba(0,0,0,0.18);}
     .btn-ghost{background:transparent;color:var(--muted);border:1px solid rgba(159,179,200,0.06);}
-    .input-row{display:flex;gap:8px;margin-top:12px;}
-    input[type="text"],textarea,select{flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--glass-2);background:transparent;color:var(--text);outline:none;transition:box-shadow var(--ui-transition), border-color var(--ui-transition);}
-    input[type="text"]:focus{box-shadow:0 6px 18px rgba(0,0,0,0.12);border-color:var(--accent);}
 
-    .workout-item{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--glass);}
-    .workout-item:last-child{border-bottom:none;}
-    .small{font-size:13px;color:var(--muted);}
-    .editable{background:transparent;padding:6px 8px;border-radius:8px;outline:none;}
-    .drag-handle{cursor:grab;padding:6px;border-radius:6px;color:var(--muted);user-select:none;}
-    .hr{height:1px;background:var(--glass);margin:12px 0;border-radius:2px;}
-    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:28px;background:rgba(0,0,0,0.6);color:#fff;padding:10px 14px;border-radius:10px;display:none;z-index:9999;}
-    .kbd{background:rgba(255,255,255,0.03);padding:4px 8px;border-radius:6px;font-weight:700;font-size:12px;color:var(--muted);}
-    .note{font-size:13px;color:var(--muted);}
-    .footer-row{display:flex;justify-content:space-between;align-items:center;gap:12px;}
-    .sr-only{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;}
-    .badge{background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:8px;color:var(--muted);font-size:12px;}
-    .empty{color:var(--muted);padding:12px 0;}
-    .confirm{color:var(--danger);font-weight:700;}
-    .flex-col{display:flex;flex-direction:column;gap:8px;}
-    .flex-row{display:flex;gap:8px;align-items:center;}
-    .search{padding:8px;border-radius:10px;border:1px solid var(--glass-2);background:transparent;color:var(--text);}
-    .tag{background:rgba(255,255,255,0.03);padding:4px 8px;border-radius:8px;font-size:12px;color:var(--muted);}
-    .theme-swatch{width:28px;height:28px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);cursor:pointer;}
-    .theme-row{display:flex;gap:8px;align-items:center;}
-    .hidden{display:none !important;}
-    .pill{background:rgba(255,255,255,0.02);padding:6px 10px;border-radius:999px;color:var(--muted);font-size:13px;}
+    .input{padding:10px 12px;border-radius:10px;border:1px solid var(--glass-2);background:transparent;color:var(--text);outline:none;min-width:0;}
+    .search{padding:8px;border-radius:10px;border:1px solid var(--glass-2);background:transparent;color:var(--text);min-width:160px;}
+
+    /* Workouts list */
+    #workouts-list{display:flex;flex-direction:column;gap:8px;}
+    .workout-item{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px;border-radius:10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02);}
+    .workout-left{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;}
+    .workout-title{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .workout-meta{font-size:12px;color:var(--muted);}
+    .workout-actions{display:flex;gap:8px;align-items:center;}
+
+    /* Weekly grid */
+    .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;}
+    .day-card{padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.02);min-height:90px;cursor:pointer;transition:transform var(--ui-transition), box-shadow var(--ui-transition);}
+    .day-card:hover{transform:translateY(-6px);box-shadow:0 8px 20px rgba(0,0,0,0.12);}
+
+    /* Session area */
+    .timer{font-weight:800;font-size:18px;color:var(--text);min-width:80px;text-align:center;}
+    .session-controls{display:flex;gap:8px;align-items:center;}
+
+    /* Settings grid */
     .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-    .switch{width:40px;height:22px;border-radius:999px;background:rgba(255,255,255,0.06);position:relative;cursor:pointer;display:inline-block;}
-    .switch .knob{position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:all .18s;}
+    .switch{width:44px;height:24px;border-radius:999px;background:rgba(255,255,255,0.06);position:relative;cursor:pointer;display:inline-block;vertical-align:middle;}
+    .switch .knob{position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left var(--ui-transition);}
     .switch.on{background:linear-gradient(90deg,var(--accent),rgba(255,255,255,0.06));}
-    .switch.on .knob{left:21px;}
-    .tag-list{display:flex;gap:6px;flex-wrap:wrap;}
-    .favorite{color:var(--accent);font-weight:800;}
-    .view-toggle{display:flex;gap:6px;align-items:center;}
-    .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;}
-    .day-card{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.02);min-height:80px;cursor:pointer;transition:transform var(--ui-transition), box-shadow var(--ui-transition);}
-    .day-card:hover{transform:translateY(-6px);box-shadow:var(--soft-shadow);}
-    .day-card h4{margin:0 0 6px 0;font-size:13px;}
-    .muted-ghost{color:rgba(255,255,255,0.6);}
+    .switch.on .knob{left:23px;}
 
-    /* small responsive tweaks */
-    @media (max-width:640px){
-      .logo{width:40px;height:40px;}
-      .day-header{font-size:18px;}
-    }
+    /* small helpers */
+    .muted{color:var(--muted);}
+    .pill{background:rgba(255,255,255,0.02);padding:6px 10px;border-radius:999px;color:var(--muted);font-size:13px;}
+    .hr{height:1px;background:var(--glass);margin:12px 0;border-radius:2px;}
+    .empty{color:var(--muted);padding:12px 0;text-align:center;}
+    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:28px;background:rgba(0,0,0,0.6);color:#fff;padding:10px 14px;border-radius:10px;display:none;z-index:9999;}
+    .sr-only{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;}
+    .kbd{background:rgba(255,255,255,0.03);padding:4px 8px;border-radius:6px;font-weight:700;font-size:12px;color:var(--muted);}
+
+    /* Focus outlines for accessibility */
+    :focus{outline:3px solid rgba(255,255,255,0.06);outline-offset:2px;border-radius:8px;}
   </style>
 </head>
 <body data-preset="dark" data-accent="orange">
   <div class="wrap" id="app">
     <header>
       <div class="topbar">
-        <div class="brand-row">
-          <div class="logo" title="Field+Iron">FI</div>
-          <div class="title-block">
-            <div class="day-header"><span id="current-day">Loading…</span> <span class="pill" id="timezone-label" aria-hidden="true"></span></div>
-            <div class="subtitle">Field+Iron — Daily & Weekly workouts, themes, and backups</div>
+        <div class="brand">
+          <div class="logo" id="logo" title="Field+Iron">FI</div>
+          <div class="title">
+            <h1>Field+Iron</h1>
+            <div class="subtitle">Daily & Weekly workouts — themes, backups, and sessions</div>
           </div>
         </div>
 
-        <!-- Theme controls (preset dropdown + accent swatches) -->
         <div class="theme-controls" aria-hidden="false">
-          <label for="preset-select" class="sr-only">Theme preset</label>
-          <select id="preset-select" class="preset-select" title="Choose a theme preset">
+          <select id="preset-select" class="preset-select" aria-label="Theme preset">
             <option value="dark">Dark</option>
             <option value="sporty">Sporty</option>
             <option value="calm">Calm</option>
@@ -250,38 +156,34 @@
             <option value="hc">High Contrast</option>
           </select>
 
-          <div class="accent-row" title="Accent">
-            <div class="accent-swatch theme-swatch" data-accent="orange" style="background:linear-gradient(90deg,#ff6a00,#ff8a3d)"></div>
-            <div class="accent-swatch theme-swatch" data-accent="teal" style="background:linear-gradient(90deg,#00d4a6,#00f0c1)"></div>
-            <div class="accent-swatch theme-swatch" data-accent="violet" style="background:linear-gradient(90deg,#8b5cf6,#a78bfa)"></div>
-            <div class="accent-swatch theme-swatch" data-accent="rose" style="background:linear-gradient(90deg,#fb7185,#fda4af)"></div>
-            <div class="accent-swatch theme-swatch" data-accent="blue" style="background:linear-gradient(90deg,#3b82f6,#60a5fa)"></div>
-            <div class="accent-swatch theme-swatch" data-accent="lime" style="background:linear-gradient(90deg,#84cc16,#bef264)"></div>
+          <div class="accent-row" aria-label="Accent colors" role="list">
+            <div class="accent-swatch" data-accent="orange" title="Orange accent" style="background:linear-gradient(90deg,#ff6a00,#ff8a3d)" role="listitem"></div>
+            <div class="accent-swatch" data-accent="teal" title="Teal accent" style="background:linear-gradient(90deg,#00d4a6,#00f0c1)" role="listitem"></div>
+            <div class="accent-swatch" data-accent="violet" title="Violet accent" style="background:linear-gradient(90deg,#8b5cf6,#a78bfa)" role="listitem"></div>
+            <div class="accent-swatch" data-accent="rose" title="Rose accent" style="background:linear-gradient(90deg,#fb7185,#fda4af)" role="listitem"></div>
+            <div class="accent-swatch" data-accent="blue" title="Blue accent" style="background:linear-gradient(90deg,#3b82f6,#60a5fa)" role="listitem"></div>
+            <div class="accent-swatch" data-accent="lime" title="Lime accent" style="background:linear-gradient(90deg,#84cc16,#bef264)" role="listitem"></div>
           </div>
         </div>
       </div>
     </header>
 
     <main>
-      <!-- Left column: daily/weekly view and workouts -->
-      <section class="card" aria-labelledby="today-heading">
+      <!-- Left: Daily / Weekly -->
+      <section class="card" aria-labelledby="view-heading">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div style="display:flex;gap:12px;align-items:center;">
-            <h2 id="today-heading" class="section-title" style="margin:0;">Daily</h2>
-            <div class="meta" id="last-saved">—</div>
+          <div>
+            <h2 id="view-heading" style="margin:0;font-size:16px;">Planner</h2>
+            <div class="muted" id="current-day-label">Loading…</div>
           </div>
 
-          <div class="controls">
-            <div class="view-toggle" role="tablist" aria-label="View toggle">
-              <button id="view-daily" class="btn btn-ghost" aria-pressed="true">Daily</button>
-              <button id="view-weekly" class="btn btn-ghost" aria-pressed="false">Weekly</button>
-            </div>
-            <div style="width:8px"></div>
-            <div class="tag" id="day-label">Day view</div>
+          <div class="controls" role="tablist" aria-label="View toggle">
+            <button id="view-daily" class="btn btn-ghost" aria-pressed="true">Daily</button>
+            <button id="view-weekly" class="btn btn-ghost" aria-pressed="false">Weekly</button>
           </div>
         </div>
 
-        <!-- Day / Week navigation -->
+        <!-- Navigation -->
         <div style="display:flex;gap:12px;align-items:center;margin-top:12px;">
           <div class="controls">
             <button id="prev" class="btn btn-ghost" title="Previous">◀</button>
@@ -295,66 +197,58 @@
         </div>
 
         <!-- Quick add -->
-        <div style="margin-top:12px;display:flex;gap:12px;align-items:center;">
-          <div style="flex:1">
-            <input id="quick-add" type="text" placeholder="Quick add for selected day (press Enter)" aria-label="Quick add" />
-          </div>
-          <button id="quick-add-btn" class="btn btn-primary">Add</button>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:12px;">
+          <input id="quick-add" class="input" type="text" placeholder="Quick add for selected day (press Enter)" aria-label="Quick add" />
+          <button id="quick-add-btn" class="btn-primary btn">Add</button>
+          <button id="templates-btn" class="btn btn-ghost">Templates</button>
         </div>
 
         <div class="hr"></div>
 
         <!-- Filters / Export -->
-        <div style="display:flex;gap:12px;align-items:center;margin-bottom:8px;">
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px;">
           <input id="filter" class="search" type="text" placeholder="Filter workouts, tags, or text" aria-label="Filter workouts" />
-          <select id="tag-filter" style="padding:8px;border-radius:8px;background:transparent;color:var(--text);border:1px solid var(--glass-2);">
-            <option value="">All tags</option>
-          </select>
+          <select id="tag-filter" class="input" aria-label="Tag filter"><option value="">All tags</option></select>
           <div style="flex:1"></div>
           <button id="export-json" class="btn btn-ghost">Export</button>
           <label for="import-file" class="btn btn-ghost" style="cursor:pointer;">Import</label>
           <input id="import-file" type="file" accept="application/json" style="display:none" />
         </div>
 
-        <!-- Workouts container (daily or weekly) -->
-        <div id="workouts-container" style="margin-top:6px;">
-          <!-- daily list -->
-          <div id="daily-view">
-            <div id="workouts-list" aria-live="polite"></div>
-          </div>
+        <!-- Views -->
+        <div id="daily-view">
+          <div id="workouts-list" aria-live="polite"></div>
+        </div>
 
-          <!-- weekly list -->
-          <div id="weekly-view" class="hidden">
-            <div class="week-grid" id="week-grid"></div>
-          </div>
+        <div id="weekly-view" class="hidden">
+          <div class="week-grid" id="week-grid"></div>
         </div>
 
         <div class="hr"></div>
 
-        <div style="display:flex;gap:8px;align-items:center;justify-content:space-between;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
           <div class="controls">
-            <button id="clear-all" class="btn btn-ghost">Clear All</button>
+            <button id="clear-all" class="btn btn-ghost">Clear Day</button>
             <button id="reset-defaults" class="btn btn-ghost">Reset Defaults</button>
-            <button id="templates-btn" class="btn btn-ghost">Templates</button>
             <button id="undo-btn" class="btn btn-ghost">Undo</button>
           </div>
 
-          <div style="display:flex;gap:8px;align-items:center;">
-            <div class="muted">Saved locally</div>
-          </div>
+          <div class="muted">Saved locally</div>
         </div>
 
         <div class="hr"></div>
 
-        <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;">
+        <!-- Session -->
+        <div style="display:flex;justify-content:space-between;align-items:center;">
           <div>
-            <strong class="small">Session</strong>
-            <div class="note" id="session-status">Idle</div>
+            <strong>Session</strong>
+            <div class="muted" id="session-status">Idle</div>
           </div>
-          <div style="display:flex;gap:8px;align-items:center;">
+
+          <div style="display:flex;align-items:center;gap:12px;">
             <div class="timer" id="session-timer">00:00</div>
-            <div class="controls">
-              <button id="start-session" class="btn btn-primary">Start</button>
+            <div class="session-controls">
+              <button id="start-session" class="btn-primary btn">Start</button>
               <button id="pause-session" class="btn btn-ghost">Pause</button>
               <button id="stop-session" class="btn btn-ghost">Stop</button>
             </div>
@@ -362,73 +256,70 @@
         </div>
       </section>
 
-      <!-- Right column: themes, settings, debug, session log -->
+      <!-- Right: Settings & Log -->
       <aside>
         <section class="card">
-          <h3 class="section-title">Themes & Accents</h3>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <div class="theme-row">
-              <div class="theme-swatch" data-theme="dark" title="Dark theme" style="background:linear-gradient(90deg,#071018,#0b1a24)" role="button" tabindex="0"></div>
-              <div class="theme-swatch" data-theme="sporty" title="Sporty theme" style="background:linear-gradient(90deg,#002b2b,#004d40)"></div>
-              <div class="theme-swatch" data-theme="calm" title="Calm theme" style="background:linear-gradient(90deg,#f3f7fb,#e9f1f6)"></div>
-              <div class="theme-swatch" data-theme="vibrant" title="Vibrant theme" style="background:linear-gradient(90deg,#fff0f6,#fff7ed)"></div>
-              <div class="theme-swatch" data-theme="minimal" title="Minimal theme" style="background:linear-gradient(90deg,#ffffff,#f7f7f7)"></div>
-            </div>
-          </div>
-
-          <div style="margin-top:12px;">
-            <div style="display:flex;gap:8px;align-items:center;">
-              <div class="theme-swatch" data-accent="orange" title="Orange accent" style="background:linear-gradient(90deg,#ff6a00,#ff8a3d)"></div>
-              <div class="theme-swatch" data-accent="teal" title="Teal accent" style="background:linear-gradient(90deg,#00d4a6,#00f0c1)"></div>
-              <div class="theme-swatch" data-accent="violet" title="Violet accent" style="background:linear-gradient(90deg,#8b5cf6,#a78bfa)"></div>
-              <div class="theme-swatch" data-accent="rose" title="Rose accent" style="background:linear-gradient(90deg,#fb7185,#fda4af)"></div>
-              <div class="theme-swatch" data-accent="blue" title="Blue accent" style="background:linear-gradient(90deg,#3b82f6,#60a5fa)"></div>
-              <div class="theme-swatch" data-accent="lime" title="Lime accent" style="background:linear-gradient(90deg,#84cc16,#bef264)"></div>
-              <div style="flex:1"></div>
-              <div class="muted">Accent</div>
-            </div>
-          </div>
-
-          <div class="hr"></div>
-
           <h3 class="section-title">Settings</h3>
           <div class="settings-grid">
-            <label class="toggle"><span class="pill">Show timezone</span><div id="show-timezone" class="switch"><div class="knob"></div></div></label>
-            <label class="toggle"><span class="pill">Short weekday</span><div id="use-short-day" class="switch"><div class="knob"></div></div></label>
-            <label class="toggle"><span class="pill">Enable offline</span><div id="enable-sw" class="switch"><div class="knob"></div></div></label>
-            <label class="toggle"><span class="pill">Vibrate</span><div id="vibrate" class="switch"><div class="knob"></div></div></label>
+            <label class="muted">Show timezone
+              <div id="show-timezone" class="switch" role="switch" aria-checked="true"><div class="knob"></div></div>
+            </label>
+
+            <label class="muted">Short weekday
+              <div id="use-short-day" class="switch" role="switch" aria-checked="false"><div class="knob"></div></div>
+            </label>
+
+            <label class="muted">Enable offline
+              <div id="enable-sw" class="switch" role="switch" aria-checked="false"><div class="knob"></div></div>
+            </label>
+
+            <label class="muted">Vibrate
+              <div id="vibrate" class="switch" role="switch" aria-checked="true"><div class="knob"></div></div>
+            </label>
           </div>
 
           <div class="hr"></div>
 
-          <details>
-            <summary style="cursor:pointer;color:var(--muted)">Advanced Debug</summary>
-            <div style="margin-top:8px;display:flex;flex-direction:column;gap:8px;">
-              <button id="unregister-sw" class="btn btn-ghost">Unregister Service Workers</button>
-              <button id="clear-storage" class="btn btn-ghost">Clear localStorage</button>
-              <button id="debug-export-local" class="btn btn-ghost">Download local dump</button>
-              <button id="download-recovery" class="btn btn-ghost">Download last deployed HTML</button>
-              <div class="muted">Unregister SW and clear caches if the site is stuck on an old version.</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <label class="muted">Default exercise count
+              <input id="default-count" class="input" type="number" min="1" max="12" value="5" />
+            </label>
+            <label class="muted">Base exercises (comma separated)
+              <textarea id="base-exercises" class="input" rows="3">Reverse Lunge — 4 sets × 8 ea, Kettlebell Farmer Carry — 4 sets × 50m, DB Bulgarian Split — 3 sets × 8 ea, Goblet Squat — 3 sets × 10, Push Up — 3 sets × 12</textarea>
+            </label>
+            <div style="display:flex;gap:8px;">
+              <button id="save-settings" class="btn-primary btn">Save</button>
+              <button id="reset-settings" class="btn btn-ghost">Reset</button>
             </div>
-          </details>
+          </div>
         </section>
 
         <section class="card" style="margin-top:12px;">
           <h3 class="section-title">Session Log</h3>
-          <div id="session-log" class="small empty">No sessions yet.</div>
-          <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
+          <div id="session-log" class="empty">No sessions yet.</div>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:12px;">
             <button id="download-log" class="btn btn-ghost">Download Log</button>
             <button id="clear-log" class="btn btn-ghost">Clear Log</button>
             <div style="flex:1"></div>
             <span class="muted">Local only</span>
           </div>
         </section>
+
+        <section class="card" style="margin-top:12px;">
+          <h3 class="section-title">Advanced</h3>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <button id="unregister-sw" class="btn btn-ghost">Unregister Service Workers</button>
+            <button id="debug-export-local" class="btn btn-ghost">Download local dump</button>
+            <button id="download-recovery" class="btn btn-ghost">Download last deployed HTML</button>
+            <button id="clear-storage" class="btn btn-ghost">Clear localStorage</button>
+          </div>
+        </section>
       </aside>
     </main>
 
-    <footer class="footer-row">
-      <small>Personal app — Field+Iron</small>
-      <div class="muted">v1.2 • Local only</div>
+    <footer style="display:flex;justify-content:space-between;align-items:center;">
+      <small class="muted">Field+Iron • Local only</small>
+      <div class="muted">v2.0</div>
     </footer>
   </div>
 
@@ -438,218 +329,177 @@
   (function(){
     'use strict';
 
-    /* ---------------- Configurable defaults ---------------- */
-    const DEFAULT_EXERCISE_COUNT = 5;
-    const DAILY_STRETCHES = [
-      'Kneeling Hip Flexor Stretch — 2 sets × 30s ea',
-      'Standing Hamstring Stretch — 2 sets × 30s ea',
-      'Child Pose Hold — 1 × 60s'
-    ];
-
-    /* ---------------- Storage keys ---------------- */
-    const STORAGE_KEY_BY_DATE = 'fieldiron.workouts.byDate.v1';
-    const SETTINGS_KEY = 'fieldiron.settings.v6';
+    /* -------------------------
+       Config & defaults
+       ------------------------- */
+    const STORAGE_BY_DATE = 'fieldiron.byDate.v2';
+    const SETTINGS_KEY = 'fieldiron.settings.v7';
     const LOG_KEY = 'fieldiron.sessions.v1';
     const RECOVERY_KEY = 'fieldiron.recovery.lastDeployedHTML';
-    const BACKUP_HISTORY_KEY = 'fieldiron.backups.v1';
-    const UNDO_STACK_KEY = 'fieldiron.undo.v1';
-    const BACKUP_INTERVAL_MS = 1000 * 60 * 5;
-    const MAX_UNDO = 20;
+    const BACKUP_KEY = 'fieldiron.backups.v1';
+    const UNDO_KEY = 'fieldiron.undo.v1';
+    const BACKUP_INTERVAL = 1000 * 60 * 5;
+    const MAX_UNDO = 30;
+
+    // default values (editable via settings UI)
+    const DEFAULTS = {
+      defaultExerciseCount: 5,
+      baseExercises: [
+        'Reverse Lunge — 4 sets × 8 ea',
+        'Kettlebell Farmer Carry — 4 sets × 50m',
+        'DB Bulgarian Split — 3 sets × 8 ea',
+        'Goblet Squat — 3 sets × 10',
+        'Push Up — 3 sets × 12'
+      ],
+      dailyStretches: [
+        'Kneeling Hip Flexor Stretch — 2 sets × 30s ea',
+        'Standing Hamstring Stretch — 2 sets × 30s ea',
+        'Child Pose Hold — 1 × 60s'
+      ]
+    };
 
     /* ---------- Utilities ---------- */
     function nowISO(){ return new Date().toISOString(); }
-    function showToast(msg, ms=2200){
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.style.display = 'block';
-      clearTimeout(t._timeout);
-      t._timeout = setTimeout(()=> t.style.display='none', ms);
-    }
-    function downloadFile(filename, content, type='application/json'){
-      const blob = new Blob([content], { type });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    }
-    function safeParse(raw, fallback){ try{ return JSON.parse(raw); } catch(e){ return fallback; } }
+    function todayISO(){ return new Date().toISOString().slice(0,10); }
+    function dateAdd(dateISO, days){ const d = new Date(dateISO + 'T00:00:00'); d.setDate(d.getDate() + days); return d.toISOString().slice(0,10); }
+    function showToast(msg, ms=2200){ const t = document.getElementById('toast'); t.textContent = msg; t.style.display='block'; clearTimeout(t._t); t._t = setTimeout(()=> t.style.display='none', ms); }
+    function downloadFile(name, content, type='application/json'){ const blob = new Blob([content], { type }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
+
+    function safeParse(raw, fallback){ try{ return JSON.parse(raw); }catch(e){ return fallback; } }
 
     /* ---------------- Recovery helper ---------------- */
     try {
       if (!sessionStorage.getItem('fieldiron.recovery.saved')) {
         try {
-          const currentHTML = '<!doctype html>\\n' + document.documentElement.outerHTML;
-          localStorage.setItem(RECOVERY_KEY, currentHTML);
-          const histRaw = localStorage.getItem(BACKUP_HISTORY_KEY);
-          const hist = safeParse(histRaw, []);
+          const html = '<!doctype html>\\n' + document.documentElement.outerHTML;
+          localStorage.setItem(RECOVERY_KEY, html);
+          const hist = safeParse(localStorage.getItem(BACKUP_KEY), []);
           hist.unshift({ ts: nowISO(), note: 'auto-saved deployed HTML' });
-          if (hist.length > 20) hist.length = 20;
-          localStorage.setItem(BACKUP_HISTORY_KEY, JSON.stringify(hist));
-          sessionStorage.setItem('fieldiron.recovery.saved', '1');
-          console.log('Recovery helper: saved deployed HTML to', RECOVERY_KEY);
-        } catch(e){
-          console.warn('Recovery helper failed', e);
-        }
+          if(hist.length>20) hist.length = 20;
+          localStorage.setItem(BACKUP_KEY, JSON.stringify(hist));
+          sessionStorage.setItem('fieldiron.recovery.saved','1');
+          console.log('Recovery saved');
+        } catch(e){ console.warn('Recovery helper failed', e); }
       }
     } catch(e){ /* ignore */ }
 
-    /* ---------------- Settings ---------------- */
-    function todayISO(){ const d = new Date(); return d.toISOString().slice(0,10); }
+    /* ---------------- Settings storage ---------------- */
     function loadSettings(){
       try{
         const raw = localStorage.getItem(SETTINGS_KEY);
-        if(!raw) return { showTimezone:true, useShortDay:false, enableSW:false, vibrate:true, preset:'dark', accent:'orange', view:'daily', selectedDate: todayISO() };
-        return Object.assign({ showTimezone:true, useShortDay:false, enableSW:false, vibrate:true, preset:'dark', accent:'orange', view:'daily', selectedDate: todayISO() }, JSON.parse(raw));
-      }catch(e){ return { showTimezone:true, useShortDay:false, enableSW:false, vibrate:true, preset:'dark', accent:'orange', view:'daily', selectedDate: todayISO() }; }
+        if(!raw) return { showTimezone:true, useShortDay:false, enableSW:false, vibrate:true, preset:'dark', accent:'orange', view:'daily', selectedDate: todayISO(), defaultExerciseCount: DEFAULTS.defaultExerciseCount, baseExercises: DEFAULTS.baseExercises.slice() };
+        return Object.assign({ showTimezone:true, useShortDay:false, enableSW:false, vibrate:true, preset:'dark', accent:'orange', view:'daily', selectedDate: todayISO(), defaultExerciseCount: DEFAULTS.defaultExerciseCount, baseExercises: DEFAULTS.baseExercises.slice() }, JSON.parse(raw));
+      }catch(e){ return { showTimezone:true, useShortDay:false, enableSW:false, vibrate:true, preset:'dark', accent:'orange', view:'daily', selectedDate: todayISO(), defaultExerciseCount: DEFAULTS.defaultExerciseCount, baseExercises: DEFAULTS.baseExercises.slice() }; }
     }
-    function saveSettings(s){
-      try{ localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); } catch(e){}
-    }
+    function saveSettings(s){ try{ localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }catch(e){ console.warn('saveSettings', e); } }
 
-    /* ---------------- Per-date workouts storage ---------------- */
-    function loadAllByDate(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY_BY_DATE);
-        if(!raw) return {};
-        return JSON.parse(raw);
-      }catch(e){ return {}; }
-    }
-    function saveAllByDate(obj){
-      try{ localStorage.setItem(STORAGE_KEY_BY_DATE, JSON.stringify(obj)); updateLastSaved(); } catch(e){ console.warn('saveAllByDate failed', e); }
-    }
-    function dateAddDays(dateISO, delta){
-      const d = new Date(dateISO + 'T00:00:00');
-      d.setDate(d.getDate() + delta);
-      return d.toISOString().slice(0,10);
-    }
+    /* ---------------- Per-date storage ---------------- */
+    function loadAll(){ return safeParse(localStorage.getItem(STORAGE_BY_DATE), {}); }
+    function saveAll(obj){ try{ localStorage.setItem(STORAGE_BY_DATE, JSON.stringify(obj)); updateLastSaved(); }catch(e){ console.warn('saveAll', e); } }
 
-    function ensureDayInitialized(dateISO){
-      const all = loadAllByDate();
-      if(!all[dateISO] || !Array.isArray(all[dateISO]) || all[dateISO].length===0){
-        const base = [
-          'Reverse Lunge — 4 sets × 8 ea',
-          'Kettlebell Farmer Carry — 4 sets × 50m',
-          'DB Bulgarian Split — 3 sets × 8 ea',
-          'Goblet Squat — 3 sets × 10',
-          'Push Up — 3 sets × 12'
-        ];
-        const pre = base.slice(0, DEFAULT_EXERCISE_COUNT);
-        const combined = pre.concat(DAILY_STRETCHES);
-        all[dateISO] = combined;
-        saveAllByDate(all);
+    function ensureDate(dateISO){
+      const all = loadAll();
+      if(!Array.isArray(all[dateISO]) || all[dateISO].length===0){
+        const s = loadSettings();
+        const base = s.baseExercises && s.baseExercises.length ? s.baseExercises.slice() : DEFAULTS.baseExercises.slice();
+        const pre = base.slice(0, s.defaultExerciseCount || DEFAULTS.defaultExerciseCount);
+        all[dateISO] = pre.concat(DEFAULTS.dailyStretches);
+        saveAll(all);
       }
       return all[dateISO];
     }
 
-    function loadWorkoutsForDate(dateISO){
-      const all = loadAllByDate();
-      if(!all[dateISO]) return ensureDayInitialized(dateISO);
-      return all[dateISO];
-    }
-    function saveWorkoutsForDate(dateISO, list, pushUndo=true){
-      try{
-        if(pushUndo) pushUndoState(dateISO);
-        const all = loadAllByDate();
-        all[dateISO] = list;
-        saveAllByDate(all);
-      }catch(e){ console.warn('saveWorkoutsForDate failed', e); }
+    function loadFor(dateISO){ const all = loadAll(); return all[dateISO] ? all[dateISO] : ensureDate(dateISO); }
+    function saveFor(dateISO, list, pushUndo=true){
+      if(pushUndo) pushUndoState(dateISO);
+      const all = loadAll(); all[dateISO] = list; saveAll(all);
     }
 
-    /* ---------------- Undo stack (per-date snapshots) ---------------- */
+    /* ---------------- Undo / backups ---------------- */
     function pushUndoState(dateISO){
       try{
-        const raw = localStorage.getItem(UNDO_STACK_KEY);
-        const stack = safeParse(raw, []);
-        const snapshot = { ts: nowISO(), date: dateISO, workouts: loadWorkoutsForDate(dateISO) };
-        stack.unshift(snapshot);
+        const stack = safeParse(localStorage.getItem(UNDO_KEY), []);
+        stack.unshift({ ts: nowISO(), date: dateISO, workouts: loadFor(dateISO) });
         if(stack.length > MAX_UNDO) stack.length = MAX_UNDO;
-        localStorage.setItem(UNDO_STACK_KEY, JSON.stringify(stack));
-      }catch(e){ console.warn('pushUndo failed', e); }
+        localStorage.setItem(UNDO_KEY, JSON.stringify(stack));
+      }catch(e){ console.warn('pushUndo', e); }
     }
     function undo(){
       try{
-        const raw = localStorage.getItem(UNDO_STACK_KEY);
-        const stack = safeParse(raw, []);
-        if(!stack.length) { showToast('Nothing to undo'); return; }
+        const stack = safeParse(localStorage.getItem(UNDO_KEY), []);
+        if(!stack.length){ showToast('Nothing to undo'); return; }
         const snap = stack.shift();
-        localStorage.setItem(UNDO_STACK_KEY, JSON.stringify(stack));
-        const all = loadAllByDate();
-        all[snap.date] = snap.workouts;
-        localStorage.setItem(STORAGE_KEY_BY_DATE, JSON.stringify(all));
+        localStorage.setItem(UNDO_KEY, JSON.stringify(stack));
+        const all = loadAll(); all[snap.date] = snap.workouts; localStorage.setItem(STORAGE_BY_DATE, JSON.stringify(all));
         renderCurrentView();
         showToast('Undo applied');
-      }catch(e){ console.warn('undo failed', e); }
+      }catch(e){ console.warn('undo', e); }
     }
+
+    function saveBackup(){
+      try{
+        const hist = safeParse(localStorage.getItem(BACKUP_KEY), []);
+        hist.unshift({ ts: nowISO(), byDate: loadAll(), settings: loadSettings() });
+        if(hist.length>10) hist.length = 10;
+        localStorage.setItem(BACKUP_KEY, JSON.stringify(hist));
+      }catch(e){ console.warn('backup', e); }
+    }
+    setInterval(saveBackup, BACKUP_INTERVAL);
 
     /* ---------------- Session log ---------------- */
-    function loadSessionLog(){ try{ const raw = localStorage.getItem(LOG_KEY); return raw ? JSON.parse(raw) : []; } catch(e){ return []; } }
-    function saveSessionLog(log){ try{ localStorage.setItem(LOG_KEY, JSON.stringify(log)); } catch(e){} }
-    function appendSessionLog(entry){
-      const log = loadSessionLog();
-      log.unshift(entry);
-      if(log.length>200) log.length = 200;
-      saveSessionLog(log);
-      renderSessionLog();
-    }
+    function loadLog(){ return safeParse(localStorage.getItem(LOG_KEY), []); }
+    function saveLog(log){ try{ localStorage.setItem(LOG_KEY, JSON.stringify(log)); }catch(e){} }
+    function appendLog(entry){ const log = loadLog(); log.unshift(entry); if(log.length>200) log.length = 200; saveLog(log); renderSessionLog(); }
 
-    /* ---------------- Day header ---------------- */
-    function updateCurrentDayLabel(dateISO){
-      const el = document.getElementById('current-day');
+    /* ---------------- UI helpers & render ---------------- */
+    function updateLastSaved(){ const el = document.getElementById('last-saved'); if(el) el.textContent = `Saved ${new Date().toLocaleString()}`; }
+
+    function updateDayLabel(dateISO){
+      const el = document.getElementById('current-day-label');
       if(!el) return;
       const s = loadSettings();
       const d = new Date(dateISO + 'T00:00:00');
       try{
         el.textContent = d.toLocaleDateString(undefined, { weekday: s.useShortDay ? 'short' : 'long', month:'short', day:'numeric' });
-      }catch(e){
-        el.textContent = dateISO;
-      }
+      }catch(e){ el.textContent = dateISO; }
       const tz = document.getElementById('timezone-label');
-      if(s.showTimezone){
-        try{
-          const tzName = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
-          tz.textContent = tzName ? tzName.replace('_',' ') : '';
-          tz.style.display = tzName ? 'inline-block' : 'none';
-        }catch(e){ tz.style.display='none'; }
-      } else tz.style.display='none';
+      if(tz){
+        if(s.showTimezone){
+          try{ const tzName = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; tz.textContent = tzName; tz.style.display = tzName ? 'inline-block' : 'none'; }catch(e){ tz.style.display='none'; }
+        } else tz.style.display='none';
+      }
     }
 
-    /* ---------------- Render daily view ---------------- */
     function renderWorkouts(filter){
-      const container = document.getElementById('workouts-list');
-      container.innerHTML = '';
       const s = loadSettings();
       const dateISO = s.selectedDate || todayISO();
-      const list = loadWorkoutsForDate(dateISO);
+      updateDayLabel(dateISO);
+      const list = loadFor(dateISO);
       const q = filter && filter.trim() ? filter.trim().toLowerCase() : '';
+      const container = document.getElementById('workouts-list');
+      container.innerHTML = '';
       const filtered = q ? list.filter(i => i.toLowerCase().includes(q)) : list;
-      if(filtered.length===0){
-        const p = document.createElement('div'); p.className='empty'; p.textContent='No workouts yet. Add one below.'; container.appendChild(p); return;
-      }
+      if(!filtered.length){ container.innerHTML = '<div class="empty">No workouts yet. Add one below.</div>'; return; }
       filtered.forEach((text, idx) => {
-        const row = document.createElement('div'); row.className='workout-item'; row.setAttribute('data-index', idx);
+        const row = document.createElement('div'); row.className = 'workout-item';
+        const left = document.createElement('div'); left.className = 'workout-left';
+        const title = document.createElement('div'); title.className = 'workout-title'; title.textContent = text;
+        const meta = document.createElement('div'); meta.className = 'workout-meta'; meta.textContent = `#${idx+1}`;
+        left.appendChild(title); left.appendChild(meta);
 
-        const left = document.createElement('div'); left.className='small editable'; left.tabIndex=0; left.setAttribute('role','textbox'); left.setAttribute('aria-label','Workout text'); left.textContent = text;
-        left.addEventListener('dblclick', ()=> startInlineEdit(left, idx, dateISO));
-        left.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); startInlineEdit(left, idx, dateISO); } });
+        const actions = document.createElement('div'); actions.className = 'workout-actions';
+        const drag = document.createElement('span'); drag.className='drag-handle'; drag.textContent='☰';
+        const up = document.createElement('button'); up.className='btn btn-ghost'; up.textContent='↑'; up.title='Move up'; up.onclick = ()=> moveItem(idx, -1, dateISO);
+        const down = document.createElement('button'); down.className='btn btn-ghost'; down.textContent='↓'; down.title='Move down'; down.onclick = ()=> moveItem(idx, 1, dateISO);
+        const fav = document.createElement('button'); fav.className='btn btn-ghost'; fav.textContent='★'; fav.title='Favorite'; fav.onclick = ()=> toggleFavorite(idx, dateISO);
+        const del = document.createElement('button'); del.className='btn btn-ghost'; del.textContent='✕'; del.title='Delete'; del.onclick = ()=> removeItem(idx, dateISO);
 
-        const right = document.createElement('div'); right.style.display='flex'; right.style.gap='8px'; right.style.alignItems='center';
+        actions.appendChild(drag); actions.appendChild(up); actions.appendChild(down); actions.appendChild(fav); actions.appendChild(del);
 
-        const drag = document.createElement('span'); drag.className='drag-handle'; drag.title='Drag to reorder'; drag.textContent='☰'; drag.setAttribute('aria-hidden','true');
-
-        const up = document.createElement('button'); up.className='btn btn-ghost'; up.style.padding='6px 8px'; up.title='Move up'; up.textContent='↑'; up.onclick = ()=> moveItem(idx, -1, dateISO);
-        const down = document.createElement('button'); down.className='btn btn-ghost'; down.style.padding='6px 8px'; down.title='Move down'; down.textContent='↓'; down.onclick = ()=> moveItem(idx, 1, dateISO);
-        const fav = document.createElement('button'); fav.className='btn btn-ghost'; fav.style.padding='6px 8px'; fav.title='Favorite'; fav.textContent='★'; fav.onclick = ()=> toggleFavorite(idx, dateISO);
-        const del = document.createElement('button'); del.className='btn btn-ghost'; del.style.padding='6px 8px'; del.title='Delete'; del.textContent='✕'; del.onclick = ()=> removeItem(idx, dateISO);
-
-        right.appendChild(drag); right.appendChild(up); right.appendChild(down); right.appendChild(fav); right.appendChild(del);
-        row.appendChild(left); row.appendChild(right);
+        row.appendChild(left); row.appendChild(actions);
         container.appendChild(row);
 
-        // drag & drop
+        // drag handlers
         row.draggable = true;
         row.addEventListener('dragstart', (ev)=>{ ev.dataTransfer.setData('text/plain', String(idx)); ev.dataTransfer.effectAllowed='move'; row.classList.add('dragging'); });
         row.addEventListener('dragend', ()=> row.classList.remove('dragging'));
@@ -658,134 +508,113 @@
       });
     }
 
-    /* ---------------- Inline edit ---------------- */
     function startInlineEdit(el, idx, dateISO){
       const old = el.textContent;
-      const input = document.createElement('input'); input.type='text'; input.value = old; input.style.width='100%'; input.className='editable';
+      const input = document.createElement('input'); input.type='text'; input.value = old; input.className='input';
       el.replaceWith(input); input.focus(); input.select();
       function commit(){
         const v = input.value.trim();
-        if(v){
-          const list = loadWorkoutsForDate(dateISO); list[idx] = v; saveWorkoutsForDate(dateISO, list); renderWorkouts(document.getElementById('filter').value);
-          showToast('Workout updated');
-        } else { renderWorkouts(document.getElementById('filter').value); }
+        if(v){ const list = loadFor(dateISO); list[idx] = v; saveFor(dateISO, list); renderCurrentView(); showToast('Workout updated'); }
+        else renderCurrentView();
       }
       input.addEventListener('blur', commit);
-      input.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ commit(); } if(e.key==='Escape'){ renderWorkouts(document.getElementById('filter').value); } });
+      input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') commit(); if(e.key==='Escape') renderCurrentView(); });
     }
 
-    /* ---------------- CRUD (per-date) ---------------- */
-    function addWorkoutToDate(dateISO, text){
+    /* ---------------- CRUD per-date ---------------- */
+    function addWorkoutTo(dateISO, text){
       if(!text || !text.trim()) return;
-      const list = loadWorkoutsForDate(dateISO);
+      const list = loadFor(dateISO);
       list.unshift(text.trim());
-      saveWorkoutsForDate(dateISO, list);
+      saveFor(dateISO, list);
       renderCurrentView();
-      vibrateIfEnabled(20);
       showToast('Workout added');
     }
-    function addWorkout(text){
-      const s = loadSettings();
-      addWorkoutToDate(s.selectedDate || todayISO(), text);
-    }
     function removeItem(index, dateISO){
-      const list = loadWorkoutsForDate(dateISO);
+      const list = loadFor(dateISO);
       if(index<0||index>=list.length) return;
       list.splice(index,1);
-      saveWorkoutsForDate(dateISO, list);
+      saveFor(dateISO, list);
       renderCurrentView();
       showToast('Workout removed');
     }
     function moveItem(index, delta, dateISO){
-      const list = loadWorkoutsForDate(dateISO);
+      const list = loadFor(dateISO);
       const to = index + delta;
       if(to<0||to>=list.length) return;
-      const [item] = list.splice(index,1);
-      list.splice(to,0,item);
-      saveWorkoutsForDate(dateISO, list);
+      const [it] = list.splice(index,1);
+      list.splice(to,0,it);
+      saveFor(dateISO, list);
       renderCurrentView();
     }
     function reorder(from, to, dateISO){
-      const list = loadWorkoutsForDate(dateISO);
+      const list = loadFor(dateISO);
       if(from===to) return;
-      const [item] = list.splice(from,1);
-      list.splice(to,0,item);
-      saveWorkoutsForDate(dateISO, list);
+      const [it] = list.splice(from,1);
+      list.splice(to,0,it);
+      saveFor(dateISO, list);
       renderCurrentView();
     }
-    function clearAll(){
-      if(!confirm('Clear all workouts for selected day? This cannot be undone.')) return;
-      const s = loadSettings();
-      saveWorkoutsForDate(s.selectedDate || todayISO(), []);
+    function toggleFavorite(index, dateISO){
+      const list = loadFor(dateISO);
+      if(index<0||index>=list.length) return;
+      const item = list[index];
+      list[index] = item.startsWith('★ ') ? item.replace(/^★\s*/, '') : '★ ' + item;
+      saveFor(dateISO, list);
       renderCurrentView();
-      showToast('All workouts cleared for selected day');
+    }
+    function clearDay(){
+      if(!confirm('Clear all workouts for selected day?')) return;
+      const s = loadSettings();
+      saveFor(s.selectedDate || todayISO(), []);
+      renderCurrentView();
+      showToast('Day cleared');
     }
     function resetDefaults(){
       if(!confirm('Reset selected day to defaults?')) return;
       const s = loadSettings();
-      const pre = [
-        'Reverse Lunge — 4 sets × 8 ea',
-        'Kettlebell Farmer Carry — 4 sets × 50m',
-        'DB Bulgarian Split — 3 sets × 8 ea',
-        'Goblet Squat — 3 sets × 10',
-        'Push Up — 3 sets × 12'
-      ].slice(0, DEFAULT_EXERCISE_COUNT).concat(DAILY_STRETCHES);
-      saveWorkoutsForDate(s.selectedDate || todayISO(), pre);
+      const base = s.baseExercises && s.baseExercises.length ? s.baseExercises.slice() : DEFAULTS.baseExercises.slice();
+      const pre = base.slice(0, s.defaultExerciseCount || DEFAULTS.defaultExerciseCount);
+      saveFor(s.selectedDate || todayISO(), pre.concat(DEFAULTS.dailyStretches));
       renderCurrentView();
-      showToast('Defaults restored for selected day');
-    }
-
-    /* ---------------- Favorites ---------------- */
-    function toggleFavorite(index, dateISO){
-      try{
-        const list = loadWorkoutsForDate(dateISO);
-        if(index<0||index>=list.length) return;
-        const item = list[index];
-        if(item.startsWith('★ ')) list[index] = item.replace(/^★\s*/, '');
-        else list[index] = '★ ' + item;
-        saveWorkoutsForDate(dateISO, list);
-        renderCurrentView();
-      }catch(e){}
+      showToast('Defaults restored');
     }
 
     /* ---------------- Export / Import ---------------- */
-    function exportJSON(){
-      const all = loadAllByDate();
-      const payload = { byDate: all, exportedAt: new Date().toISOString(), version: 1 };
-      downloadFile('fieldiron-workouts-by-date.json', JSON.stringify(payload, null, 2), 'application/json');
+    function exportAll(){
+      const payload = { byDate: loadAll(), exportedAt: nowISO(), version: 2 };
+      downloadFile('fieldiron-by-date.json', JSON.stringify(payload, null, 2));
       showToast('Export started');
     }
-    function importJSONFile(file){
+    function importFile(file){
       if(!file) return;
       const reader = new FileReader();
       reader.onload = function(e){
         try{
           const parsed = JSON.parse(e.target.result);
           if(parsed && parsed.byDate && typeof parsed.byDate === 'object'){
-            saveAllByDate(parsed.byDate);
+            saveAll(parsed.byDate);
             renderCurrentView();
-            showToast('Imported workouts by date');
+            showToast('Imported by-date data');
           } else if(Array.isArray(parsed)){
             const s = loadSettings();
-            saveWorkoutsForDate(s.selectedDate || todayISO(), parsed);
+            saveFor(s.selectedDate || todayISO(), parsed);
             renderCurrentView();
-            showToast('Imported workouts to selected day');
-          } else {
-            alert('Invalid file format.');
-          }
-        }catch(err){ alert('Failed to parse file.'); }
+            showToast('Imported to selected day');
+          } else alert('Invalid file format');
+        }catch(err){ alert('Failed to parse file'); }
       };
       reader.readAsText(file);
     }
 
-    /* ---------------- Service Worker helpers ---------------- */
-    function registerServiceWorker(){
+    /* ---------------- Service worker helpers ---------------- */
+    function registerSW(){
       if(!('serviceWorker' in navigator)) return;
-      navigator.serviceWorker.register('/sw.js').then(reg=>{ console.log('SW registered', reg); showToast('Service worker registered'); }).catch(err=>{ console.warn('SW registration failed', err); showToast('Service worker failed'); });
+      navigator.serviceWorker.register('/sw.js').then(()=> showToast('Service worker registered')).catch(()=> showToast('SW registration failed'));
     }
-    function unregisterServiceWorker(){
+    function unregisterSW(){
       if(!('serviceWorker' in navigator)) return;
-      navigator.serviceWorker.getRegistrations().then(regs=>{ regs.forEach(r=>r.unregister()); if('caches' in window){ caches.keys().then(keys=>keys.forEach(k=>caches.delete(k))); } showToast('Service workers unregistered'); });
+      navigator.serviceWorker.getRegistrations().then(regs=>{ regs.forEach(r=>r.unregister()); if('caches' in window) caches.keys().then(keys=>keys.forEach(k=>caches.delete(k))); showToast('Service workers unregistered'); });
     }
 
     /* ---------------- Session timer ---------------- */
@@ -795,18 +624,23 @@
       sessionStart = Date.now() - sessionElapsed;
       sessionTimer = setInterval(()=>{ sessionElapsed = Date.now() - sessionStart; updateSessionUI(); }, 250);
       document.getElementById('session-status').textContent = 'Running';
-      showToast('Session started'); vibrateIfEnabled(30);
+      showToast('Session started');
+      vibrate(30);
     }
     function pauseSession(){
       if(!sessionTimer) return;
-      clearInterval(sessionTimer); sessionTimer = null; document.getElementById('session-status').textContent = 'Paused'; showToast('Session paused');
+      clearInterval(sessionTimer); sessionTimer = null;
+      document.getElementById('session-status').textContent = 'Paused';
+      showToast('Session paused');
     }
     function stopSession(){
       if(sessionTimer){ clearInterval(sessionTimer); sessionTimer = null; }
       const duration = msToTime(sessionElapsed);
       const s = loadSettings();
-      appendSessionLog({ title: `Session ${new Date().toLocaleString()}`, startedAt: sessionStart ? new Date(sessionStart).toISOString() : new Date().toISOString(), duration, notes: `Date: ${s.selectedDate || todayISO()}` });
-      sessionElapsed = 0; sessionStart = null; updateSessionUI(); document.getElementById('session-status').textContent = 'Idle'; showToast('Session stopped and logged');
+      appendLog({ title: `Session ${new Date().toLocaleString()}`, startedAt: sessionStart ? new Date(sessionStart).toISOString() : new Date().toISOString(), duration, notes: `Date: ${s.selectedDate || todayISO()}` });
+      sessionElapsed = 0; sessionStart = null; updateSessionUI();
+      document.getElementById('session-status').textContent = 'Idle';
+      showToast('Session stopped and logged');
     }
     function updateSessionUI(){
       const btn = document.getElementById('start-session'); const pause = document.getElementById('pause-session'); const timer = document.getElementById('session-timer');
@@ -819,65 +653,229 @@
       const s = Math.floor(ms/1000)%60; const m = Math.floor(ms/(60*1000))%60; const h = Math.floor(ms/(60*60*1000));
       return (h? (h+':') : '') + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
     }
+    function vibrate(ms){ try{ const s = loadSettings(); if(s.vibrate && navigator.vibrate) navigator.vibrate(ms); }catch(e){} }
 
-    /* ---------------- Vibration ---------------- */
-    function vibrateIfEnabled(duration){
-      try{ const s = loadSettings(); if(s.vibrate && navigator.vibrate) navigator.vibrate(duration); } catch(e){}
+    /* ---------------- Render weekly ---------------- */
+    function getWeekStart(dateISO){
+      const d = new Date(dateISO + 'T00:00:00'); const day = d.getDay(); const diff = (day + 6) % 7; d.setDate(d.getDate() - diff); return d.toISOString().slice(0,10);
+    }
+    function renderWeek(centerDate){
+      const start = getWeekStart(centerDate);
+      const grid = document.getElementById('week-grid'); grid.innerHTML = '';
+      for(let i=0;i<7;i++){
+        const dateISO = dateAdd(start, i);
+        const d = new Date(dateISO + 'T00:00:00');
+        const dayName = d.toLocaleDateString(undefined, { weekday: 'short' });
+        const dayNum = d.toLocaleDateString(undefined, { month:'short', day:'numeric' });
+        const card = document.createElement('div'); card.className='day-card';
+        const h = document.createElement('div'); h.style.fontWeight='700'; h.textContent = `${dayName} • ${dayNum}`;
+        card.appendChild(h);
+        const list = loadFor(dateISO);
+        const preview = document.createElement('div'); preview.style.marginTop='8px'; preview.style.fontSize='13px'; preview.style.color='var(--muted)';
+        if(!list || !list.length) preview.textContent = '—';
+        else {
+          list.slice(0,4).forEach(it => { const p = document.createElement('div'); p.textContent = it; preview.appendChild(p); });
+          if(list.length>4){ const more = document.createElement('div'); more.className='muted'; more.textContent = `+${list.length-4} more`; preview.appendChild(more); }
+        }
+        card.appendChild(preview);
+        card.addEventListener('click', ()=> { const s = loadSettings(); s.selectedDate = dateISO; s.view = 'daily'; saveSettings(s); applyView(); renderCurrentView(); });
+        grid.appendChild(card);
+      }
     }
 
-    /* ---------------- Session log render ---------------- */
+    /* ---------------- Render session log ---------------- */
     function renderSessionLog(){
-      const el = document.getElementById('session-log'); const log = loadSessionLog();
+      const el = document.getElementById('session-log'); const log = loadLog();
       if(!el) return;
-      if(!log.length){ el.className='small empty'; el.textContent='No sessions yet.'; return; }
-      el.className='small'; el.innerHTML='';
-      log.forEach(entry=>{
+      if(!log.length){ el.className='empty'; el.textContent='No sessions yet.'; return; }
+      el.className=''; el.innerHTML = '';
+      log.forEach(entry => {
         const d = document.createElement('div'); d.style.padding='8px 0'; d.style.borderBottom='1px solid rgba(255,255,255,0.02)';
-        d.innerHTML = `<strong style="display:block;color:#fff">${entry.title || 'Session'}</strong>
-                       <span class="muted">${new Date(entry.startedAt).toLocaleDateString()} — ${entry.duration}</span>
-                       <div class="muted" style="margin-top:6px">${entry.notes || ''}</div>`;
+        d.innerHTML = `<strong style="display:block;color:var(--text)">${entry.title}</strong><div class="muted">${new Date(entry.startedAt).toLocaleDateString()} — ${entry.duration}</div><div class="muted" style="margin-top:6px">${entry.notes || ''}</div>`;
         el.appendChild(d);
       });
     }
 
-    /* ---------------- Backups (periodic) ---------------- */
-    function saveBackupSnapshot(){
-      try{
-        const snapshot = { ts: nowISO(), byDate: loadAllByDate(), settings: loadSettings(), sessions: loadSessionLog() };
-        const raw = localStorage.getItem(BACKUP_HISTORY_KEY);
-        const hist = safeParse(raw, []);
-        hist.unshift(snapshot);
-        if(hist.length>10) hist.length = 10;
-        localStorage.setItem(BACKUP_HISTORY_KEY, JSON.stringify(hist));
-        console.log('Saved backup snapshot', snapshot.ts);
-      }catch(e){ console.warn('backup failed', e); }
-    }
-    setInterval(saveBackupSnapshot, BACKUP_INTERVAL_MS);
-
-    /* ---------------- Last saved UI ---------------- */
-    function updateLastSaved(){ const el = document.getElementById('last-saved'); if(!el) return; el.textContent = `Saved ${new Date().toLocaleString()}`; }
-
-    /* ---------------- Debug helpers ---------------- */
-    function downloadLocalDump(){
-      const dump = { byDate: loadAllByDate(), settings: loadSettings(), sessions: loadSessionLog(), backups: safeParse(localStorage.getItem(BACKUP_HISTORY_KEY),[]) , exportedAt: new Date().toISOString() };
-      downloadFile('fieldiron-local-dump.json', JSON.stringify(dump, null, 2), 'application/json');
-      showToast('Local dump downloaded');
+    /* ---------------- Render current view ---------------- */
+    function renderCurrentView(){
+      const s = loadSettings();
+      updateLastSaved();
+      updateDayLabel(s.selectedDate || todayISO());
+      document.getElementById('default-count-label').textContent = s.defaultExerciseCount || DEFAULTS.defaultExerciseCount;
+      document.getElementById('default-count').value = s.defaultExerciseCount || DEFAULTS.defaultExerciseCount;
+      document.getElementById('base-exercises').value = (s.baseExercises && s.baseExercises.length) ? s.baseExercises.join(', ') : DEFAULTS.baseExercises.join(', ');
+      if(s.view === 'weekly'){ document.getElementById('daily-view').classList.add('hidden'); document.getElementById('weekly-view').classList.remove('hidden'); renderWeek(s.selectedDate || todayISO()); }
+      else { document.getElementById('daily-view').classList.remove('hidden'); document.getElementById('weekly-view').classList.add('hidden'); renderWorkouts(document.getElementById('filter').value); }
     }
 
-    /* ---------------- Weekly view rendering ---------------- */
-    function getWeekStart(dateISO){
-      const d = new Date(dateISO + 'T00:00:00');
-      const day = d.getDay();
-      const diff = (day + 6) % 7;
-      d.setDate(d.getDate() - diff);
-      return d.toISOString().slice(0,10);
-    }
-    function renderWeek(centerDateISO){
-      const start = getWeekStart(centerDateISO);
-      const grid = document.getElementById('week-grid');
-      grid.innerHTML = '';
-      for(let i=0;i<7;i++){
-        const dateISO = dateAddDays(start, i);
-        const d = new Date(dateISO + 'T00:00:00');
-        const dayName = d.toLocaleDateString(undefined, { weekday: 'short' });
-        const dayNum = d.toLocaleDateString(undefined, { month:'short', day:'numeric'
+    /* ---------------- Initialization & wiring ---------------- */
+    document.addEventListener('DOMContentLoaded', ()=>{
+      // elements
+      const presetSelect = document.getElementById('preset-select');
+      const accentSwatches = document.querySelectorAll('.accent-swatch');
+      const viewDaily = document.getElementById('view-daily');
+      const viewWeekly = document.getElementById('view-weekly');
+      const prevBtn = document.getElementById('prev');
+      const nextBtn = document.getElementById('next');
+      const todayBtn = document.getElementById('today-btn');
+      const quickAdd = document.getElementById('quick-add');
+      const quickAddBtn = document.getElementById('quick-add-btn');
+      const filter = document.getElementById('filter');
+      const importFile = document.getElementById('import-file');
+      const exportBtn = document.getElementById('export-json');
+      const startBtn = document.getElementById('start-session');
+      const pauseBtn = document.getElementById('pause-session');
+      const stopBtn = document.getElementById('stop-session');
+      const clearAllBtn = document.getElementById('clear-all');
+      const resetDefaultsBtn = document.getElementById('reset-defaults');
+      const undoBtn = document.getElementById('undo-btn');
+      const templatesBtn = document.getElementById('templates-btn');
+
+      // settings
+      const showTZ = document.getElementById('show-timezone');
+      const useShort = document.getElementById('use-short-day');
+      const enableSW = document.getElementById('enable-sw');
+      const vibrateSwitch = document.getElementById('vibrate');
+      const defaultCountInput = document.getElementById('default-count');
+      const baseExercisesInput = document.getElementById('base-exercises');
+      const saveSettingsBtn = document.getElementById('save-settings');
+      const resetSettingsBtn = document.getElementById('reset-settings');
+
+      // advanced
+      const unregisterBtn = document.getElementById('unregister-sw');
+      const debugExportBtn = document.getElementById('debug-export-local');
+      const downloadRecoveryBtn = document.getElementById('download-recovery');
+      const clearStorageBtn = document.getElementById('clear-storage');
+
+      // session log
+      const downloadLogBtn = document.getElementById('download-log');
+      const clearLogBtn = document.getElementById('clear-log');
+
+      // apply saved settings
+      const s = loadSettings();
+      document.body.setAttribute('data-preset', s.preset || 'dark');
+      document.body.setAttribute('data-accent', s.accent || 'orange');
+      presetSelect.value = s.preset || 'dark';
+      // set switches visuals
+      function setSwitch(el, on){ if(on) el.classList.add('on'); else el.classList.remove('on'); el.setAttribute('aria-checked', !!on); }
+      setSwitch(showTZ, s.showTimezone); setSwitch(useShort, s.useShortDay); setSwitch(enableSW, s.enableSW); setSwitch(vibrateSwitch, s.vibrate);
+
+      // initial render
+      if(!s.selectedDate) s.selectedDate = todayISO();
+      saveSettings(s);
+      renderCurrentView();
+      renderSessionLog();
+      updateSessionUI();
+
+      // theme wiring
+      presetSelect.addEventListener('change', (e)=>{ const st = loadSettings(); st.preset = e.target.value; saveSettings(st); document.body.setAttribute('data-preset', e.target.value); });
+      accentSwatches.forEach(sw => sw.addEventListener('click', ()=>{ const a = sw.dataset.accent; const st = loadSettings(); st.accent = a; saveSettings(st); document.body.setAttribute('data-accent', a); }));
+
+      // view toggle
+      viewDaily.addEventListener('click', ()=>{ const st = loadSettings(); st.view = 'daily'; saveSettings(st); applyView(); });
+      viewWeekly.addEventListener('click', ()=>{ const st = loadSettings(); st.view = 'weekly'; saveSettings(st); applyView(); });
+      function applyView(){ const st = loadSettings(); viewDaily.setAttribute('aria-pressed', st.view==='daily'); viewWeekly.setAttribute('aria-pressed', st.view==='weekly'); renderCurrentView(); }
+
+      // navigation
+      prevBtn.addEventListener('click', ()=>{ const st = loadSettings(); st.selectedDate = (st.view==='weekly') ? dateAdd(st.selectedDate, -7) : dateAdd(st.selectedDate, -1); saveSettings(st); renderCurrentView(); });
+      nextBtn.addEventListener('click', ()=>{ const st = loadSettings(); st.selectedDate = (st.view==='weekly') ? dateAdd(st.selectedDate, 7) : dateAdd(st.selectedDate, 1); saveSettings(st); renderCurrentView(); });
+      todayBtn.addEventListener('click', ()=>{ const st = loadSettings(); st.selectedDate = todayISO(); saveSettings(st); renderCurrentView(); showToast('Jumped to today'); });
+
+      // quick add
+      quickAddBtn.addEventListener('click', ()=>{ const st = loadSettings(); addWorkoutTo(st.selectedDate || todayISO(), quickAdd.value); quickAdd.value=''; quickAdd.focus(); });
+      quickAdd.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); const st = loadSettings(); addWorkoutTo(st.selectedDate || todayISO(), quickAdd.value); quickAdd.value=''; } });
+
+      // filter
+      filter.addEventListener('input', ()=> renderWorkouts(filter.value));
+
+      // import/export
+      exportBtn.addEventListener('click', exportAll);
+      importFile.addEventListener('change', (e)=>{ const f = e.target.files && e.target.files[0]; if(f) importFileHandler(f); importFile.value=''; });
+      function importFileHandler(f){ importFile(f); }
+
+      // session controls
+      startBtn.addEventListener('click', ()=>{ if(!sessionTimer) startSession(); else showToast('Session already running'); });
+      pauseBtn.addEventListener('click', ()=>{ if(sessionTimer) pauseSession(); else startSession(); });
+      stopBtn.addEventListener('click', stopSession);
+
+      // CRUD controls
+      clearAllBtn.addEventListener('click', clearDay);
+      resetDefaultsBtn.addEventListener('click', resetDefaults);
+      undoBtn.addEventListener('click', undo);
+
+      // templates
+      templatesBtn.addEventListener('click', ()=>{
+        const templates = [
+          'Reverse Lunge — 4 sets × 8 ea',
+          'Kettlebell Farmer Carry — 4 sets × 50m',
+          'DB Bulgarian Split — 3 sets × 8 ea',
+          'Kneeling Hip Flexor Stretch — 2 sets × 30s ea'
+        ];
+        const pick = templates[Math.floor(Math.random()*templates.length)];
+        quickAdd.value = pick; quickAdd.focus();
+      });
+
+      // settings toggles
+      showTZ.addEventListener('click', ()=>{ const st = loadSettings(); st.showTimezone = !st.showTimezone; saveSettings(st); setSwitch(showTZ, st.showTimezone); updateDayLabel(st.selectedDate || todayISO()); });
+      useShort.addEventListener('click', ()=>{ const st = loadSettings(); st.useShortDay = !st.useShortDay; saveSettings(st); setSwitch(useShort, st.useShortDay); updateDayLabel(st.selectedDate || todayISO()); });
+      enableSW.addEventListener('click', ()=>{ const st = loadSettings(); st.enableSW = !st.enableSW; saveSettings(st); setSwitch(enableSW, st.enableSW); if(st.enableSW) registerSW(); else unregisterSW(); });
+      vibrateSwitch.addEventListener('click', ()=>{ const st = loadSettings(); st.vibrate = !st.vibrate; saveSettings(st); setSwitch(vibrateSwitch, st.vibrate); });
+
+      // save settings
+      saveSettingsBtn.addEventListener('click', ()=>{
+        const st = loadSettings();
+        st.defaultExerciseCount = Math.max(1, Math.min(12, Number(defaultCountInput.value) || DEFAULTS.defaultExerciseCount));
+        st.baseExercises = baseExercisesInput.value.split(',').map(s=>s.trim()).filter(Boolean);
+        saveSettings(st);
+        showToast('Settings saved');
+        renderCurrentView();
+      });
+      resetSettingsBtn.addEventListener('click', ()=>{
+        const st = loadSettings();
+        st.defaultExerciseCount = DEFAULTS.defaultExerciseCount;
+        st.baseExercises = DEFAULTS.baseExercises.slice();
+        saveSettings(st);
+        defaultCountInput.value = st.defaultExerciseCount;
+        baseExercisesInput.value = st.baseExercises.join(', ');
+        showToast('Settings reset');
+        renderCurrentView();
+      });
+
+      // advanced
+      unregisterBtn.addEventListener('click', unregisterSW);
+      debugExportBtn.addEventListener('click', downloadLocalDump);
+      downloadRecoveryBtn.addEventListener('click', ()=>{
+        const html = localStorage.getItem(RECOVERY_KEY);
+        if(!html){ alert('No recovery HTML saved'); return; }
+        downloadFile('recovered-deployed.html', html, 'text/html'); showToast('Downloaded recovery HTML');
+      });
+      clearStorageBtn.addEventListener('click', ()=>{
+        if(!confirm('Clear localStorage? This will remove workouts and settings.')) return;
+        localStorage.removeItem(STORAGE_BY_DATE); localStorage.removeItem(SETTINGS_KEY); localStorage.removeItem(LOG_KEY); localStorage.removeItem(BACKUP_KEY); localStorage.removeItem(UNDO_KEY);
+        renderCurrentView(); renderSessionLog(); updateLastSaved(); showToast('Local storage cleared');
+      });
+
+      // session log controls
+      downloadLogBtn.addEventListener('click', ()=>{ downloadFile('fieldiron-session-log.json', JSON.stringify({ sessions: loadLog(), exportedAt: nowISO() }, null, 2)); showToast('Session log downloaded'); });
+      clearLogBtn.addEventListener('click', ()=>{ if(!confirm('Clear session log?')) return; localStorage.removeItem(LOG_KEY); renderSessionLog(); showToast('Session log cleared'); });
+
+      // undo shortcut on logo double-click
+      document.getElementById('logo').addEventListener('dblclick', undo);
+
+      // register SW if enabled
+      if(loadSettings().enableSW) registerSW();
+    });
+
+    /* ---------------- Misc helpers ---------------- */
+    function downloadLocalDump(){ const dump = { byDate: loadAll(), settings: loadSettings(), sessions: loadLog(), backups: safeParse(localStorage.getItem(BACKUP_KEY),[]) }; downloadFile('fieldiron-local-dump.json', JSON.stringify(dump, null, 2)); showToast('Local dump downloaded'); }
+
+    // Expose debug API
+    try{ window.__FieldIron = { loadAll, saveAll, loadFor, saveFor, loadSettings, saveSettings, DEFAULTS, undo }; } catch(e){}
+
+    // Render on visibility change
+    document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState === 'visible') renderCurrentView(); });
+
+  })();
+  </script>
+</body>
+</html>
