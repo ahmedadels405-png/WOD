@@ -3,24 +3,18 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Field+Iron — Smart Generator + Themes</title>
+<title>Field+Iron — Fixes: Replace modes + Weights</title>
 <meta name="theme-color" content="#071018">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#07121a; --panel-bg:linear-gradient(180deg,#071a22,#081826); --muted:#9fb3c8; --text:#e9f3f8;
-    --accent:#00d4a6; --accent-2:#3b82f6; --accent-3:#ffd166; --glass:rgba(255,255,255,0.04);
-    --radius:14px; --ui:220ms cubic-bezier(.2,.9,.2,1); --touch:56px;
+    --accent:#00d4a6; --accent-2:#3b82f6; --glass:rgba(255,255,255,0.04);
+    --radius:12px; --ui:220ms cubic-bezier(.2,.9,.2,1); --touch:56px;
     --safe-top:env(safe-area-inset-top); --safe-bottom:env(safe-area-inset-bottom);
     --card-elev:0 12px 36px rgba(0,0,0,0.45); --max-width:980px;
   }
-  /* Theme tokens */
-  body[data-theme="Sporty"]{ --bg:#07121a; --panel-bg:linear-gradient(180deg,#071a22,#081826); --accent:#ff6b5f; --accent-2:#00d4a6; --accent-3:#ffd166; --text:#e9f3f8; --muted:#9fb3c8; }
-  body[data-theme="Calm"]{ --bg:#0b1720; --panel-bg:linear-gradient(180deg,#0f2430,#0b1720); --accent:#6aa6ff; --accent-2:#7ee7c7; --accent-3:#cfeef0; --text:#eaf6fb; --muted:#9fb3c8; }
-  body[data-theme="Vibrant"]{ --bg:#0b0f1a; --panel-bg:linear-gradient(180deg,#111827,#0b0f1a); --accent:#ff5fa3; --accent-2:#ffd166; --accent-3:#7ee7c7; --text:#fff6fb; --muted:#d1c7e0; }
-  body[data-theme="Dark"]{ --bg:#07121a; --panel-bg:linear-gradient(180deg,#071a22,#081826); --accent:#00d4a6; --accent-2:#3b82f6; --accent-3:#ffd166; --text:#e9f3f8; --muted:#9fb3c8; }
-  body[data-theme="Light"]{ --bg:#f6f8fa; --panel-bg:linear-gradient(180deg,#ffffff,#f8fbff); --accent:#ff6b5f; --accent-2:#00a884; --accent-3:#ffd166; --text:#07121a; --muted:#6b7f8f; --glass:rgba(0,0,0,0.04); }
-
+  body[data-theme="Dark"]{ --bg:#07121a; --panel-bg:linear-gradient(180deg,#071a22,#081826); --accent:#00d4a6; --accent-2:#3b82f6; --text:#e9f3f8; --muted:#9fb3c8; }
   html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;box-sizing:border-box;}
   *{box-sizing:border-box}
   .app{max-width:var(--max-width);margin:0 auto;padding:calc(12px + var(--safe-top)) 12px calc(92px + var(--safe-bottom));display:flex;flex-direction:column;gap:12px;min-height:100vh;}
@@ -45,32 +39,18 @@
   .search,.swap-select,input[type="number"]{padding:10px;border-radius:10px;border:1px solid var(--glass);background:transparent;color:var(--text);font-size:15px}
 
   .ex-list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
-  .ex-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.02);transition:transform 260ms,var(--ui);cursor:pointer}
-  .ex-item:hover{transform:translateY(-4px)}
+  .ex-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.02);transition:transform 260ms,var(--ui)}
   .ex-left{flex:1;min-width:0}
   .ex-title{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .ex-meta{color:var(--muted);font-size:13px;margin-top:6px}
   .ex-actions{display:flex;gap:8px;align-items:center}
 
+  .weight-input{width:84px;padding:8px;border-radius:8px;border:1px solid var(--glass);background:transparent;color:var(--text);text-align:center}
+
   .stat{display:flex;flex-direction:column;gap:8px}
   .stat-row{display:flex;justify-content:space-between;align-items:center}
   .progress{height:12px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden}
   .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;transition:width 700ms var(--ui)}
-
-  .theme-swatches{display:flex;gap:8px;align-items:center;margin-top:10px}
-  .swatch{width:36px;height:36px;border-radius:8px;border:2px solid rgba(255,255,255,0.04);cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.25)}
-  .swatch.selected{outline:3px solid rgba(255,255,255,0.06);transform:scale(1.04)}
-
-  .core-count{display:flex;gap:8px;align-items:center;margin-top:10px}
-  .core-count input[type="range"]{width:160px}
-
-  .runner{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6));z-index:10000;padding:12px}
-  .runner-card{width:760px;max-width:100%;border-radius:12px;padding:16px;background:var(--panel-bg);border:1px solid var(--glass)}
-  @media (max-width:640px){ .runner-card{height:100%;border-radius:0;padding:18px;overflow:auto} }
-
-  .sets-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-  .set-pill{min-width:44px;height:44px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;font-weight:700;background:transparent}
-  .set-pill.done{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:none;box-shadow:0 8px 20px rgba(0,0,0,0.25)}
 
   .sticky-start{position:fixed;left:12px;right:12px;bottom:calc(12px + var(--safe-bottom));display:flex;justify-content:center;z-index:999;pointer-events:auto}
   .sticky-start .btn-primary{width:100%;height:56px;font-size:16px;border-radius:12px}
@@ -92,7 +72,7 @@
       <div class="logo" aria-hidden="true">FI</div>
       <div class="brand">
         <h1>Field+Iron</h1>
-        <p class="small">Adjustable core size • Themes • Smart generator</p>
+        <p class="small">Auto Replace / Pick Replacement • Weights per exercise</p>
       </div>
       <div style="flex:1"></div>
 
@@ -149,13 +129,14 @@
         <section class="panel" style="margin-top:12px">
           <div class="panel-header">
             <div><strong>Swap Controls</strong><div class="small muted">Replace a core slot</div></div>
-            <div class="small muted">Double-tap to quick replace</div>
+            <div class="small muted">Auto Replace vs Pick Replacement</div>
           </div>
 
           <div class="swap-row">
             <select id="swap-target" class="swap-select" aria-label="Swap target"></select>
             <input id="swap-search" class="search" placeholder="Search DB to swap" />
-            <button id="swap-btn" class="btn-primary btn">Replace</button>
+            <button id="swap-auto" class="btn">Auto Replace</button>
+            <button id="swap-pick" class="btn-primary">Pick Replacement</button>
           </div>
         </section>
       </div>
@@ -164,7 +145,7 @@
         <section class="panel stat">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <div><strong>Profile</strong><div class="small muted">83 kg • 15.3% BF • target 12% BF</div></div>
-            <div class="small muted">v1.6</div>
+            <div class="small muted">v1.7</div>
           </div>
 
           <div style="margin-top:10px">
@@ -218,7 +199,7 @@
     </main>
 
     <footer style="display:flex;justify-content:space-between;align-items:center;padding-top:6px">
-      <div class="small muted">Smart selection: explosiveness + strength + isolated finish</div>
+      <div class="small muted">Auto Replace prefers same tag; Pick Replacement opens DB. Weights saved per date+slot.</div>
       <div class="small muted">Shortcuts: S shuffle • D open DB</div>
     </footer>
   </div>
@@ -246,7 +227,7 @@
   <div id="runner" class="runner" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Workout runner">
     <div class="runner-card">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <div><div style="font-weight:900;font-size:18px">Workout Runner</div><div class="small muted">Core only • per‑set pills</div></div>
+        <div><div style="font-weight:900;font-size:18px">Workout Runner</div><div class="small muted">Core only • weight recorded per set</div></div>
         <div><button id="runner-close" class="btn">Close</button></div>
       </div>
 
@@ -261,6 +242,11 @@
             <div style="flex:1"></div>
             <div class="small muted">Rest</div>
             <div id="runner-rest" style="font-weight:900">00:00</div>
+          </div>
+
+          <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+            <label class="small muted">Weight (kg)</label>
+            <input id="runner-weight" class="weight-input" type="number" step="0.5" />
           </div>
 
           <div class="sets-row" id="sets-row" aria-hidden="false"></div>
@@ -292,15 +278,13 @@
     </div>
   </div>
 
-  <div id="toast" class="hidden" style="position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));background:linear-gradient(90deg,var(--accent-3, #ffd166),rgba(255,255,255,0.02));color:#07121a;padding:10px 14px;border-radius:12px;z-index:11000"></div>
+  <div id="toast" class="hidden" style="position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));background:linear-gradient(90deg,#ffd166,rgba(255,255,255,0.02));color:#07121a;padding:10px 14px;border-radius:12px;z-index:11000"></div>
 
 <script>
 (() => {
   'use strict';
 
-  /* -------------------------
-     Exercise DB (125 items)
-     ------------------------- */
+  /* DB */
   const EXERCISES = [
     "Goblet Squat — 3 sets × 10","Back Squat — 5 sets × 5","Front Squat — 4 sets × 6","Romanian Deadlift — 4 sets × 8",
     "Conventional Deadlift — 5 sets × 3","Sumo Deadlift — 4 sets × 5","Trap Bar Deadlift — 4 sets × 6","Kettlebell Swing — 4 sets × 12",
@@ -335,15 +319,10 @@
     "Sled Lateral Push — 6 rounds × 10m"
   ];
 
-  /* -------------------------
-     Tagging rules for Smart Selection
-     - We'll classify exercises by keyword matching into:
-       strength, explosive, isolation, cardio, mobility
-     - Smart generator uses these categories.
-     ------------------------- */
+  /* Tagging rules (same as before) */
   const TAG_RULES = {
-    explosive: ['jump','sprint','plyo','broad jump','box jump','medicine ball','sprint','kettlebell snatch','kettlebell swing','power clean','clean and jerk','snatch','broad jump','box jump','plyo','hill sprint','sled sprint','bike sprints','row','battle ropes','lateral bounds','broad jump','broad'],
-    strength: ['squat','deadlift','press','bench','thrust','hip','row','pull','chin','pull up','dip','clean','snatch','deadlift','zerc','zercher','leg press','good morning','tempo squat','trap bar'],
+    explosive: ['jump','sprint','plyo','broad jump','box jump','medicine ball','sprint','kettlebell snatch','kettlebell swing','power clean','clean and jerk','snatch','broad jump','box jump','plyo','hill sprint','sled sprint','bike sprints','row','battle ropes','lateral bounds','broad'],
+    strength: ['squat','deadlift','press','bench','thrust','hip','row','pull','chin','pull up','dip','clean','snatch','deadlift','zercher','leg press','good morning','tempo squat','trap bar'],
     isolation: ['curl','lateral raise','front raise','skull crusher','triceps','hammer curl','incline hammer','cable fly','rear delt','band pull','face pull','calf','hamstring curl','ab wheel','russian twist'],
     cardio: ['sprint','row','bike','interval','battle ropes','sled','sprint intervals','rowing intervals'],
     mobility: ['stretch','child pose','hip flexor','hamstring stretch','kneeling','child pose','mobility','stretch']
@@ -357,17 +336,19 @@
         if(n.includes(kw)) { tags.add(tag); break; }
       }
     }
-    // fallback: if contains 'carry' or 'farmer' treat as strength
     if(n.includes('carry') || n.includes('farmer')) tags.add('strength');
-    // if nothing matched, mark as 'strength' by default (safe)
     if(tags.size === 0) tags.add('strength');
     return Array.from(tags);
   }
 
-  /* -------------------------
-     Storage & defaults
-     ------------------------- */
-  const STORAGE = { byDate: 'fi.byDate.v5', routines: 'fi.routines.v5', settings: 'fi.settings.v5', sessions: 'fi.sessions.v1' };
+  /* Storage keys */
+  const STORAGE = {
+    byDate: 'fi.byDate.v7',
+    routines: 'fi.routines.v7',
+    settings: 'fi.settings.v7',
+    sessions: 'fi.sessions.v1',
+    weights: 'fi.weights.v1' // new: weights per date+slot
+  };
   const DEFAULTS = { defaultCount:5, stretches:['Kneeling Hip Flexor Stretch — 2 sets × 30s ea','Standing Hamstring Stretch — 2 sets × 30s ea','Child Pose Hold — 1 × 60s'], profile:{weight:83,bf:15.3,bfTarget:12} };
 
   /* Utilities */
@@ -378,7 +359,23 @@
   const sampleShuffle = (arr,n)=>{ const c=arr.slice(); for(let i=c.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [c[i],c[j]]=[c[j],c[i]] } return c.slice(0,n) };
   const showToast = (msg,ms=1400)=>{ const t=document.getElementById('toast'); t.textContent=msg; t.classList.remove('hidden'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.add('hidden'),ms) };
 
-  /* State */
+  /* Weights helpers (new) */
+  function loadWeights(){
+    return loadJSON(STORAGE.weights, {}); // structure: { "2026-04-04": { "slot0": 80, "slot1": 40 } }
+  }
+  function saveWeightFor(date, slotIndex, kg){
+    const all = loadWeights();
+    all[date] = all[date] || {};
+    if(kg === '' || kg === null || kg === undefined) delete all[date]['slot' + slotIndex];
+    else all[date]['slot' + slotIndex] = Number(kg);
+    saveJSON(STORAGE.weights, all);
+  }
+  function getWeightFor(date, slotIndex){
+    const all = loadWeights();
+    return (all[date] && all[date]['slot' + slotIndex] !== undefined) ? all[date]['slot' + slotIndex] : '';
+  }
+
+  /* App state */
   let state = { selectedDate: todayISO(), settings: loadJSON(STORAGE.settings,{profile:DEFAULTS.profile,theme:'Dark',defaultCount:DEFAULTS.defaultCount}), routines: loadJSON(STORAGE.routines,{}) };
 
   /* DOM refs */
@@ -423,128 +420,253 @@
   }
   function loadToday(){ const all=loadJSON(STORAGE.byDate,{}); const arr=all[state.selectedDate]||ensureToday(); const core=arr.slice(0,state.settings.defaultCount||DEFAULTS.defaultCount); const stretches=arr.slice(state.settings.defaultCount||DEFAULTS.defaultCount); return {core,stretches}; }
 
-  /* Render */
+  /* Render lists (core + stretches) with weight inputs and new buttons */
   function renderDate(){ refs.dateLabel.textContent = new Date(state.selectedDate+'T00:00:00').toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'}); refs.defaultCountLabel.textContent = state.settings.defaultCount || DEFAULTS.defaultCount; }
   function renderLists(){
     const today = loadToday();
-    refs.coreList.innerHTML=''; today.core.forEach((ex,idx)=>{
-      const item=document.createElement('div'); item.className='ex-item fade-in';
-      const left=document.createElement('div'); left.className='ex-left';
-      const title=document.createElement('div'); title.className='ex-title'; title.textContent=ex;
-      const meta=document.createElement('div'); meta.className='ex-meta muted'; meta.textContent=`Core • slot ${idx+1}`;
+    refs.coreList.innerHTML = '';
+    today.core.forEach((ex, idx) => {
+      const item = document.createElement('div'); item.className = 'ex-item fade-in';
+      const left = document.createElement('div'); left.className = 'ex-left';
+      const title = document.createElement('div'); title.className = 'ex-title'; title.textContent = ex;
+      const meta = document.createElement('div'); meta.className = 'ex-meta muted'; meta.textContent = `Core • slot ${idx+1}`;
       left.appendChild(title); left.appendChild(meta);
-      const actions=document.createElement('div'); actions.className='ex-actions';
-      const swapBtn=document.createElement('button'); swapBtn.className='btn'; swapBtn.textContent='Swap'; swapBtn.onclick=()=>openSwapFor(idx);
-      const replaceBtn=document.createElement('button'); replaceBtn.className='btn'; replaceBtn.textContent='Replace'; replaceBtn.onclick=()=>openDBAndReplace(idx);
-      const removeBtn=document.createElement('button'); removeBtn.className='btn'; removeBtn.textContent='Remove'; removeBtn.onclick=()=>removeCore(idx);
-      actions.appendChild(swapBtn); actions.appendChild(replaceBtn); actions.appendChild(removeBtn);
-      item.appendChild(left); item.appendChild(actions);
-      let lastTap=0; item.addEventListener('touchend',()=>{ const now=Date.now(); if(now-lastTap<300) quickReplace(idx); lastTap=now; });
-      item.addEventListener('dblclick',()=>quickReplace(idx));
+
+      // weight input (per date + slot)
+      const weight = document.createElement('input');
+      weight.type = 'number';
+      weight.step = '0.5';
+      weight.placeholder = 'kg';
+      weight.className = 'weight-input';
+      weight.value = getWeightFor(state.selectedDate, idx);
+      weight.title = 'Weight used for this exercise (saved)';
+      weight.addEventListener('change', (e) => {
+        const v = e.target.value;
+        if(v === '') saveWeightFor(state.selectedDate, idx, '');
+        else saveWeightFor(state.selectedDate, idx, Number(v));
+        showToast('Weight saved');
+      });
+
+      const actions = document.createElement('div'); actions.className = 'ex-actions';
+
+      // Auto Replace (new): picks an alternative automatically
+      const autoBtn = document.createElement('button'); autoBtn.className = 'btn'; autoBtn.textContent = 'Auto Replace';
+      autoBtn.title = 'Automatically pick a replacement for this slot';
+      autoBtn.onclick = () => autoReplaceSlot(idx);
+
+      // Pick Replacement (new): opens DB modal to pick
+      const pickBtn = document.createElement('button'); pickBtn.className = 'btn-primary'; pickBtn.textContent = 'Pick Replacement';
+      pickBtn.title = 'Open DB to pick replacement';
+      pickBtn.onclick = () => { dbReplaceIndex = idx; openDB(); };
+
+      // Remove
+      const removeBtn = document.createElement('button'); removeBtn.className = 'btn'; removeBtn.textContent = 'Remove';
+      removeBtn.onclick = () => removeCore(idx);
+
+      actions.appendChild(weight);
+      actions.appendChild(autoBtn);
+      actions.appendChild(pickBtn);
+      actions.appendChild(removeBtn);
+
+      item.appendChild(left);
+      item.appendChild(actions);
+
+      // double-tap quick replace
+      let lastTap = 0;
+      item.addEventListener('touchend', () => {
+        const now = Date.now();
+        if (now - lastTap < 300) quickReplace(idx);
+        lastTap = now;
+      });
+      item.addEventListener('dblclick', () => quickReplace(idx));
+
       refs.coreList.appendChild(item);
     });
 
-    refs.stretchList.innerHTML=''; today.stretches.forEach((ex,idx)=>{
-      const item=document.createElement('div'); item.className='ex-item stretch-item fade-in';
-      const left=document.createElement('div'); left.className='ex-left';
-      const title=document.createElement('div'); title.className='ex-title'; title.textContent=ex;
-      const meta=document.createElement('div'); meta.className='ex-meta muted'; meta.textContent='Stretch';
+    // stretches
+    refs.stretchList.innerHTML = '';
+    today.stretches.forEach((ex, idx) => {
+      const item = document.createElement('div'); item.className = 'ex-item fade-in';
+      const left = document.createElement('div'); left.className = 'ex-left';
+      const title = document.createElement('div'); title.className = 'ex-title'; title.textContent = ex;
+      const meta = document.createElement('div'); meta.className = 'ex-meta muted'; meta.textContent = 'Stretch';
       left.appendChild(title); left.appendChild(meta);
-      const actions=document.createElement('div'); actions.className='ex-actions';
-      const removeBtn=document.createElement('button'); removeBtn.className='btn'; removeBtn.textContent='Remove'; removeBtn.onclick=()=>removeStretch(idx);
+      const actions = document.createElement('div'); actions.className = 'ex-actions';
+      const removeBtn = document.createElement('button'); removeBtn.className = 'btn'; removeBtn.textContent = 'Remove';
+      removeBtn.onclick = () => removeStretch(idx);
       actions.appendChild(removeBtn);
       item.appendChild(left); item.appendChild(actions);
       refs.stretchList.appendChild(item);
     });
 
-    populateSwapTarget(); renderSavedList();
+    populateSwapTarget();
+    renderSavedList();
   }
 
-  function populateSwapTarget(){ const sel=document.getElementById('swap-target'); sel.innerHTML=''; const count=state.settings.defaultCount||DEFAULTS.defaultCount; for(let i=0;i<count;i++){ const opt=document.createElement('option'); opt.value=i; opt.textContent=`Slot ${i+1}`; sel.appendChild(opt); } }
-
-  function renderDB(filter=''){ refs.dbList.innerHTML=''; const q=(filter||'').toLowerCase(); EXERCISES.forEach(ex=>{ if(q && !ex.toLowerCase().includes(q)) return; const card=document.createElement('div'); card.className='ex-item'; card.style.cursor='pointer'; const left=document.createElement('div'); left.style.flex='1'; const t=document.createElement('div'); t.className='ex-title'; t.textContent=ex; left.appendChild(t); const btns=document.createElement('div'); const addBtn=document.createElement('button'); addBtn.className='btn'; addBtn.textContent='Add'; addBtn.onclick=(e)=>{ e.stopPropagation(); addStretch(ex); }; const previewBtn=document.createElement('button'); previewBtn.className='btn'; previewBtn.textContent='Preview'; previewBtn.onclick=(e)=>{ e.stopPropagation(); alert(ex); }; btns.appendChild(addBtn); btns.appendChild(previewBtn); card.appendChild(left); card.appendChild(btns); card.addEventListener('click',()=>{ if(dbReplaceIndex!==null){ replaceCoreSlot(dbReplaceIndex,ex); dbReplaceIndex=null; closeDB(); } }); refs.dbList.appendChild(card); }); }
-
-  function renderSavedList(){ const keys=Object.keys(state.routines||{}); if(!keys.length){ refs.savedList.textContent='No saved routines'; return; } refs.savedList.innerHTML = keys.map(k=>`<div style="margin-top:6px"><strong>${k}</strong> <span class="small muted">(${state.routines[k].length} items)</span> <button data-name="${k}" class="btn load-routine">Load</button> <button data-name="${k}" class="btn del-routine">Delete</button></div>`).join(''); document.querySelectorAll('.load-routine').forEach(b=>b.addEventListener('click',e=>loadRoutine(e.target.dataset.name))); document.querySelectorAll('.del-routine').forEach(b=>b.addEventListener('click',e=>{ const name=e.target.dataset.name; if(confirm('Delete '+name+'?')){ delete state.routines[name]; saveJSON(STORAGE.routines,state.routines); renderSavedList(); } })); }
-
-  /* Actions */
-  function addCoreCustom(){ const v=document.getElementById('quick-add-core').value.trim(); if(!v) return; const all=loadJSON(STORAGE.byDate,{}); const arr=all[state.selectedDate]||ensureToday(); arr.splice(state.settings.defaultCount,0,v); all[state.selectedDate]=arr; saveJSON(STORAGE.byDate,all); document.getElementById('quick-add-core').value=''; renderLists(); showToast('Core added'); }
-  function addStretch(ex){ const all=loadJSON(STORAGE.byDate,{}); const arr=all[state.selectedDate]||ensureToday(); arr.push(ex); all[state.selectedDate]=arr; saveJSON(STORAGE.byDate,all); renderLists(); showToast('Stretch added'); }
-  function addStretchCustom(){ const v=document.getElementById('quick-add-stretch').value.trim(); if(!v) return; addStretch(v); document.getElementById('quick-add-stretch').value=''; }
-  function removeCore(idx){ if(!confirm('Remove core slot '+(idx+1)+'?')) return; const all=loadJSON(STORAGE.byDate,{}); const arr=all[state.selectedDate]||ensureToday(); arr.splice(idx,1); all[state.selectedDate]=arr; saveJSON(STORAGE.byDate,all); renderLists(); }
-  function removeStretch(idx){ if(!confirm('Remove stretch?')) return; const all=loadJSON(STORAGE.byDate,{}); const arr=all[state.selectedDate]||ensureToday(); const coreCount=state.settings.defaultCount||DEFAULTS.defaultCount; arr.splice(coreCount+idx,1); all[state.selectedDate]=arr; saveJSON(STORAGE.byDate,all); renderLists(); }
-  function openSwapFor(idx){ document.getElementById('swap-target').value=idx; openDB(); }
-  let dbReplaceIndex=null;
-  function openDBAndReplace(idx){ dbReplaceIndex=idx; openDB(); }
-  function replaceCoreSlot(slotIndex,ex){ const all=loadJSON(STORAGE.byDate,{}); const arr=all[state.selectedDate]||ensureToday(); arr[slotIndex]=ex; all[state.selectedDate]=arr; saveJSON(STORAGE.byDate,all); renderLists(); showToast('Slot replaced'); }
-  function quickReplace(idx){ const pool=EXERCISES.filter(e=>!loadToday().core.includes(e)); if(!pool.length) return; const pick=pool[Math.floor(Math.random()*pool.length)]; replaceCoreSlot(idx,pick); }
-  function swapReplaceFromSearch(){ const q=document.getElementById('swap-search').value.trim().toLowerCase(); if(!q) return alert('Search DB first'); const found=EXERCISES.find(e=>e.toLowerCase().includes(q)); if(!found) return alert('No match'); const slot=Number(document.getElementById('swap-target').value); replaceCoreSlot(slot,found); }
-  function shuffleCore(){ const picks=sampleShuffle(EXERCISES,state.settings.defaultCount||DEFAULTS.defaultCount); const all=loadJSON(STORAGE.byDate,{}); const arr=all[state.selectedDate]||ensureToday(); const stretches=arr.slice(state.settings.defaultCount||DEFAULTS.defaultCount); all[state.selectedDate]=picks.concat(stretches); saveJSON(STORAGE.byDate,all); renderLists(); showToast('Core shuffled'); }
-  function saveRoutine(){ const name=prompt('Name this routine'); if(!name) return; const today=loadToday(); state.routines[name]=today.core.concat(today.stretches); saveJSON(STORAGE.routines,state.routines); renderSavedList(); showToast('Routine saved'); }
-  function loadRoutine(name){ const r=state.routines[name]; if(!r) return; const all=loadJSON(STORAGE.byDate,{}); all[state.selectedDate]=r.slice(); saveJSON(STORAGE.byDate,all); renderLists(); showToast('Routine loaded'); }
-  function exportAll(){ const payload={byDate:loadJSON(STORAGE.byDate,{}),routines:state.routines,settings:state.settings,exportedAt:nowISO()}; const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='fieldiron-export.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); showToast('Export ready'); }
-  function importFile(file){ const reader=new FileReader(); reader.onload=(e)=>{ try{ const parsed=JSON.parse(e.target.result); if(parsed.byDate) saveJSON(STORAGE.byDate,parsed.byDate); if(parsed.routines){ state.routines=parsed.routines; saveJSON(STORAGE.routines,state.routines); } if(parsed.settings){ state.settings=parsed.settings; saveJSON(STORAGE.settings,state.settings); } renderLists(); renderSavedList(); showToast('Import complete'); }catch(err){ alert('Invalid file'); } }; reader.readAsText(file); }
-
-  /* Profile */
-  function applyProfile(){ const w=Number(document.getElementById('weight').value)||DEFAULTS.profile.weight; const bf=Number(document.getElementById('bf').value)||DEFAULTS.profile.bf; const target=Number(document.getElementById('bf-target').value)||DEFAULTS.profile.bfTarget; state.settings.profile={weight:w,bf:bf,bfTarget:target}; state.settings.defaultCount=state.settings.defaultCount||DEFAULTS.defaultCount; saveJSON(STORAGE.settings,state.settings); computeProgress(); showToast('Profile applied'); }
-  function computeProgress(){ const p=state.settings.profile||DEFAULTS.profile; const lean=p.weight*(1-(p.bf/100)); const targetWeight=lean/(1-(p.bfTarget/100)); const toLose=p.weight-targetWeight; const pct=Math.max(0,Math.min(100,((p.bf-p.bfTarget)/p.bf)*100)); document.getElementById('progress-bar').style.width=Math.max(6,Math.min(100,pct))+'%'; document.getElementById('progress-text').textContent=`Estimated target ${targetWeight.toFixed(2)} kg • ${toLose>0?toLose.toFixed(2)+' kg to lose':Math.abs(toLose).toFixed(2)+' kg to gain'}`; }
-
-  /* Modal */
-  function openDB(){ document.getElementById('db-modal').classList.remove('hidden'); document.getElementById('db-modal').setAttribute('aria-hidden','false'); renderDB(''); }
-  function closeDB(){ document.getElementById('db-modal').classList.add('hidden'); document.getElementById('db-modal').setAttribute('aria-hidden','true'); dbReplaceIndex=null; }
-
-  /* Runner (core only) */
-  const RUNNER_COUNT = ()=> state.settings.defaultCount || DEFAULTS.defaultCount;
-  const runnerEl = document.getElementById('runner');
-  const runnerSummary = document.getElementById('runner-summary');
-  let runnerState = { exercises: [], index: 0, setIndex: 1, setsTotal: 1, restTimer: null, restRemaining: 0, inSet: false, sessionStart: null, log: [] };
-
-  function parseSets(text){ const m=text.match(/(\d+)\s*sets?/i); return m?Number(m[1]):1; }
-  function parseReps(text){ const m=text.match(/×\s*([0-9]+(?:-[0-9]+)?)/); return m?m[1]:''; }
-
-  function loadRunnerExercises(){ const today=loadToday(); runnerState.exercises=today.core.slice(0,RUNNER_COUNT()); runnerSummary.innerHTML=''; runnerState.exercises.forEach((ex,i)=>{ const el=document.createElement('div'); el.style.display='flex'; el.style.justifyContent='space-between'; el.style.alignItems='center'; el.innerHTML=`<div style="flex:1;min-width:0"><strong style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${i+1}. ${ex}</strong></div><div class="small muted">slot ${i+1}</div>`; runnerSummary.appendChild(el); }); }
-
-  function showRunner(){ loadRunnerExercises(); runnerState.index=0; runnerState.setIndex=1; runnerState.sessionStart=Date.now(); runnerState.log=[]; updateRunnerUI(); runnerEl.style.display='flex'; runnerEl.setAttribute('aria-hidden','false'); attachSwipe(); }
-
-  function hideRunner(){ runnerEl.style.display='none'; runnerEl.setAttribute('aria-hidden','true'); stopRest(); detachSwipe(); }
-
-  function updateRunnerUI(){
-    const ex = runnerState.exercises[runnerState.index] || '—';
-    document.getElementById('runner-ex').textContent = ex;
-    const sets = parseSets(ex) || 1; runnerState.setsTotal = sets;
-    document.getElementById('runner-presc').textContent = `${sets} sets • ${parseReps(ex)}`;
-    document.getElementById('runner-set').textContent = `${runnerState.setIndex} / ${runnerState.setsTotal}`;
-    document.getElementById('runner-rest').textContent = formatTime(runnerState.restRemaining || 0);
-    const setsRow = document.getElementById('sets-row'); setsRow.innerHTML=''; for(let i=1;i<=sets;i++){ const pill=document.createElement('div'); pill.className='set-pill'+(i<runnerState.setIndex?' done':''); pill.textContent=i; pill.onclick=(()=>{ return ()=>{ if(i<runnerState.setIndex) return; runnerState.setIndex=i; updateRunnerUI(); } })(); setsRow.appendChild(pill); }
-    const summaryChildren = runnerSummary.children; for(let i=0;i<summaryChildren.length;i++){ summaryChildren[i].style.opacity=(i===runnerState.index)?'1':'0.6'; summaryChildren[i].style.background=(i===runnerState.index)?'rgba(255,255,255,0.02)':'transparent'; summaryChildren[i].style.padding='6px'; summaryChildren[i].style.borderRadius='8px'; }
+  function populateSwapTarget(){
+    const sel = document.getElementById('swap-target');
+    sel.innerHTML = '';
+    const count = state.settings.defaultCount || DEFAULTS.defaultCount;
+    for (let i=0;i<count;i++){
+      const opt = document.createElement('option'); opt.value = i; opt.textContent = `Slot ${i+1}`;
+      sel.appendChild(opt);
+    }
   }
 
-  function formatTime(sec){ const s=Math.max(0,Math.floor(sec)); const mm=String(Math.floor(s/60)).padStart(2,'0'); const ss=String(s%60).padStart(2,'0'); return `${mm}:${ss}`; }
-  function startSet(){ if(runnerState.inSet) return; runnerState.inSet=true; document.getElementById('runner-start').textContent='In Progress'; document.getElementById('runner-start').disabled=true; }
-  function completeSet(){ runnerState.inSet=false; document.getElementById('runner-start').textContent='Start Set'; document.getElementById('runner-start').disabled=false; const ex=runnerState.exercises[runnerState.index]||'—'; runnerState.log.push({exercise:ex,set:runnerState.setIndex,ts:Date.now()}); if(runnerState.setIndex<runnerState.setsTotal){ const restSec=Number(document.getElementById('runner-rest-input').value)||60; runnerState.restRemaining=restSec; startRest(); runnerState.setIndex++; } else { if(runnerState.index<runnerState.exercises.length-1){ runnerState.index++; runnerState.setIndex=1; } else { showToast('Workout complete — press Finish'); } } updateRunnerUI(); }
-  function startRest(){ stopRest(); document.getElementById('runner-done').disabled=true; runnerState.restTimer=setInterval(()=>{ runnerState.restRemaining-=1; if(runnerState.restRemaining<=0){ stopRest(); document.getElementById('runner-done').disabled=false; try{ if(navigator.vibrate) navigator.vibrate(40); }catch(e){} showToast('Rest complete'); } updateRunnerUI(); },1000); }
-  function stopRest(){ if(runnerState.restTimer){ clearInterval(runnerState.restTimer); runnerState.restTimer=null; } runnerState.restRemaining=0; document.getElementById('runner-done').disabled=false; updateRunnerUI(); }
-  function nextExercise(){ if(runnerState.index<runnerState.exercises.length-1){ runnerState.index++; runnerState.setIndex=1; stopRest(); updateRunnerUI(); } else showToast('Last exercise'); }
-  function prevExercise(){ if(runnerState.index>0){ runnerState.index--; runnerState.setIndex=1; stopRest(); updateRunnerUI(); } else showToast('First exercise'); }
-  function finishWorkout(){ const sessions=loadJSON(STORAGE.sessions,[]); const duration=Math.round((Date.now()-runnerState.sessionStart)/1000); sessions.unshift({startedAt:new Date(runnerState.sessionStart).toISOString(),durationSec:duration,exercises:runnerState.log}); saveJSON(STORAGE.sessions,sessions); showToast('Workout saved'); hideRunner(); }
+  function renderDB(filter=''){
+    refs.dbList.innerHTML = '';
+    const q = (filter||'').toLowerCase();
+    EXERCISES.forEach((ex) => {
+      if(q && !ex.toLowerCase().includes(q)) return;
+      const card = document.createElement('div'); card.className = 'ex-item';
+      card.style.cursor = 'pointer';
+      const left = document.createElement('div'); left.style.flex = '1';
+      const t = document.createElement('div'); t.className = 'ex-title'; t.textContent = ex;
+      left.appendChild(t);
+      const btns = document.createElement('div');
+      const addBtn = document.createElement('button'); addBtn.className = 'btn'; addBtn.textContent = 'Add'; addBtn.onclick = (e)=>{ e.stopPropagation(); addStretch(ex); };
+      const previewBtn = document.createElement('button'); previewBtn.className = 'btn'; previewBtn.textContent = 'Preview'; previewBtn.onclick = (e)=>{ e.stopPropagation(); alert(ex); };
+      btns.appendChild(addBtn); btns.appendChild(previewBtn);
+      card.appendChild(left); card.appendChild(btns);
+      card.addEventListener('click', ()=> {
+        if(dbReplaceIndex !== null){
+          replaceCoreSlot(dbReplaceIndex, ex);
+          dbReplaceIndex = null;
+          closeDB();
+        }
+      });
+      refs.dbList.appendChild(card);
+    });
+  }
 
-  /* Swipe */
-  let touchStartX=0,touchStartY=0;
-  function attachSwipe(){ const card=document.querySelector('.runner-card'); if(!card) return; card.addEventListener('touchstart',onTouchStart,{passive:true}); card.addEventListener('touchend',onTouchEnd,{passive:true}); }
-  function detachSwipe(){ const card=document.querySelector('.runner-card'); if(!card) return; card.removeEventListener('touchstart',onTouchStart); card.removeEventListener('touchend',onTouchEnd); }
-  function onTouchStart(e){ const t=e.touches[0]; touchStartX=t.clientX; touchStartY=t.clientY; }
-  function onTouchEnd(e){ const t=e.changedTouches[0]; const dx=t.clientX-touchStartX; const dy=t.clientY-touchStartY; if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)){ if(dx<0) nextExercise(); else prevExercise(); } }
+  function renderSavedList(){
+    const keys = Object.keys(state.routines || {});
+    if(!keys.length){ refs.savedList.textContent = 'No saved routines'; return; }
+    refs.savedList.innerHTML = keys.map(k => `<div style="margin-top:6px"><strong>${k}</strong> <span class="small muted">(${state.routines[k].length} items)</span> <button data-name="${k}" class="btn load-routine">Load</button> <button data-name="${k}" class="btn del-routine">Delete</button></div>`).join('');
+    document.querySelectorAll('.load-routine').forEach(b => b.addEventListener('click', (e)=> { loadRoutine(e.target.dataset.name); }));
+    document.querySelectorAll('.del-routine').forEach(b => b.addEventListener('click', (e)=> { const name = e.target.dataset.name; if(confirm('Delete '+name+'?')){ delete state.routines[name]; saveJSON(STORAGE.routines, state.routines); renderSavedList(); } }));
+  }
 
-  /* -------------------------
-     Smart Selection logic
-     - Goal: explosiveness + strength + isolated near end
-     - For N slots:
-       * Reserve last slot for isolation (if available)
-       * Fill remaining slots with a balanced mix of explosive and strength
-       * Avoid duplicates and prefer variety
-     ------------------------- */
+  /* Add / remove / replace actions */
+  function addCoreCustom(){
+    const v = document.getElementById('quick-add-core').value.trim();
+    if(!v) return;
+    const all = loadJSON(STORAGE.byDate, {});
+    const arr = all[state.selectedDate] || ensureToday();
+    arr.splice(state.settings.defaultCount, 0, v);
+    all[state.selectedDate] = arr;
+    saveJSON(STORAGE.byDate, all);
+    document.getElementById('quick-add-core').value = '';
+    renderLists();
+    showToast('Core added');
+  }
+
+  function addStretch(ex){
+    const all = loadJSON(STORAGE.byDate, {});
+    const arr = all[state.selectedDate] || ensureToday();
+    arr.push(ex);
+    all[state.selectedDate] = arr;
+    saveJSON(STORAGE.byDate, all);
+    renderLists();
+    showToast('Stretch added');
+  }
+
+  function removeCore(idx){
+    if(!confirm('Remove core slot '+(idx+1)+'?')) return;
+    const all = loadJSON(STORAGE.byDate, {});
+    const arr = all[state.selectedDate] || ensureToday();
+    arr.splice(idx, 1);
+    all[state.selectedDate] = arr;
+    saveJSON(STORAGE.byDate, all);
+    // also remove weight for that slot (shift weights down)
+    const weights = loadWeights();
+    const wdate = weights[state.selectedDate] || {};
+    const newW = {};
+    const keys = Object.keys(wdate).sort();
+    // rebuild mapping shifting slots after removed index
+    for(const k of keys){
+      const slot = Number(k.replace('slot',''));
+      if(slot < idx) newW['slot'+slot] = wdate['slot'+slot];
+      else if(slot > idx) newW['slot'+(slot-1)] = wdate['slot'+slot];
+    }
+    weights[state.selectedDate] = newW;
+    saveJSON(STORAGE.weights, weights);
+    renderLists();
+  }
+
+  function removeStretch(idx){
+    if(!confirm('Remove stretch?')) return;
+    const all = loadJSON(STORAGE.byDate, {});
+    const arr = all[state.selectedDate] || ensureToday();
+    const coreCount = state.settings.defaultCount || DEFAULTS.defaultCount;
+    arr.splice(coreCount + idx, 1);
+    all[state.selectedDate] = arr;
+    saveJSON(STORAGE.byDate, all);
+    renderLists();
+  }
+
+  function replaceCoreSlot(slotIndex, ex){
+    // Correct replacement: replace the core slot at slotIndex
+    const all = loadJSON(STORAGE.byDate, {});
+    const arr = all[state.selectedDate] || ensureToday();
+    // ensure arr has enough length
+    while(arr.length < (slotIndex + 1)) arr.push('');
+    arr[slotIndex] = ex;
+    all[state.selectedDate] = arr;
+    saveJSON(STORAGE.byDate, all);
+    renderLists();
+    showToast('Slot replaced');
+  }
+
+  function quickReplace(idx){
+    const pool = EXERCISES.filter(e => !loadToday().core.includes(e));
+    if(!pool.length) return;
+    const pick = pool[Math.floor(Math.random()*pool.length)];
+    replaceCoreSlot(idx, pick);
+  }
+
+  function swapReplaceFromSearch(){
+    const q = document.getElementById('swap-search').value.trim().toLowerCase();
+    if(!q) return alert('Search DB first');
+    const found = EXERCISES.find(e => e.toLowerCase().includes(q));
+    if(!found) return alert('No match');
+    const slot = Number(document.getElementById('swap-target').value);
+    replaceCoreSlot(slot, found);
+  }
+
+  function shuffleCore(){
+    const picks = sampleShuffle(EXERCISES, state.settings.defaultCount || DEFAULTS.defaultCount);
+    const all = loadJSON(STORAGE.byDate, {});
+    const arr = all[state.selectedDate] || ensureToday();
+    const stretches = arr.slice(state.settings.defaultCount || DEFAULTS.defaultCount);
+    all[state.selectedDate] = picks.concat(stretches);
+    saveJSON(STORAGE.byDate, all);
+    renderLists();
+    showToast('Core shuffled');
+  }
+
+  /* Auto Replace logic (new) */
+  function autoReplaceSlot(slotIndex){
+    const today = loadToday();
+    const current = today.core[slotIndex];
+    const currentTags = classifyExercise(current);
+    // prefer same tag pool
+    let pool = EXERCISES.filter(e => !today.core.includes(e));
+    // try to prefer same tag
+    let preferred = pool.filter(e => {
+      const t = classifyExercise(e);
+      return currentTags.some(ct => t.includes(ct));
+    });
+    let pick = null;
+    if(preferred.length) pick = preferred[Math.floor(Math.random()*preferred.length)];
+    else if(pool.length) pick = pool[Math.floor(Math.random()*pool.length)];
+    if(pick) replaceCoreSlot(slotIndex, pick);
+    else showToast('No replacement available');
+  }
+
+  /* Smart generator (kept from previous) */
   function smartGenerateForDate(coreCount){
     coreCount = Math.max(3, Math.min(12, Number(coreCount) || DEFAULTS.defaultCount));
-    // classify DB into buckets
     const buckets = { explosive: [], strength: [], isolation: [], cardio: [], mobility: [] };
     for(const ex of EXERCISES){
       const tags = classifyExercise(ex);
@@ -554,61 +676,259 @@
       if(tags.includes('cardio')) buckets.cardio.push(ex);
       if(tags.includes('mobility')) buckets.mobility.push(ex);
     }
-
-    // helper to pick unique random from bucket
     function pickUnique(bucketArr, used, count){
       const pool = bucketArr.filter(x => !used.has(x));
       return sampleShuffle(pool, Math.min(count, pool.length));
     }
-
     const used = new Set();
     const result = [];
-
-    // Reserve last slot for isolation if possible
     const reserveIsolation = buckets.isolation.length > 0;
-
-    // Determine counts: aim for 50/50 explosive/strength for the main body
     const mainSlots = reserveIsolation ? coreCount - 1 : coreCount;
     const half = Math.floor(mainSlots / 2);
-    const extra = mainSlots - (half * 2); // 0 or 1
-
-    // pick strength and explosive
-    const strengthPick = pickUnique(buckets.strength, used, half + (extra>0?1:0)); // give strength the extra if odd
+    const extra = mainSlots - (half * 2);
+    const strengthPick = pickUnique(buckets.strength, used, half + (extra>0?1:0));
     strengthPick.forEach(s => { result.push(s); used.add(s); });
-
     const explosivePick = pickUnique(buckets.explosive, used, half);
     explosivePick.forEach(s => { result.push(s); used.add(s); });
-
-    // If we still need slots (due to small buckets), fill from other buckets preferring strength then explosive then cardio
     while(result.length < mainSlots){
       const fill = pickUnique(buckets.strength.concat(buckets.explosive, buckets.cardio), used, 1);
       if(fill.length===0) break;
       result.push(fill[0]); used.add(fill[0]);
     }
-
-    // Shuffle main body lightly to avoid all strengths first
     result.sort(()=>Math.random()-0.5);
-
-    // Add isolation near the end
     if(reserveIsolation){
       const iso = pickUnique(buckets.isolation, used, 1);
       if(iso.length) { result.push(iso[0]); used.add(iso[0]); }
       else {
-        // fallback: pick a lighter single-joint movement from strength pool
         const fallback = pickUnique(buckets.strength, used, 1);
         if(fallback.length) { result.push(fallback[0]); used.add(fallback[0]); }
       }
     }
-
-    // If still short, fill with any remaining exercises
     while(result.length < coreCount){
       const fill = EXERCISES.filter(x => !used.has(x));
       if(!fill.length) break;
       const pick = fill[Math.floor(Math.random()*fill.length)];
       result.push(pick); used.add(pick);
     }
+    const all = loadJSON(STORAGE.byDate, {});
+    const existing = all[state.selectedDate] || ensureToday();
+    const stretches = existing.slice(state.settings.defaultCount || DEFAULTS.defaultCount);
+    all[state.selectedDate] = result.concat(stretches);
+    saveJSON(STORAGE.byDate, all);
+    renderLists();
+    showToast('Smart set generated (' + coreCount + ' items)');
+  }
 
-    // Save into today's array: core first, then keep existing stretches
+  /* Profile & progress */
+  function applyProfile(){
+    const w = Number(document.getElementById('weight').value) || DEFAULTS.profile.weight;
+    const bf = Number(document.getElementById('bf').value) || DEFAULTS.profile.bf;
+    const target = Number(document.getElementById('bf-target').value) || DEFAULTS.profile.bfTarget;
+    state.settings.profile = { weight: w, bf: bf, bfTarget: target };
+    state.settings.defaultCount = state.settings.defaultCount || DEFAULTS.defaultCount;
+    saveJSON(STORAGE.settings, state.settings);
+    computeProgress();
+    showToast('Profile applied');
+  }
+  function computeProgress(){
+    const p = state.settings.profile || DEFAULTS.profile;
+    const lean = p.weight * (1 - (p.bf/100));
+    const targetWeight = lean / (1 - (p.bfTarget/100));
+    const toLose = p.weight - targetWeight;
+    const pct = Math.max(0, Math.min(100, ((p.bf - p.bfTarget) / p.bf) * 100));
+    document.getElementById('progress-bar').style.width = Math.max(6, Math.min(100, pct)) + '%';
+    document.getElementById('progress-text').textContent = `Estimated target ${targetWeight.toFixed(2)} kg • ${toLose > 0 ? toLose.toFixed(2)+' kg to lose' : Math.abs(toLose).toFixed(2)+' kg to gain'}`;
+  }
+
+  /* Modal helpers */
+  function openDB(){ document.getElementById('db-modal').classList.remove('hidden'); document.getElementById('db-modal').setAttribute('aria-hidden','false'); renderDB(''); }
+  function closeDB(){ document.getElementById('db-modal').classList.add('hidden'); document.getElementById('db-modal').setAttribute('aria-hidden','true'); dbReplaceIndex = null; }
+
+  /* Runner (core only) with weight integration */
+  const RUNNER_COUNT = ()=> state.settings.defaultCount || DEFAULTS.defaultCount;
+  const runnerEl = document.getElementById('runner');
+  const runnerSummary = document.getElementById('runner-summary');
+  let runnerState = { exercises: [], index: 0, setIndex: 1, setsTotal: 1, restTimer: null, restRemaining: 0, inSet: false, sessionStart: null, log: [] };
+
+  function parseSets(text){ const m=text.match(/(\d+)\s*sets?/i); return m?Number(m[1]):1; }
+  function parseReps(text){ const m=text.match(/×\s*([0-9]+(?:-[0-9]+)?)/); return m?m[1]:''; }
+
+  function loadRunnerExercises(){
+    const today = loadToday();
+    runnerState.exercises = today.core.slice(0, RUNNER_COUNT());
+    runnerSummary.innerHTML = '';
+    runnerState.exercises.forEach((ex,i)=> {
+      const el = document.createElement('div'); el.style.display='flex'; el.style.justifyContent='space-between'; el.style.alignItems='center';
+      el.innerHTML = `<div style="flex:1;min-width:0"><strong style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${i+1}. ${ex}</strong></div><div class="small muted">slot ${i+1}</div>`;
+      runnerSummary.appendChild(el);
+    });
+  }
+
+  function showRunner(){
+    loadRunnerExercises();
+    runnerState.index = 0; runnerState.setIndex = 1; runnerState.sessionStart = Date.now(); runnerState.log = [];
+    updateRunnerUI();
+    runnerEl.style.display = 'flex';
+    runnerEl.setAttribute('aria-hidden','false');
+    attachSwipe();
+  }
+
+  function hideRunner(){
+    runnerEl.style.display = 'none';
+    runnerEl.setAttribute('aria-hidden','true');
+    stopRest();
+    detachSwipe();
+  }
+
+  function updateRunnerUI(){
+    const ex = runnerState.exercises[runnerState.index] || '—';
+    document.getElementById('runner-ex').textContent = ex;
+    const sets = parseSets(ex) || 1;
+    runnerState.setsTotal = sets;
+    document.getElementById('runner-presc').textContent = `${sets} sets • ${parseReps(ex)}`;
+    document.getElementById('runner-set').textContent = `${runnerState.setIndex} / ${runnerState.setsTotal}`;
+    document.getElementById('runner-rest').textContent = formatTime(runnerState.restRemaining || 0);
+
+    // show weight for this slot
+    const weightVal = getWeightFor(state.selectedDate, runnerState.index);
+    document.getElementById('runner-weight').value = weightVal;
+
+    // render set pills
+    const setsRow = document.getElementById('sets-row'); setsRow.innerHTML = '';
+    for(let i=1;i<=sets;i++){
+      const pill = document.createElement('div'); pill.className = 'set-pill' + (i<runnerState.setIndex ? ' done' : ''); pill.textContent = i;
+      pill.onclick = (()=>{ return ()=>{ if(i<runnerState.setIndex) return; runnerState.setIndex = i; updateRunnerUI(); } })();
+      setsRow.appendChild(pill);
+    }
+
+    const summaryChildren = runnerSummary.children;
+    for(let i=0;i<summaryChildren.length;i++){
+      summaryChildren[i].style.opacity = (i === runnerState.index) ? '1' : '0.6';
+      summaryChildren[i].style.background = (i === runnerState.index) ? 'rgba(255,255,255,0.02)' : 'transparent';
+      summaryChildren[i].style.padding = '6px';
+      summaryChildren[i].style.borderRadius = '8px';
+    }
+  }
+
+  function formatTime(sec){ const s = Math.max(0, Math.floor(sec)); const mm = String(Math.floor(s/60)).padStart(2,'0'); const ss = String(s%60).padStart(2,'0'); return `${mm}:${ss}`; }
+
+  function startSet(){ if(runnerState.inSet) return; runnerState.inSet = true; document.getElementById('runner-start').textContent = 'In Progress'; document.getElementById('runner-start').disabled = true; }
+  function completeSet(){
+    runnerState.inSet = false;
+    document.getElementById('runner-start').textContent = 'Start Set';
+    document.getElementById('runner-start').disabled = false;
+    const ex = runnerState.exercises[runnerState.index] || '—';
+    const weightUsed = Number(document.getElementById('runner-weight').value) || getWeightFor(state.selectedDate, runnerState.index) || null;
+    // record weight into weights storage (persist)
+    if(weightUsed) saveWeightFor(state.selectedDate, runnerState.index, weightUsed);
+    runnerState.log.push({ exercise: ex, set: runnerState.setIndex, weight: weightUsed, ts: Date.now() });
+    if(runnerState.setIndex < runnerState.setsTotal){
+      const restSec = Number(document.getElementById('runner-rest-input').value) || 60;
+      runnerState.restRemaining = restSec;
+      startRest();
+      runnerState.setIndex++;
+    } else {
+      if(runnerState.index < runnerState.exercises.length - 1){
+        runnerState.index++; runnerState.setIndex = 1;
+      } else {
+        showToast('Workout complete — press Finish');
+      }
+    }
+    updateRunnerUI();
+  }
+
+  function startRest(){
+    stopRest();
+    document.getElementById('runner-done').disabled = true;
+    runnerState.restTimer = setInterval(()=> {
+      runnerState.restRemaining -= 1;
+      if(runnerState.restRemaining <= 0){
+        stopRest();
+        document.getElementById('runner-done').disabled = false;
+        try{ if(navigator.vibrate) navigator.vibrate(40); }catch(e){}
+        showToast('Rest complete');
+      }
+      updateRunnerUI();
+    }, 1000);
+  }
+
+  function stopRest(){ if(runnerState.restTimer){ clearInterval(runnerState.restTimer); runnerState.restTimer = null; } runnerState.restRemaining = 0; document.getElementById('runner-done').disabled = false; updateRunnerUI(); }
+
+  function nextExercise(){ if(runnerState.index < runnerState.exercises.length - 1){ runnerState.index++; runnerState.setIndex = 1; stopRest(); updateRunnerUI(); } else showToast('Last exercise'); }
+  function prevExercise(){ if(runnerState.index > 0){ runnerState.index--; runnerState.setIndex = 1; stopRest(); updateRunnerUI(); } else showToast('First exercise'); }
+
+  function finishWorkout(){
+    const sessions = loadJSON(STORAGE.sessions, []);
+    const duration = Math.round((Date.now() - runnerState.sessionStart)/1000);
+    sessions.unshift({ startedAt: new Date(runnerState.sessionStart).toISOString(), durationSec: duration, exercises: runnerState.log });
+    saveJSON(STORAGE.sessions, sessions);
+    showToast('Workout saved');
+    hideRunner();
+  }
+
+  /* Swipe handlers */
+  let touchStartX = 0, touchStartY = 0;
+  function attachSwipe(){
+    const card = document.querySelector('.runner-card');
+    if(!card) return;
+    card.addEventListener('touchstart', onTouchStart, { passive:true });
+    card.addEventListener('touchend', onTouchEnd, { passive:true });
+  }
+  function detachSwipe(){
+    const card = document.querySelector('.runner-card');
+    if(!card) return;
+    card.removeEventListener('touchstart', onTouchStart);
+    card.removeEventListener('touchend', onTouchEnd);
+  }
+  function onTouchStart(e){ const t = e.touches[0]; touchStartX = t.clientX; touchStartY = t.clientY; }
+  function onTouchEnd(e){ const t = e.changedTouches[0]; const dx = t.clientX - touchStartX; const dy = t.clientY - touchStartY; if(Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)){ if(dx < 0) nextExercise(); else prevExercise(); } }
+
+  /* Smart generator (kept) */
+  function smartGenerateForDate(coreCount){
+    coreCount = Math.max(3, Math.min(12, Number(coreCount) || DEFAULTS.defaultCount));
+    const buckets = { explosive: [], strength: [], isolation: [], cardio: [], mobility: [] };
+    for(const ex of EXERCISES){
+      const tags = classifyExercise(ex);
+      if(tags.includes('explosive')) buckets.explosive.push(ex);
+      if(tags.includes('strength')) buckets.strength.push(ex);
+      if(tags.includes('isolation')) buckets.isolation.push(ex);
+      if(tags.includes('cardio')) buckets.cardio.push(ex);
+      if(tags.includes('mobility')) buckets.mobility.push(ex);
+    }
+    function pickUnique(bucketArr, used, count){
+      const pool = bucketArr.filter(x => !used.has(x));
+      return sampleShuffle(pool, Math.min(count, pool.length));
+    }
+    const used = new Set();
+    const result = [];
+    const reserveIsolation = buckets.isolation.length > 0;
+    const mainSlots = reserveIsolation ? coreCount - 1 : coreCount;
+    const half = Math.floor(mainSlots / 2);
+    const extra = mainSlots - (half * 2);
+    const strengthPick = pickUnique(buckets.strength, used, half + (extra>0?1:0));
+    strengthPick.forEach(s => { result.push(s); used.add(s); });
+    const explosivePick = pickUnique(buckets.explosive, used, half);
+    explosivePick.forEach(s => { result.push(s); used.add(s); });
+    while(result.length < mainSlots){
+      const fill = pickUnique(buckets.strength.concat(buckets.explosive, buckets.cardio), used, 1);
+      if(fill.length===0) break;
+      result.push(fill[0]); used.add(fill[0]);
+    }
+    result.sort(()=>Math.random()-0.5);
+    if(reserveIsolation){
+      const iso = pickUnique(buckets.isolation, used, 1);
+      if(iso.length) { result.push(iso[0]); used.add(iso[0]); }
+      else {
+        const fallback = pickUnique(buckets.strength, used, 1);
+        if(fallback.length) { result.push(fallback[0]); used.add(fallback[0]); }
+      }
+    }
+    while(result.length < coreCount){
+      const fill = EXERCISES.filter(x => !used.has(x));
+      if(!fill.length) break;
+      const pick = fill[Math.floor(Math.random()*fill.length)];
+      result.push(pick); used.add(pick);
+    }
     const all = loadJSON(STORAGE.byDate, {});
     const existing = all[state.selectedDate] || ensureToday();
     const stretches = existing.slice(state.settings.defaultCount || DEFAULTS.defaultCount);
@@ -635,14 +955,12 @@
     saveJSON(STORAGE.settings, state.settings);
     document.getElementById('core-range').value = n;
     document.getElementById('core-number').value = n;
-    // Ensure today's list has at least n core items; if not, fill with random picks
     const all = loadJSON(STORAGE.byDate, {});
-    const arr = all[state.selectedDate] || ensureToday();
-    const currentCore = arr.slice(0, state.settings.defaultCount || DEFAULTS.defaultCount);
-    const stretches = arr.slice(state.settings.defaultCount || DEFAULTS.defaultCount);
-    let core = arr.slice(0, n);
+    const existing = all[state.selectedDate] || ensureToday();
+    const stretches = existing.slice(state.settings.defaultCount || DEFAULTS.defaultCount);
+    let core = existing.slice(0, n);
     if(core.length < n){
-      const picks = sampleShuffle(EXERCISES.filter(e => !arr.includes(e)), n - core.length);
+      const picks = sampleShuffle(EXERCISES.filter(e => !existing.includes(e)), n - core.length);
       core = core.concat(picks);
     }
     all[state.selectedDate] = core.concat(stretches);
@@ -657,28 +975,36 @@
   document.getElementById('smart-gen').addEventListener('click', ()=> smartGenerateForDate(state.settings.defaultCount || DEFAULTS.defaultCount));
   document.getElementById('open-db').addEventListener('click',openDB);
   document.getElementById('close-db').addEventListener('click',closeDB);
-  document.getElementById('db-filter').addEventListener('input',e=>renderDB(e.target.value));
-  document.getElementById('add-core').addEventListener('click',addCoreCustom);
-  document.getElementById('quick-add-core').addEventListener('keydown',e=>{ if(e.key==='Enter') addCoreCustom(); });
-  document.getElementById('add-stretch').addEventListener('click',addStretchCustom);
-  document.getElementById('quick-add-stretch').addEventListener('keydown',e=>{ if(e.key==='Enter') addStretchCustom(); });
-  document.getElementById('swap-btn').addEventListener('click',swapReplaceFromSearch);
-  document.getElementById('swap-search').addEventListener('keydown',e=>{ if(e.key==='Enter') swapReplaceFromSearch(); });
-  document.getElementById('save-routine').addEventListener('click',saveRoutine);
-  document.getElementById('export-btn').addEventListener('click',exportAll);
-  document.getElementById('apply-profile').addEventListener('click',applyProfile);
-  document.getElementById('reset-profile').addEventListener('click',()=>{ state.settings.profile=DEFAULTS.profile; document.getElementById('weight').value=DEFAULTS.profile.weight; document.getElementById('bf').value=DEFAULTS.profile.bf; document.getElementById('bf-target').value=DEFAULTS.profile.bfTarget; saveJSON(STORAGE.settings,state.settings); computeProgress(); showToast('Profile reset'); });
-  document.getElementById('db-list').addEventListener('click',e=>{ const card=e.target.closest('.ex-item'); if(!card) return; const title=card.querySelector('.ex-title').textContent; if(dbReplaceIndex!==null){ replaceCoreSlot(dbReplaceIndex,title); dbReplaceIndex=null; closeDB(); } });
+  document.getElementById('db-filter').addEventListener('input', (e)=> renderDB(e.target.value));
+  document.getElementById('add-core').addEventListener('click', addCoreCustom);
+  document.getElementById('quick-add-core').addEventListener('keydown', (e)=> { if(e.key==='Enter') addCoreCustom(); });
+  document.getElementById('add-stretch').addEventListener('click', addStretchCustom);
+  document.getElementById('quick-add-stretch').addEventListener('keydown', (e)=> { if(e.key==='Enter') addStretchCustom(); });
+  document.getElementById('swap-auto').addEventListener('click', ()=> {
+    const slot = Number(document.getElementById('swap-target').value);
+    autoReplaceSlot(slot);
+  });
+  document.getElementById('swap-pick').addEventListener('click', ()=> {
+    const slot = Number(document.getElementById('swap-target').value);
+    dbReplaceIndex = slot;
+    openDB();
+  });
+  document.getElementById('swap-search').addEventListener('keydown', (e)=> { if(e.key==='Enter') swapReplaceFromSearch(); });
+  document.getElementById('save-routine').addEventListener('click', saveRoutine);
+  document.getElementById('export-btn').addEventListener('click', exportAll);
+  document.getElementById('apply-profile').addEventListener('click', applyProfile);
+  document.getElementById('reset-profile').addEventListener('click', ()=> { state.settings.profile = DEFAULTS.profile; document.getElementById('weight').value = DEFAULTS.profile.weight; document.getElementById('bf').value = DEFAULTS.profile.bf; document.getElementById('bf-target').value = DEFAULTS.profile.bfTarget; saveJSON(STORAGE.settings, state.settings); computeProgress(); showToast('Profile reset'); });
+  document.getElementById('db-list').addEventListener('click', (e)=> { const card = e.target.closest('.ex-item'); if(!card) return; const title = card.querySelector('.ex-title').textContent; if(dbReplaceIndex !== null){ replaceCoreSlot(dbReplaceIndex, title); dbReplaceIndex = null; closeDB(); } });
 
   // Runner buttons
-  document.getElementById('start-workout').addEventListener('click',showRunner);
-  document.getElementById('runner-close').addEventListener('click',hideRunner);
-  document.getElementById('runner-start').addEventListener('click',startSet);
-  document.getElementById('runner-done').addEventListener('click',completeSet);
-  document.getElementById('runner-next').addEventListener('click',nextExercise);
-  document.getElementById('runner-prev').addEventListener('click',prevExercise);
-  document.getElementById('runner-finish').addEventListener('click',finishWorkout);
-  document.getElementById('runner-save').addEventListener('click',()=>{ const sessions=loadJSON(STORAGE.sessions,[]); alert('Saved sessions: '+sessions.length); });
+  document.getElementById('start-workout').addEventListener('click', showRunner);
+  document.getElementById('runner-close').addEventListener('click', hideRunner);
+  document.getElementById('runner-start').addEventListener('click', startSet);
+  document.getElementById('runner-done').addEventListener('click', completeSet);
+  document.getElementById('runner-next').addEventListener('click', nextExercise);
+  document.getElementById('runner-prev').addEventListener('click', prevExercise);
+  document.getElementById('runner-finish').addEventListener('click', finishWorkout);
+  document.getElementById('runner-save').addEventListener('click', ()=> { const sessions = loadJSON(STORAGE.sessions, []); alert('Saved sessions: ' + sessions.length); });
 
   // core size controls
   refs.coreRange.addEventListener('input', (e)=> setCoreCount(e.target.value));
@@ -692,20 +1018,18 @@
   refs.swLight.addEventListener('click', ()=> applyTheme('Light'));
 
   // DB replace index setter
-  function openDBForReplace(idx){ dbReplaceIndex=idx; openDB(); }
+  let dbReplaceIndex = null;
+  function openDBForReplace(idx){ dbReplaceIndex = idx; openDB(); }
 
   // keyboard shortcuts
-  document.addEventListener('keydown',e=>{ if(e.key.toLowerCase()==='s') shuffleCore(); if(e.key.toLowerCase()==='d') openDB(); });
+  document.addEventListener('keydown', (e)=> { if(e.key.toLowerCase()==='s') shuffleCore(); if(e.key.toLowerCase()==='d') openDB(); });
 
   /* Init */
   function init(){
-    // apply saved theme
     applyTheme(state.settings.theme || 'Dark');
-    // set core controls
     const n = state.settings.defaultCount || DEFAULTS.defaultCount;
     refs.coreRange.value = n;
     refs.coreNumber.value = n;
-    // profile
     document.getElementById('weight').value = state.settings.profile.weight || DEFAULTS.profile.weight;
     document.getElementById('bf').value = state.settings.profile.bf || DEFAULTS.profile.bf;
     document.getElementById('bf-target').value = state.settings.profile.bfTarget || DEFAULTS.profile.bfTarget;
@@ -721,9 +1045,9 @@
   // expose for debugging
   window.__FieldIron = window.__FieldIron || {};
   window.__FieldIron.state = state;
-  window.__FieldIron.smartGenerateForDate = smartGenerateForDate;
-  window.__FieldIron.setCoreCount = setCoreCount;
-  window.__FieldIron.applyTheme = applyTheme;
+  window.__FieldIron.autoReplaceSlot = autoReplaceSlot;
+  window.__FieldIron.replaceCoreSlot = replaceCoreSlot;
+  window.__FieldIron.saveWeightFor = saveWeightFor;
 
 })();
 </script>
