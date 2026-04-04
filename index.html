@@ -3,21 +3,35 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Field+Iron — Polished</title>
+<title>Field+Iron — Polished (SVG + Palette)</title>
 <meta name="theme-color" content="#071018">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#071018; --panel:#0b1a24; --muted:#9fb3c8; --text:#e6eef6;
-    --accent:#00d4a6; --accent-2:#3b82f6; --glass:rgba(255,255,255,0.04);
-    --radius:14px; --ui:220ms cubic-bezier(.2,.9,.2,1);
-    --touch:56px; --safe-top:env(safe-area-inset-top); --safe-bottom:env(safe-area-inset-bottom);
-    --card-elev: 0 10px 30px rgba(0,0,0,0.35);
+    /* Palette: deep slate background, warm coral primary, cool teal secondary */
+    --bg: #07121a;
+    --panel: linear-gradient(180deg,#071a22,#081826);
+    --muted: #9fb3c8;
+    --text: #e9f3f8;
+    --accent: #ff6b5f;       /* warm coral */
+    --accent-2: #00d4a6;     /* cool teal */
+    --accent-3: #ffd166;     /* highlight */
+    --glass: rgba(255,255,255,0.04);
+    --radius:14px;
+    --ui: 220ms cubic-bezier(.2,.9,.2,1);
+    --touch:56px;
+    --safe-top: env(safe-area-inset-top);
+    --safe-bottom: env(safe-area-inset-bottom);
+    --card-elev: 0 12px 36px rgba(0,0,0,0.45);
+    --max-width:980px;
   }
-  body[data-theme="light"]{ --bg:#f6f8fa; --panel:#fff; --muted:#6b7f8f; --text:#0b1a24; --accent:#ff6a00; --glass:rgba(0,0,0,0.04); }
+  body[data-theme="light"]{
+    --bg:#f6f8fa; --panel:linear-gradient(180deg,#ffffff,#f8fbff); --muted:#6b7f8f; --text:#07121a; --accent:#ff6b5f; --accent-2:#00a884; --glass:rgba(0,0,0,0.04);
+  }
+
   html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;box-sizing:border-box;}
   *{box-sizing:border-box}
-  .app{max-width:980px;margin:0 auto;padding:calc(12px + var(--safe-top)) 12px calc(92px + var(--safe-bottom));display:flex;flex-direction:column;gap:12px;min-height:100vh;}
+  .app{max-width:var(--max-width);margin:0 auto;padding:calc(12px + var(--safe-top)) 12px calc(92px + var(--safe-bottom));display:flex;flex-direction:column;gap:12px;min-height:100vh;}
 
   /* Header */
   header{display:flex;align-items:center;gap:12px;padding:8px 6px;border-radius:12px}
@@ -31,7 +45,7 @@
   @media (max-width:980px){ main{grid-template-columns:1fr} .right-col{order:2} .left-col{order:1} }
 
   /* Panels */
-  .panel{background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border-radius:12px;padding:12px;border:1px solid var(--glass);transition:transform var(--ui),box-shadow var(--ui)}
+  .panel{background:var(--panel);border-radius:12px;padding:12px;border:1px solid var(--glass);transition:transform var(--ui),box-shadow var(--ui)}
   .panel:focus-within{transform:translateY(-6px);box-shadow:var(--card-elev)}
   .panel-header{display:flex;justify-content:space-between;align-items:center;gap:8px}
   .muted{color:var(--muted);font-size:13px}
@@ -40,6 +54,7 @@
   /* Controls */
   .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .btn{height:44px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text);font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+  .btn svg{width:18px;height:18px;flex-shrink:0}
   .btn:active{transform:scale(.98)}
   .btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,0.22)}
   .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
@@ -52,9 +67,6 @@
   .ex-title{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .ex-meta{color:var(--muted);font-size:13px;margin-top:6px}
   .ex-actions{display:flex;gap:8px;align-items:center}
-
-  /* Stretch smaller */
-  .stretch-item .ex-title{font-weight:700}
 
   /* Swap controls */
   .swap-row{display:flex;gap:8px;align-items:center;margin-top:10px}
@@ -100,13 +112,28 @@
       <div class="logo" aria-hidden="true">FI</div>
       <div class="brand">
         <h1>Field+Iron</h1>
-        <p class="small">Polished • Core 5 • Stretches separated</p>
+        <p class="small">Core 5 • Stretches separated • refined palette</p>
       </div>
       <div style="flex:1"></div>
+
       <div class="controls" role="toolbar" aria-label="Top controls">
-        <button id="shuffle-btn" class="btn" title="Shuffle core">Shuffle</button>
-        <button id="open-db" class="btn" title="Browse DB">Browse DB</button>
-        <button id="export-btn" class="btn" title="Export">Export</button>
+        <button id="shuffle-btn" class="btn" title="Shuffle core" aria-label="Shuffle">
+          <!-- Shuffle SVG -->
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 6h4l5 8 4-6h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Shuffle
+        </button>
+
+        <button id="open-db" class="btn" title="Browse DB" aria-label="Browse database">
+          <!-- Database SVG -->
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3" stroke="currentColor" stroke-width="1.6"/><path d="M4 5v6c0 1.657 3.582 3 8 3s8-1.343 8-3V5" stroke="currentColor" stroke-width="1.6"/></svg>
+          DB
+        </button>
+
+        <button id="export-btn" class="btn" title="Export" aria-label="Export">
+          <!-- Export SVG -->
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M8 7l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="15" width="18" height="6" rx="2" stroke="currentColor" stroke-width="1.6"/></svg>
+          Export
+        </button>
       </div>
     </header>
 
@@ -130,9 +157,17 @@
 
           <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
             <input id="quick-add-core" class="search" placeholder="Add custom core exercise (Enter)" aria-label="Add core exercise" />
-            <button id="add-core" class="btn">Add Core</button>
+            <button id="add-core" class="btn" title="Add core">
+              <!-- Plus SVG -->
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Add Core
+            </button>
             <div style="flex:1"></div>
-            <button id="save-routine" class="btn-primary btn">Save Routine</button>
+            <button id="save-routine" class="btn-primary btn" title="Save routine" aria-label="Save routine">
+              <!-- Save SVG -->
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 7V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Save Routine
+            </button>
           </div>
         </section>
 
@@ -146,9 +181,16 @@
 
           <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
             <input id="quick-add-stretch" class="search" placeholder="Add custom stretch (Enter)" aria-label="Add stretch" />
-            <button id="add-stretch" class="btn">Add Stretch</button>
+            <button id="add-stretch" class="btn" title="Add stretch">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Add Stretch
+            </button>
             <div style="flex:1"></div>
-            <button id="export-stretches" class="btn">Export Stretches</button>
+            <button id="export-stretches" class="btn" title="Export stretches" aria-label="Export stretches">
+              <!-- Download SVG -->
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M8 11l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="17" width="16" height="4" rx="1" stroke="currentColor" stroke-width="1.6"/></svg>
+              Export Stretches
+            </button>
           </div>
         </section>
 
@@ -161,7 +203,11 @@
           <div class="swap-row">
             <select id="swap-target" class="swap-select" aria-label="Swap target"></select>
             <input id="swap-search" class="search" placeholder="Search DB to swap" aria-label="Search DB" />
-            <button id="swap-btn" class="btn-primary btn">Replace</button>
+            <button id="swap-btn" class="btn-primary btn" title="Replace slot" aria-label="Replace slot">
+              <!-- Replace SVG -->
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 15v4h-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 9v-4h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 3l-9 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Replace
+            </button>
           </div>
         </section>
       </div>
@@ -170,7 +216,7 @@
         <section class="panel stat">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <div><strong>Profile</strong><div class="small muted">83 kg • 15.3% BF • target 12% BF</div></div>
-            <div class="small muted">v1.3</div>
+            <div class="small muted">v1.4</div>
           </div>
 
           <div style="margin-top:10px">
@@ -195,8 +241,8 @@
           <div style="display:flex;justify-content:space-between;align-items:center">
             <div><strong>Theme</strong><div class="small muted">Pick a look</div></div>
             <div class="controls">
-              <button id="theme-dark" class="btn">Dark</button>
-              <button id="theme-light" class="btn">Light</button>
+              <button id="theme-dark" class="btn" title="Dark theme">Dark</button>
+              <button id="theme-light" class="btn" title="Light theme">Light</button>
             </div>
           </div>
 
@@ -209,14 +255,18 @@
     </main>
 
     <footer style="display:flex;justify-content:space-between;align-items:center;padding-top:6px">
-      <div class="small muted">Tighter UI • improved micro‑interactions • iPhone safe</div>
+      <div class="small muted">SVG icons • refined palette • improved contrast</div>
       <div class="small muted">Shortcuts: S shuffle • D open DB</div>
     </footer>
   </div>
 
   <!-- Sticky Start -->
   <div class="sticky-start" id="sticky-start">
-    <button id="start-workout" class="btn-primary btn" aria-label="Start Workout">Start Workout</button>
+    <button id="start-workout" class="btn-primary btn" aria-label="Start Workout">
+      <!-- Play SVG -->
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 3v18l15-9L5 3z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Start Workout
+    </button>
   </div>
 
   <!-- DB modal -->
@@ -237,7 +287,7 @@
   <div id="runner" class="runner" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Workout runner">
     <div class="runner-card">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <div><div style="font-weight:900;font-size:18px">Workout Runner</div><div class="small muted">Core only • per‑set checkboxes</div></div>
+        <div><div style="font-weight:900;font-size:18px">Workout Runner</div><div class="small muted">Core only • per‑set pills</div></div>
         <div><button id="runner-close" class="btn">Close</button></div>
       </div>
 
@@ -284,13 +334,15 @@
   </div>
 
   <!-- Toast -->
-  <div id="toast" class="hidden" style="position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));background:rgba(0,0,0,0.7);color:#fff;padding:10px 14px;border-radius:12px;z-index:11000"></div>
+  <div id="toast" class="hidden" style="position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));background:linear-gradient(90deg,var(--accent-3),rgba(255,255,255,0.02));color:#07121a;padding:10px 14px;border-radius:12px;z-index:11000"></div>
 
 <script>
 (() => {
   'use strict';
 
-  /* DB (125 items) */
+  /* -------------------------
+     Exercise DB (125 items)
+     ------------------------- */
   const EXERCISES = [
     "Goblet Squat — 3 sets × 10","Back Squat — 5 sets × 5","Front Squat — 4 sets × 6","Romanian Deadlift — 4 sets × 8",
     "Conventional Deadlift — 5 sets × 3","Sumo Deadlift — 4 sets × 5","Trap Bar Deadlift — 4 sets × 6","Kettlebell Swing — 4 sets × 12",
@@ -385,12 +437,11 @@
       const meta=document.createElement('div'); meta.className='ex-meta muted'; meta.textContent=`Core • slot ${idx+1}`;
       left.appendChild(title); left.appendChild(meta);
       const actions=document.createElement('div'); actions.className='ex-actions';
-      const swapBtn=document.createElement('button'); swapBtn.className='btn'; swapBtn.textContent='Swap'; swapBtn.onclick=()=>openSwapFor(idx);
-      const replaceBtn=document.createElement('button'); replaceBtn.className='btn'; replaceBtn.textContent='Replace'; replaceBtn.onclick=()=>openDBAndReplace(idx);
-      const removeBtn=document.createElement('button'); removeBtn.className='btn'; removeBtn.textContent='Remove'; removeBtn.onclick=()=>removeCore(idx);
+      const swapBtn=document.createElement('button'); swapBtn.className='btn'; swapBtn.title='Swap'; swapBtn.innerHTML = '<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M3 6h4l5 8 4-6h4\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Swap'; swapBtn.onclick=()=>openSwapFor(idx);
+      const replaceBtn=document.createElement('button'); replaceBtn.className='btn'; replaceBtn.title='Replace'; replaceBtn.innerHTML = '<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M21 15v4h-4\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M3 9v-4h4\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M21 3l-9 9\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Replace'; replaceBtn.onclick=()=>openDBAndReplace(idx);
+      const removeBtn=document.createElement('button'); removeBtn.className='btn'; removeBtn.title='Remove'; removeBtn.innerHTML = '<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M3 6h18\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\"/><path d=\"M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Remove'; removeBtn.onclick=()=>removeCore(idx);
       actions.appendChild(swapBtn); actions.appendChild(replaceBtn); actions.appendChild(removeBtn);
       item.appendChild(left); item.appendChild(actions);
-      // double-tap mobile quick replace
       let lastTap=0; item.addEventListener('touchend',()=>{ const now=Date.now(); if(now-lastTap<300) quickReplace(idx); lastTap=now; });
       item.addEventListener('dblclick',()=>quickReplace(idx));
       refs.coreList.appendChild(item);
@@ -403,7 +454,7 @@
       const meta=document.createElement('div'); meta.className='ex-meta muted'; meta.textContent='Stretch';
       left.appendChild(title); left.appendChild(meta);
       const actions=document.createElement('div'); actions.className='ex-actions';
-      const removeBtn=document.createElement('button'); removeBtn.className='btn'; removeBtn.textContent='Remove'; removeBtn.onclick=()=>removeStretch(idx);
+      const removeBtn=document.createElement('button'); removeBtn.className='btn'; removeBtn.title='Remove'; removeBtn.innerHTML = '<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M3 6h18\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\"/><path d=\"M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Remove'; removeBtn.onclick=()=>removeStretch(idx);
       actions.appendChild(removeBtn);
       item.appendChild(left); item.appendChild(actions);
       refs.stretchList.appendChild(item);
@@ -466,9 +517,7 @@
     document.getElementById('runner-presc').textContent = `${sets} sets • ${parseReps(ex)}`;
     document.getElementById('runner-set').textContent = `${runnerState.setIndex} / ${runnerState.setsTotal}`;
     document.getElementById('runner-rest').textContent = formatTime(runnerState.restRemaining || 0);
-    // render set pills
     const setsRow = document.getElementById('sets-row'); setsRow.innerHTML=''; for(let i=1;i<=sets;i++){ const pill=document.createElement('div'); pill.className='set-pill'+(i<runnerState.setIndex?' done':''); pill.textContent=i; pill.onclick=(()=>{ return ()=>{ if(i<runnerState.setIndex) return; runnerState.setIndex=i; updateRunnerUI(); } })(); setsRow.appendChild(pill); }
-    // highlight summary
     const summaryChildren = runnerSummary.children; for(let i=0;i<summaryChildren.length;i++){ summaryChildren[i].style.opacity=(i===runnerState.index)?'1':'0.6'; summaryChildren[i].style.background=(i===runnerState.index)?'rgba(255,255,255,0.02)':'transparent'; summaryChildren[i].style.padding='6px'; summaryChildren[i].style.borderRadius='8px'; }
   }
 
@@ -518,9 +567,6 @@
   document.getElementById('runner-prev').addEventListener('click',prevExercise);
   document.getElementById('runner-finish').addEventListener('click',finishWorkout);
   document.getElementById('runner-save').addEventListener('click',()=>{ const sessions=loadJSON(STORAGE.sessions,[]); alert('Saved sessions: '+sessions.length); });
-
-  // DB replace index setter
-  function openDBForReplace(idx){ dbReplaceIndex=idx; openDB(); }
 
   // keyboard shortcuts
   document.addEventListener('keydown',e=>{ if(e.key.toLowerCase()==='s') shuffleCore(); if(e.key.toLowerCase()==='d') openDB(); });
