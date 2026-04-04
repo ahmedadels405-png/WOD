@@ -3,19 +3,18 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Field+Iron — Adjustable Core + Themes</title>
+<title>Field+Iron — Smart Generator + Themes</title>
 <meta name="theme-color" content="#071018">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#07121a; --panel-bg:#071a22; --muted:#9fb3c8; --text:#e9f3f8;
-    --accent:#00d4a6; --accent-2:#3b82f6; --glass:rgba(255,255,255,0.04);
+    --bg:#07121a; --panel-bg:linear-gradient(180deg,#071a22,#081826); --muted:#9fb3c8; --text:#e9f3f8;
+    --accent:#00d4a6; --accent-2:#3b82f6; --accent-3:#ffd166; --glass:rgba(255,255,255,0.04);
     --radius:14px; --ui:220ms cubic-bezier(.2,.9,.2,1); --touch:56px;
     --safe-top:env(safe-area-inset-top); --safe-bottom:env(safe-area-inset-bottom);
     --card-elev:0 12px 36px rgba(0,0,0,0.45); --max-width:980px;
   }
-
-  /* Theme tokens (will be updated by JS when user picks a theme) */
+  /* Theme tokens */
   body[data-theme="Sporty"]{ --bg:#07121a; --panel-bg:linear-gradient(180deg,#071a22,#081826); --accent:#ff6b5f; --accent-2:#00d4a6; --accent-3:#ffd166; --text:#e9f3f8; --muted:#9fb3c8; }
   body[data-theme="Calm"]{ --bg:#0b1720; --panel-bg:linear-gradient(180deg,#0f2430,#0b1720); --accent:#6aa6ff; --accent-2:#7ee7c7; --accent-3:#cfeef0; --text:#eaf6fb; --muted:#9fb3c8; }
   body[data-theme="Vibrant"]{ --bg:#0b0f1a; --panel-bg:linear-gradient(180deg,#111827,#0b0f1a); --accent:#ff5fa3; --accent-2:#ffd166; --accent-3:#7ee7c7; --text:#fff6fb; --muted:#d1c7e0; }
@@ -93,11 +92,13 @@
       <div class="logo" aria-hidden="true">FI</div>
       <div class="brand">
         <h1>Field+Iron</h1>
-        <p class="small">Adjustable core size • Themes restored</p>
+        <p class="small">Adjustable core size • Themes • Smart generator</p>
       </div>
       <div style="flex:1"></div>
+
       <div class="controls" role="toolbar" aria-label="Top controls">
         <button id="shuffle-btn" class="btn">Shuffle</button>
+        <button id="smart-gen" class="btn">Smart Generate</button>
         <button id="open-db" class="btn">DB</button>
         <button id="export-btn" class="btn">Export</button>
       </div>
@@ -163,7 +164,7 @@
         <section class="panel stat">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <div><strong>Profile</strong><div class="small muted">83 kg • 15.3% BF • target 12% BF</div></div>
-            <div class="small muted">v1.5</div>
+            <div class="small muted">v1.6</div>
           </div>
 
           <div style="margin-top:10px">
@@ -217,7 +218,7 @@
     </main>
 
     <footer style="display:flex;justify-content:space-between;align-items:center;padding-top:6px">
-      <div class="small muted">Adjust core size and pick a theme — changes save automatically</div>
+      <div class="small muted">Smart selection: explosiveness + strength + isolated finish</div>
       <div class="small muted">Shortcuts: S shuffle • D open DB</div>
     </footer>
   </div>
@@ -334,7 +335,38 @@
     "Sled Lateral Push — 6 rounds × 10m"
   ];
 
-  /* Storage & defaults */
+  /* -------------------------
+     Tagging rules for Smart Selection
+     - We'll classify exercises by keyword matching into:
+       strength, explosive, isolation, cardio, mobility
+     - Smart generator uses these categories.
+     ------------------------- */
+  const TAG_RULES = {
+    explosive: ['jump','sprint','plyo','broad jump','box jump','medicine ball','sprint','kettlebell snatch','kettlebell swing','power clean','clean and jerk','snatch','broad jump','box jump','plyo','hill sprint','sled sprint','bike sprints','row','battle ropes','lateral bounds','broad jump','broad'],
+    strength: ['squat','deadlift','press','bench','thrust','hip','row','pull','chin','pull up','dip','clean','snatch','deadlift','zerc','zercher','leg press','good morning','tempo squat','trap bar'],
+    isolation: ['curl','lateral raise','front raise','skull crusher','triceps','hammer curl','incline hammer','cable fly','rear delt','band pull','face pull','calf','hamstring curl','ab wheel','russian twist'],
+    cardio: ['sprint','row','bike','interval','battle ropes','sled','sprint intervals','rowing intervals'],
+    mobility: ['stretch','child pose','hip flexor','hamstring stretch','kneeling','child pose','mobility','stretch']
+  };
+
+  function classifyExercise(name){
+    const n = name.toLowerCase();
+    const tags = new Set();
+    for(const [tag, keywords] of Object.entries(TAG_RULES)){
+      for(const kw of keywords){
+        if(n.includes(kw)) { tags.add(tag); break; }
+      }
+    }
+    // fallback: if contains 'carry' or 'farmer' treat as strength
+    if(n.includes('carry') || n.includes('farmer')) tags.add('strength');
+    // if nothing matched, mark as 'strength' by default (safe)
+    if(tags.size === 0) tags.add('strength');
+    return Array.from(tags);
+  }
+
+  /* -------------------------
+     Storage & defaults
+     ------------------------- */
   const STORAGE = { byDate: 'fi.byDate.v5', routines: 'fi.routines.v5', settings: 'fi.settings.v5', sessions: 'fi.sessions.v1' };
   const DEFAULTS = { defaultCount:5, stretches:['Kneeling Hip Flexor Stretch — 2 sets × 30s ea','Standing Hamstring Stretch — 2 sets × 30s ea','Child Pose Hold — 1 × 60s'], profile:{weight:83,bf:15.3,bfTarget:12} };
 
@@ -349,7 +381,7 @@
   /* State */
   let state = { selectedDate: todayISO(), settings: loadJSON(STORAGE.settings,{profile:DEFAULTS.profile,theme:'Dark',defaultCount:DEFAULTS.defaultCount}), routines: loadJSON(STORAGE.routines,{}) };
 
-  /* Refs */
+  /* DOM refs */
   const refs = {
     dateLabel: document.getElementById('date-label'),
     defaultCountLabel: document.getElementById('default-count-label'),
@@ -375,7 +407,8 @@
     swCalm: document.getElementById('sw-calm'),
     swVibrant: document.getElementById('sw-vibrant'),
     swDark: document.getElementById('sw-dark'),
-    swLight: document.getElementById('sw-light')
+    swLight: document.getElementById('sw-light'),
+    smartGenBtn: document.getElementById('smart-gen')
   };
 
   /* Ensure today */
@@ -501,12 +534,95 @@
   function onTouchStart(e){ const t=e.touches[0]; touchStartX=t.clientX; touchStartY=t.clientY; }
   function onTouchEnd(e){ const t=e.changedTouches[0]; const dx=t.clientX-touchStartX; const dy=t.clientY-touchStartY; if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)){ if(dx<0) nextExercise(); else prevExercise(); } }
 
+  /* -------------------------
+     Smart Selection logic
+     - Goal: explosiveness + strength + isolated near end
+     - For N slots:
+       * Reserve last slot for isolation (if available)
+       * Fill remaining slots with a balanced mix of explosive and strength
+       * Avoid duplicates and prefer variety
+     ------------------------- */
+  function smartGenerateForDate(coreCount){
+    coreCount = Math.max(3, Math.min(12, Number(coreCount) || DEFAULTS.defaultCount));
+    // classify DB into buckets
+    const buckets = { explosive: [], strength: [], isolation: [], cardio: [], mobility: [] };
+    for(const ex of EXERCISES){
+      const tags = classifyExercise(ex);
+      if(tags.includes('explosive')) buckets.explosive.push(ex);
+      if(tags.includes('strength')) buckets.strength.push(ex);
+      if(tags.includes('isolation')) buckets.isolation.push(ex);
+      if(tags.includes('cardio')) buckets.cardio.push(ex);
+      if(tags.includes('mobility')) buckets.mobility.push(ex);
+    }
+
+    // helper to pick unique random from bucket
+    function pickUnique(bucketArr, used, count){
+      const pool = bucketArr.filter(x => !used.has(x));
+      return sampleShuffle(pool, Math.min(count, pool.length));
+    }
+
+    const used = new Set();
+    const result = [];
+
+    // Reserve last slot for isolation if possible
+    const reserveIsolation = buckets.isolation.length > 0;
+
+    // Determine counts: aim for 50/50 explosive/strength for the main body
+    const mainSlots = reserveIsolation ? coreCount - 1 : coreCount;
+    const half = Math.floor(mainSlots / 2);
+    const extra = mainSlots - (half * 2); // 0 or 1
+
+    // pick strength and explosive
+    const strengthPick = pickUnique(buckets.strength, used, half + (extra>0?1:0)); // give strength the extra if odd
+    strengthPick.forEach(s => { result.push(s); used.add(s); });
+
+    const explosivePick = pickUnique(buckets.explosive, used, half);
+    explosivePick.forEach(s => { result.push(s); used.add(s); });
+
+    // If we still need slots (due to small buckets), fill from other buckets preferring strength then explosive then cardio
+    while(result.length < mainSlots){
+      const fill = pickUnique(buckets.strength.concat(buckets.explosive, buckets.cardio), used, 1);
+      if(fill.length===0) break;
+      result.push(fill[0]); used.add(fill[0]);
+    }
+
+    // Shuffle main body lightly to avoid all strengths first
+    result.sort(()=>Math.random()-0.5);
+
+    // Add isolation near the end
+    if(reserveIsolation){
+      const iso = pickUnique(buckets.isolation, used, 1);
+      if(iso.length) { result.push(iso[0]); used.add(iso[0]); }
+      else {
+        // fallback: pick a lighter single-joint movement from strength pool
+        const fallback = pickUnique(buckets.strength, used, 1);
+        if(fallback.length) { result.push(fallback[0]); used.add(fallback[0]); }
+      }
+    }
+
+    // If still short, fill with any remaining exercises
+    while(result.length < coreCount){
+      const fill = EXERCISES.filter(x => !used.has(x));
+      if(!fill.length) break;
+      const pick = fill[Math.floor(Math.random()*fill.length)];
+      result.push(pick); used.add(pick);
+    }
+
+    // Save into today's array: core first, then keep existing stretches
+    const all = loadJSON(STORAGE.byDate, {});
+    const existing = all[state.selectedDate] || ensureToday();
+    const stretches = existing.slice(state.settings.defaultCount || DEFAULTS.defaultCount);
+    all[state.selectedDate] = result.concat(stretches);
+    saveJSON(STORAGE.byDate, all);
+    renderLists();
+    showToast('Smart set generated (' + coreCount + ' items)');
+  }
+
   /* Theme & core size wiring */
   function applyTheme(name){
     document.body.setAttribute('data-theme', name);
     state.settings.theme = name;
     saveJSON(STORAGE.settings, state.settings);
-    // mark selected swatch
     document.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
     const map = { Sporty: 'sw-sporty', Calm: 'sw-calm', Vibrant: 'sw-vibrant', Dark: 'sw-dark', Light: 'sw-light' };
     const el = document.getElementById(map[name]);
@@ -519,24 +635,15 @@
     saveJSON(STORAGE.settings, state.settings);
     document.getElementById('core-range').value = n;
     document.getElementById('core-number').value = n;
-    // ensure today's array has at least n core items (if not, fill with random)
+    // Ensure today's list has at least n core items; if not, fill with random picks
     const all = loadJSON(STORAGE.byDate, {});
     const arr = all[state.selectedDate] || ensureToday();
-    const currentCore = arr.slice(0, arr.length);
-    if(arr.length < n){
-      const needed = n - arr.length;
-      const picks = sampleShuffle(EXERCISES.filter(e => !arr.includes(e)), needed);
-      all[state.selectedDate] = (arr.concat(picks));
-    }
-    // if arr has more than n core items, keep first n and append stretches after
-    // We'll rebuild: take first n from current core (or fill), then append existing stretches
-    const existing = loadJSON(STORAGE.byDate, {})[state.selectedDate] || ensureToday();
-    const stretches = existing.slice(state.settings.defaultCount || DEFAULTS.defaultCount);
-    const core = existing.slice(0, n);
-    // if core shorter than n, fill
+    const currentCore = arr.slice(0, state.settings.defaultCount || DEFAULTS.defaultCount);
+    const stretches = arr.slice(state.settings.defaultCount || DEFAULTS.defaultCount);
+    let core = arr.slice(0, n);
     if(core.length < n){
-      const picks = sampleShuffle(EXERCISES.filter(e => !existing.includes(e)), n - core.length);
-      core.push(...picks);
+      const picks = sampleShuffle(EXERCISES.filter(e => !arr.includes(e)), n - core.length);
+      core = core.concat(picks);
     }
     all[state.selectedDate] = core.concat(stretches);
     saveJSON(STORAGE.byDate, all);
@@ -547,6 +654,7 @@
 
   /* Wiring & init */
   document.getElementById('shuffle-btn').addEventListener('click',shuffleCore);
+  document.getElementById('smart-gen').addEventListener('click', ()=> smartGenerateForDate(state.settings.defaultCount || DEFAULTS.defaultCount));
   document.getElementById('open-db').addEventListener('click',openDB);
   document.getElementById('close-db').addEventListener('click',closeDB);
   document.getElementById('db-filter').addEventListener('input',e=>renderDB(e.target.value));
@@ -613,6 +721,7 @@
   // expose for debugging
   window.__FieldIron = window.__FieldIron || {};
   window.__FieldIron.state = state;
+  window.__FieldIron.smartGenerateForDate = smartGenerateForDate;
   window.__FieldIron.setCoreCount = setCoreCount;
   window.__FieldIron.applyTheme = applyTheme;
 
