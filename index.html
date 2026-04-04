@@ -3,63 +3,48 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Field+Iron — Polished (SVG + Palette)</title>
+<title>Field+Iron — Adjustable Core + Themes</title>
 <meta name="theme-color" content="#071018">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    /* Palette: deep slate background, warm coral primary, cool teal secondary */
-    --bg: #07121a;
-    --panel: linear-gradient(180deg,#071a22,#081826);
-    --muted: #9fb3c8;
-    --text: #e9f3f8;
-    --accent: #ff6b5f;       /* warm coral */
-    --accent-2: #00d4a6;     /* cool teal */
-    --accent-3: #ffd166;     /* highlight */
-    --glass: rgba(255,255,255,0.04);
-    --radius:14px;
-    --ui: 220ms cubic-bezier(.2,.9,.2,1);
-    --touch:56px;
-    --safe-top: env(safe-area-inset-top);
-    --safe-bottom: env(safe-area-inset-bottom);
-    --card-elev: 0 12px 36px rgba(0,0,0,0.45);
-    --max-width:980px;
+    --bg:#07121a; --panel-bg:#071a22; --muted:#9fb3c8; --text:#e9f3f8;
+    --accent:#00d4a6; --accent-2:#3b82f6; --glass:rgba(255,255,255,0.04);
+    --radius:14px; --ui:220ms cubic-bezier(.2,.9,.2,1); --touch:56px;
+    --safe-top:env(safe-area-inset-top); --safe-bottom:env(safe-area-inset-bottom);
+    --card-elev:0 12px 36px rgba(0,0,0,0.45); --max-width:980px;
   }
-  body[data-theme="light"]{
-    --bg:#f6f8fa; --panel:linear-gradient(180deg,#ffffff,#f8fbff); --muted:#6b7f8f; --text:#07121a; --accent:#ff6b5f; --accent-2:#00a884; --glass:rgba(0,0,0,0.04);
-  }
+
+  /* Theme tokens (will be updated by JS when user picks a theme) */
+  body[data-theme="Sporty"]{ --bg:#07121a; --panel-bg:linear-gradient(180deg,#071a22,#081826); --accent:#ff6b5f; --accent-2:#00d4a6; --accent-3:#ffd166; --text:#e9f3f8; --muted:#9fb3c8; }
+  body[data-theme="Calm"]{ --bg:#0b1720; --panel-bg:linear-gradient(180deg,#0f2430,#0b1720); --accent:#6aa6ff; --accent-2:#7ee7c7; --accent-3:#cfeef0; --text:#eaf6fb; --muted:#9fb3c8; }
+  body[data-theme="Vibrant"]{ --bg:#0b0f1a; --panel-bg:linear-gradient(180deg,#111827,#0b0f1a); --accent:#ff5fa3; --accent-2:#ffd166; --accent-3:#7ee7c7; --text:#fff6fb; --muted:#d1c7e0; }
+  body[data-theme="Dark"]{ --bg:#07121a; --panel-bg:linear-gradient(180deg,#071a22,#081826); --accent:#00d4a6; --accent-2:#3b82f6; --accent-3:#ffd166; --text:#e9f3f8; --muted:#9fb3c8; }
+  body[data-theme="Light"]{ --bg:#f6f8fa; --panel-bg:linear-gradient(180deg,#ffffff,#f8fbff); --accent:#ff6b5f; --accent-2:#00a884; --accent-3:#ffd166; --text:#07121a; --muted:#6b7f8f; --glass:rgba(0,0,0,0.04); }
 
   html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;box-sizing:border-box;}
   *{box-sizing:border-box}
   .app{max-width:var(--max-width);margin:0 auto;padding:calc(12px + var(--safe-top)) 12px calc(92px + var(--safe-bottom));display:flex;flex-direction:column;gap:12px;min-height:100vh;}
 
-  /* Header */
   header{display:flex;align-items:center;gap:12px;padding:8px 6px;border-radius:12px}
   .logo{width:52px;height:52px;border-radius:12px;background:linear-gradient(90deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:18px;box-shadow:var(--card-elev)}
   .brand{display:flex;flex-direction:column}
   .brand h1{margin:0;font-size:18px}
   .brand p{margin:0;color:var(--muted);font-size:13px}
 
-  /* Layout */
   main{display:grid;grid-template-columns:1fr 360px;gap:12px;align-items:start}
   @media (max-width:980px){ main{grid-template-columns:1fr} .right-col{order:2} .left-col{order:1} }
 
-  /* Panels */
-  .panel{background:var(--panel);border-radius:12px;padding:12px;border:1px solid var(--glass);transition:transform var(--ui),box-shadow var(--ui)}
-  .panel:focus-within{transform:translateY(-6px);box-shadow:var(--card-elev)}
+  .panel{background:var(--panel-bg);border-radius:12px;padding:12px;border:1px solid var(--glass);transition:transform var(--ui),box-shadow var(--ui)}
   .panel-header{display:flex;justify-content:space-between;align-items:center;gap:8px}
   .muted{color:var(--muted);font-size:13px}
   .small{font-size:13px;color:var(--muted)}
 
-  /* Controls */
   .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .btn{height:44px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text);font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
-  .btn svg{width:18px;height:18px;flex-shrink:0}
-  .btn:active{transform:scale(.98)}
   .btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,0.22)}
-  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+  .search,.swap-select,input[type="number"]{padding:10px;border-radius:10px;border:1px solid var(--glass);background:transparent;color:var(--text);font-size:15px}
 
-  /* Lists */
   .ex-list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
   .ex-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.02);transition:transform 260ms,var(--ui);cursor:pointer}
   .ex-item:hover{transform:translateY(-4px)}
@@ -68,78 +53,59 @@
   .ex-meta{color:var(--muted);font-size:13px;margin-top:6px}
   .ex-actions{display:flex;gap:8px;align-items:center}
 
-  /* Swap controls */
-  .swap-row{display:flex;gap:8px;align-items:center;margin-top:10px}
-  .swap-select,.search{padding:10px;border-radius:10px;border:1px solid var(--glass);background:transparent;color:var(--text);font-size:15px}
-
-  /* Right column */
   .stat{display:flex;flex-direction:column;gap:8px}
   .stat-row{display:flex;justify-content:space-between;align-items:center}
   .progress{height:12px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden}
   .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;transition:width 700ms var(--ui)}
 
-  /* Runner overlay */
+  .theme-swatches{display:flex;gap:8px;align-items:center;margin-top:10px}
+  .swatch{width:36px;height:36px;border-radius:8px;border:2px solid rgba(255,255,255,0.04);cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.25)}
+  .swatch.selected{outline:3px solid rgba(255,255,255,0.06);transform:scale(1.04)}
+
+  .core-count{display:flex;gap:8px;align-items:center;margin-top:10px}
+  .core-count input[type="range"]{width:160px}
+
   .runner{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6));z-index:10000;padding:12px}
-  .runner-card{width:760px;max-width:100%;border-radius:12px;padding:16px;background:var(--panel);border:1px solid var(--glass)}
+  .runner-card{width:760px;max-width:100%;border-radius:12px;padding:16px;background:var(--panel-bg);border:1px solid var(--glass)}
   @media (max-width:640px){ .runner-card{height:100%;border-radius:0;padding:18px;overflow:auto} }
 
-  /* Per-set UI */
   .sets-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
   .set-pill{min-width:44px;height:44px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;font-weight:700;background:transparent}
   .set-pill.done{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:none;box-shadow:0 8px 20px rgba(0,0,0,0.25)}
 
-  /* Sticky start */
   .sticky-start{position:fixed;left:12px;right:12px;bottom:calc(12px + var(--safe-bottom));display:flex;justify-content:center;z-index:999;pointer-events:auto}
   .sticky-start .btn-primary{width:100%;height:56px;font-size:16px;border-radius:12px}
 
-  /* Modal */
   .modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999;padding:12px}
-  .modal-card{width:980px;max-width:100%;max-height:92vh;overflow:auto;border-radius:12px;padding:12px;background:var(--panel);border:1px solid var(--glass)}
+  .modal-card{width:980px;max-width:100%;max-height:92vh;overflow:auto;border-radius:12px;padding:12px;background:var(--panel-bg);border:1px solid var(--glass)}
   @media (max-width:640px){ .modal-card{width:100%;height:100%;border-radius:0;padding:16px} }
 
-  /* micro */
   .fade-in{animation:fadeIn .36s ease both}
   @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   .hidden{display:none !important}
-  .center{display:flex;align-items:center;justify-content:center}
-  input[type="number"], input[type="text"], textarea, select{background:transparent;color:var(--text);border:1px solid var(--glass);padding:8px;border-radius:10px}
+  input,select,textarea{background:transparent;color:var(--text);border:1px solid var(--glass);padding:8px;border-radius:10px}
   .muted-2{color:rgba(255,255,255,0.6)}
 </style>
 </head>
-<body data-theme="dark">
+<body data-theme="Dark">
   <div class="app" id="app">
     <header>
       <div class="logo" aria-hidden="true">FI</div>
       <div class="brand">
         <h1>Field+Iron</h1>
-        <p class="small">Core 5 • Stretches separated • refined palette</p>
+        <p class="small">Adjustable core size • Themes restored</p>
       </div>
       <div style="flex:1"></div>
-
       <div class="controls" role="toolbar" aria-label="Top controls">
-        <button id="shuffle-btn" class="btn" title="Shuffle core" aria-label="Shuffle">
-          <!-- Shuffle SVG -->
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 6h4l5 8 4-6h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Shuffle
-        </button>
-
-        <button id="open-db" class="btn" title="Browse DB" aria-label="Browse database">
-          <!-- Database SVG -->
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3" stroke="currentColor" stroke-width="1.6"/><path d="M4 5v6c0 1.657 3.582 3 8 3s8-1.343 8-3V5" stroke="currentColor" stroke-width="1.6"/></svg>
-          DB
-        </button>
-
-        <button id="export-btn" class="btn" title="Export" aria-label="Export">
-          <!-- Export SVG -->
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M8 7l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="15" width="18" height="6" rx="2" stroke="currentColor" stroke-width="1.6"/></svg>
-          Export
-        </button>
+        <button id="shuffle-btn" class="btn">Shuffle</button>
+        <button id="open-db" class="btn">DB</button>
+        <button id="export-btn" class="btn">Export</button>
       </div>
     </header>
 
     <main>
       <div class="left-col">
-        <section class="panel" aria-labelledby="core-heading">
+        <section class="panel">
           <div class="panel-header">
             <div>
               <div class="small">Today</div>
@@ -149,25 +115,17 @@
             <div style="text-align:right">
               <div class="small">Core</div>
               <div style="font-weight:900;font-size:18px" id="default-count-label">5</div>
-              <div class="small muted">Tap item to swap</div>
+              <div class="small muted">Change core size on the right</div>
             </div>
           </div>
 
           <div class="ex-list" id="core-list" aria-live="polite"></div>
 
           <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
-            <input id="quick-add-core" class="search" placeholder="Add custom core exercise (Enter)" aria-label="Add core exercise" />
-            <button id="add-core" class="btn" title="Add core">
-              <!-- Plus SVG -->
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Add Core
-            </button>
+            <input id="quick-add-core" class="search" placeholder="Add custom core exercise (Enter)" />
+            <button id="add-core" class="btn">Add Core</button>
             <div style="flex:1"></div>
-            <button id="save-routine" class="btn-primary btn" title="Save routine" aria-label="Save routine">
-              <!-- Save SVG -->
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 7V4a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Save Routine
-            </button>
+            <button id="save-routine" class="btn-primary btn">Save Routine</button>
           </div>
         </section>
 
@@ -180,17 +138,10 @@
           <div class="ex-list" id="stretch-list" aria-live="polite"></div>
 
           <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
-            <input id="quick-add-stretch" class="search" placeholder="Add custom stretch (Enter)" aria-label="Add stretch" />
-            <button id="add-stretch" class="btn" title="Add stretch">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Add Stretch
-            </button>
+            <input id="quick-add-stretch" class="search" placeholder="Add custom stretch (Enter)" />
+            <button id="add-stretch" class="btn">Add Stretch</button>
             <div style="flex:1"></div>
-            <button id="export-stretches" class="btn" title="Export stretches" aria-label="Export stretches">
-              <!-- Download SVG -->
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M8 11l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="17" width="16" height="4" rx="1" stroke="currentColor" stroke-width="1.6"/></svg>
-              Export Stretches
-            </button>
+            <button id="export-stretches" class="btn">Export Stretches</button>
           </div>
         </section>
 
@@ -202,12 +153,8 @@
 
           <div class="swap-row">
             <select id="swap-target" class="swap-select" aria-label="Swap target"></select>
-            <input id="swap-search" class="search" placeholder="Search DB to swap" aria-label="Search DB" />
-            <button id="swap-btn" class="btn-primary btn" title="Replace slot" aria-label="Replace slot">
-              <!-- Replace SVG -->
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 15v4h-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 9v-4h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 3l-9 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Replace
-            </button>
+            <input id="swap-search" class="search" placeholder="Search DB to swap" />
+            <button id="swap-btn" class="btn-primary btn">Replace</button>
           </div>
         </section>
       </div>
@@ -216,7 +163,7 @@
         <section class="panel stat">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <div><strong>Profile</strong><div class="small muted">83 kg • 15.3% BF • target 12% BF</div></div>
-            <div class="small muted">v1.4</div>
+            <div class="small muted">v1.5</div>
           </div>
 
           <div style="margin-top:10px">
@@ -239,11 +186,26 @@
 
         <section class="panel" style="margin-top:12px">
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <div><strong>Theme</strong><div class="small muted">Pick a look</div></div>
-            <div class="controls">
-              <button id="theme-dark" class="btn" title="Dark theme">Dark</button>
-              <button id="theme-light" class="btn" title="Light theme">Light</button>
+            <div>
+              <strong>Theme</strong>
+              <div class="small muted">Pick a look</div>
             </div>
+
+            <div style="text-align:right">
+              <div class="small muted">Core size</div>
+              <div class="core-count" style="justify-content:flex-end">
+                <input id="core-range" type="range" min="3" max="12" value="5" />
+                <input id="core-number" type="number" min="3" max="12" value="5" style="width:56px" />
+              </div>
+            </div>
+          </div>
+
+          <div class="theme-swatches" style="margin-top:12px">
+            <div class="swatch" id="sw-sporty" title="Sporty" style="background:linear-gradient(90deg,#ff6b5f,#00d4a6)"></div>
+            <div class="swatch" id="sw-calm" title="Calm" style="background:linear-gradient(90deg,#6aa6ff,#7ee7c7)"></div>
+            <div class="swatch" id="sw-vibrant" title="Vibrant" style="background:linear-gradient(90deg,#ff5fa3,#ffd166)"></div>
+            <div class="swatch" id="sw-dark" title="Dark" style="background:linear-gradient(90deg,#00d4a6,#3b82f6)"></div>
+            <div class="swatch" id="sw-light" title="Light" style="background:linear-gradient(90deg,#ff6b5f,#00a884)"></div>
           </div>
 
           <div style="margin-top:12px">
@@ -255,18 +217,14 @@
     </main>
 
     <footer style="display:flex;justify-content:space-between;align-items:center;padding-top:6px">
-      <div class="small muted">SVG icons • refined palette • improved contrast</div>
+      <div class="small muted">Adjust core size and pick a theme — changes save automatically</div>
       <div class="small muted">Shortcuts: S shuffle • D open DB</div>
     </footer>
   </div>
 
   <!-- Sticky Start -->
   <div class="sticky-start" id="sticky-start">
-    <button id="start-workout" class="btn-primary btn" aria-label="Start Workout">
-      <!-- Play SVG -->
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 3v18l15-9L5 3z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Start Workout
-    </button>
+    <button id="start-workout" class="btn-primary btn">Start Workout</button>
   </div>
 
   <!-- DB modal -->
@@ -277,7 +235,7 @@
         <div><button id="close-db" class="btn">Close</button></div>
       </div>
       <div style="margin-top:12px">
-        <input id="db-filter" class="search" placeholder="Filter exercises by name" aria-label="Filter exercises" />
+        <input id="db-filter" class="search" placeholder="Filter exercises by name" />
       </div>
       <div id="db-list" style="margin-top:12px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px"></div>
     </div>
@@ -333,8 +291,7 @@
     </div>
   </div>
 
-  <!-- Toast -->
-  <div id="toast" class="hidden" style="position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));background:linear-gradient(90deg,var(--accent-3),rgba(255,255,255,0.02));color:#07121a;padding:10px 14px;border-radius:12px;z-index:11000"></div>
+  <div id="toast" class="hidden" style="position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));background:linear-gradient(90deg,var(--accent-3, #ffd166),rgba(255,255,255,0.02));color:#07121a;padding:10px 14px;border-radius:12px;z-index:11000"></div>
 
 <script>
 (() => {
@@ -378,7 +335,7 @@
   ];
 
   /* Storage & defaults */
-  const STORAGE = { byDate: 'fi.byDate.v4', routines: 'fi.routines.v4', settings: 'fi.settings.v4', sessions: 'fi.sessions.v1' };
+  const STORAGE = { byDate: 'fi.byDate.v5', routines: 'fi.routines.v5', settings: 'fi.settings.v5', sessions: 'fi.sessions.v1' };
   const DEFAULTS = { defaultCount:5, stretches:['Kneeling Hip Flexor Stretch — 2 sets × 30s ea','Standing Hamstring Stretch — 2 sets × 30s ea','Child Pose Hold — 1 × 60s'], profile:{weight:83,bf:15.3,bfTarget:12} };
 
   /* Utilities */
@@ -390,7 +347,7 @@
   const showToast = (msg,ms=1400)=>{ const t=document.getElementById('toast'); t.textContent=msg; t.classList.remove('hidden'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.add('hidden'),ms) };
 
   /* State */
-  let state = { selectedDate: todayISO(), settings: loadJSON(STORAGE.settings,{profile:DEFAULTS.profile,theme:'dark',defaultCount:DEFAULTS.defaultCount}), routines: loadJSON(STORAGE.routines,{}) };
+  let state = { selectedDate: todayISO(), settings: loadJSON(STORAGE.settings,{profile:DEFAULTS.profile,theme:'Dark',defaultCount:DEFAULTS.defaultCount}), routines: loadJSON(STORAGE.routines,{}) };
 
   /* Refs */
   const refs = {
@@ -411,7 +368,14 @@
     progressText: document.getElementById('progress-text'),
     runner: document.getElementById('runner'),
     runnerSummary: document.getElementById('runner-summary'),
-    setsRow: document.getElementById('sets-row')
+    setsRow: document.getElementById('sets-row'),
+    coreRange: document.getElementById('core-range'),
+    coreNumber: document.getElementById('core-number'),
+    swSporty: document.getElementById('sw-sporty'),
+    swCalm: document.getElementById('sw-calm'),
+    swVibrant: document.getElementById('sw-vibrant'),
+    swDark: document.getElementById('sw-dark'),
+    swLight: document.getElementById('sw-light')
   };
 
   /* Ensure today */
@@ -437,9 +401,9 @@
       const meta=document.createElement('div'); meta.className='ex-meta muted'; meta.textContent=`Core • slot ${idx+1}`;
       left.appendChild(title); left.appendChild(meta);
       const actions=document.createElement('div'); actions.className='ex-actions';
-      const swapBtn=document.createElement('button'); swapBtn.className='btn'; swapBtn.title='Swap'; swapBtn.innerHTML = '<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M3 6h4l5 8 4-6h4\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Swap'; swapBtn.onclick=()=>openSwapFor(idx);
-      const replaceBtn=document.createElement('button'); replaceBtn.className='btn'; replaceBtn.title='Replace'; replaceBtn.innerHTML = '<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M21 15v4h-4\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M3 9v-4h4\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M21 3l-9 9\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Replace'; replaceBtn.onclick=()=>openDBAndReplace(idx);
-      const removeBtn=document.createElement('button'); removeBtn.className='btn'; removeBtn.title='Remove'; removeBtn.innerHTML = '<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M3 6h18\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\"/><path d=\"M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Remove'; removeBtn.onclick=()=>removeCore(idx);
+      const swapBtn=document.createElement('button'); swapBtn.className='btn'; swapBtn.textContent='Swap'; swapBtn.onclick=()=>openSwapFor(idx);
+      const replaceBtn=document.createElement('button'); replaceBtn.className='btn'; replaceBtn.textContent='Replace'; replaceBtn.onclick=()=>openDBAndReplace(idx);
+      const removeBtn=document.createElement('button'); removeBtn.className='btn'; removeBtn.textContent='Remove'; removeBtn.onclick=()=>removeCore(idx);
       actions.appendChild(swapBtn); actions.appendChild(replaceBtn); actions.appendChild(removeBtn);
       item.appendChild(left); item.appendChild(actions);
       let lastTap=0; item.addEventListener('touchend',()=>{ const now=Date.now(); if(now-lastTap<300) quickReplace(idx); lastTap=now; });
@@ -454,7 +418,7 @@
       const meta=document.createElement('div'); meta.className='ex-meta muted'; meta.textContent='Stretch';
       left.appendChild(title); left.appendChild(meta);
       const actions=document.createElement('div'); actions.className='ex-actions';
-      const removeBtn=document.createElement('button'); removeBtn.className='btn'; removeBtn.title='Remove'; removeBtn.innerHTML = '<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M3 6h18\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\"/><path d=\"M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Remove'; removeBtn.onclick=()=>removeStretch(idx);
+      const removeBtn=document.createElement('button'); removeBtn.className='btn'; removeBtn.textContent='Remove'; removeBtn.onclick=()=>removeStretch(idx);
       actions.appendChild(removeBtn);
       item.appendChild(left); item.appendChild(actions);
       refs.stretchList.appendChild(item);
@@ -495,8 +459,8 @@
   function openDB(){ document.getElementById('db-modal').classList.remove('hidden'); document.getElementById('db-modal').setAttribute('aria-hidden','false'); renderDB(''); }
   function closeDB(){ document.getElementById('db-modal').classList.add('hidden'); document.getElementById('db-modal').setAttribute('aria-hidden','true'); dbReplaceIndex=null; }
 
-  /* Runner (core only) with per-set pills */
-  const RUNNER_COUNT = state.settings.defaultCount || DEFAULTS.defaultCount;
+  /* Runner (core only) */
+  const RUNNER_COUNT = ()=> state.settings.defaultCount || DEFAULTS.defaultCount;
   const runnerEl = document.getElementById('runner');
   const runnerSummary = document.getElementById('runner-summary');
   let runnerState = { exercises: [], index: 0, setIndex: 1, setsTotal: 1, restTimer: null, restRemaining: 0, inSet: false, sessionStart: null, log: [] };
@@ -504,7 +468,7 @@
   function parseSets(text){ const m=text.match(/(\d+)\s*sets?/i); return m?Number(m[1]):1; }
   function parseReps(text){ const m=text.match(/×\s*([0-9]+(?:-[0-9]+)?)/); return m?m[1]:''; }
 
-  function loadRunnerExercises(){ const today=loadToday(); runnerState.exercises=today.core.slice(0,RUNNER_COUNT); runnerSummary.innerHTML=''; runnerState.exercises.forEach((ex,i)=>{ const el=document.createElement('div'); el.style.display='flex'; el.style.justifyContent='space-between'; el.style.alignItems='center'; el.innerHTML=`<div style="flex:1;min-width:0"><strong style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${i+1}. ${ex}</strong></div><div class="small muted">slot ${i+1}</div>`; runnerSummary.appendChild(el); }); }
+  function loadRunnerExercises(){ const today=loadToday(); runnerState.exercises=today.core.slice(0,RUNNER_COUNT()); runnerSummary.innerHTML=''; runnerState.exercises.forEach((ex,i)=>{ const el=document.createElement('div'); el.style.display='flex'; el.style.justifyContent='space-between'; el.style.alignItems='center'; el.innerHTML=`<div style="flex:1;min-width:0"><strong style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${i+1}. ${ex}</strong></div><div class="small muted">slot ${i+1}</div>`; runnerSummary.appendChild(el); }); }
 
   function showRunner(){ loadRunnerExercises(); runnerState.index=0; runnerState.setIndex=1; runnerState.sessionStart=Date.now(); runnerState.log=[]; updateRunnerUI(); runnerEl.style.display='flex'; runnerEl.setAttribute('aria-hidden','false'); attachSwipe(); }
 
@@ -522,7 +486,6 @@
   }
 
   function formatTime(sec){ const s=Math.max(0,Math.floor(sec)); const mm=String(Math.floor(s/60)).padStart(2,'0'); const ss=String(s%60).padStart(2,'0'); return `${mm}:${ss}`; }
-
   function startSet(){ if(runnerState.inSet) return; runnerState.inSet=true; document.getElementById('runner-start').textContent='In Progress'; document.getElementById('runner-start').disabled=true; }
   function completeSet(){ runnerState.inSet=false; document.getElementById('runner-start').textContent='Start Set'; document.getElementById('runner-start').disabled=false; const ex=runnerState.exercises[runnerState.index]||'—'; runnerState.log.push({exercise:ex,set:runnerState.setIndex,ts:Date.now()}); if(runnerState.setIndex<runnerState.setsTotal){ const restSec=Number(document.getElementById('runner-rest-input').value)||60; runnerState.restRemaining=restSec; startRest(); runnerState.setIndex++; } else { if(runnerState.index<runnerState.exercises.length-1){ runnerState.index++; runnerState.setIndex=1; } else { showToast('Workout complete — press Finish'); } } updateRunnerUI(); }
   function startRest(){ stopRest(); document.getElementById('runner-done').disabled=true; runnerState.restTimer=setInterval(()=>{ runnerState.restRemaining-=1; if(runnerState.restRemaining<=0){ stopRest(); document.getElementById('runner-done').disabled=false; try{ if(navigator.vibrate) navigator.vibrate(40); }catch(e){} showToast('Rest complete'); } updateRunnerUI(); },1000); }
@@ -538,7 +501,51 @@
   function onTouchStart(e){ const t=e.touches[0]; touchStartX=t.clientX; touchStartY=t.clientY; }
   function onTouchEnd(e){ const t=e.changedTouches[0]; const dx=t.clientX-touchStartX; const dy=t.clientY-touchStartY; if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)){ if(dx<0) nextExercise(); else prevExercise(); } }
 
-  /* Wiring */
+  /* Theme & core size wiring */
+  function applyTheme(name){
+    document.body.setAttribute('data-theme', name);
+    state.settings.theme = name;
+    saveJSON(STORAGE.settings, state.settings);
+    // mark selected swatch
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
+    const map = { Sporty: 'sw-sporty', Calm: 'sw-calm', Vibrant: 'sw-vibrant', Dark: 'sw-dark', Light: 'sw-light' };
+    const el = document.getElementById(map[name]);
+    if(el) el.classList.add('selected');
+  }
+
+  function setCoreCount(n){
+    n = Math.max(3, Math.min(12, Number(n) || DEFAULTS.defaultCount));
+    state.settings.defaultCount = n;
+    saveJSON(STORAGE.settings, state.settings);
+    document.getElementById('core-range').value = n;
+    document.getElementById('core-number').value = n;
+    // ensure today's array has at least n core items (if not, fill with random)
+    const all = loadJSON(STORAGE.byDate, {});
+    const arr = all[state.selectedDate] || ensureToday();
+    const currentCore = arr.slice(0, arr.length);
+    if(arr.length < n){
+      const needed = n - arr.length;
+      const picks = sampleShuffle(EXERCISES.filter(e => !arr.includes(e)), needed);
+      all[state.selectedDate] = (arr.concat(picks));
+    }
+    // if arr has more than n core items, keep first n and append stretches after
+    // We'll rebuild: take first n from current core (or fill), then append existing stretches
+    const existing = loadJSON(STORAGE.byDate, {})[state.selectedDate] || ensureToday();
+    const stretches = existing.slice(state.settings.defaultCount || DEFAULTS.defaultCount);
+    const core = existing.slice(0, n);
+    // if core shorter than n, fill
+    if(core.length < n){
+      const picks = sampleShuffle(EXERCISES.filter(e => !existing.includes(e)), n - core.length);
+      core.push(...picks);
+    }
+    all[state.selectedDate] = core.concat(stretches);
+    saveJSON(STORAGE.byDate, all);
+    renderDate();
+    renderLists();
+    showToast('Core size set to ' + n);
+  }
+
+  /* Wiring & init */
   document.getElementById('shuffle-btn').addEventListener('click',shuffleCore);
   document.getElementById('open-db').addEventListener('click',openDB);
   document.getElementById('close-db').addEventListener('click',closeDB);
@@ -553,9 +560,6 @@
   document.getElementById('export-btn').addEventListener('click',exportAll);
   document.getElementById('apply-profile').addEventListener('click',applyProfile);
   document.getElementById('reset-profile').addEventListener('click',()=>{ state.settings.profile=DEFAULTS.profile; document.getElementById('weight').value=DEFAULTS.profile.weight; document.getElementById('bf').value=DEFAULTS.profile.bf; document.getElementById('bf-target').value=DEFAULTS.profile.bfTarget; saveJSON(STORAGE.settings,state.settings); computeProgress(); showToast('Profile reset'); });
-  document.getElementById('theme-dark').addEventListener('click',()=>{ document.body.removeAttribute('data-theme'); state.settings.theme='dark'; saveJSON(STORAGE.settings,state.settings); });
-  document.getElementById('theme-light').addEventListener('click',()=>{ document.body.setAttribute('data-theme','light'); state.settings.theme='light'; saveJSON(STORAGE.settings,state.settings); });
-
   document.getElementById('db-list').addEventListener('click',e=>{ const card=e.target.closest('.ex-item'); if(!card) return; const title=card.querySelector('.ex-title').textContent; if(dbReplaceIndex!==null){ replaceCoreSlot(dbReplaceIndex,title); dbReplaceIndex=null; closeDB(); } });
 
   // Runner buttons
@@ -568,15 +572,49 @@
   document.getElementById('runner-finish').addEventListener('click',finishWorkout);
   document.getElementById('runner-save').addEventListener('click',()=>{ const sessions=loadJSON(STORAGE.sessions,[]); alert('Saved sessions: '+sessions.length); });
 
+  // core size controls
+  refs.coreRange.addEventListener('input', (e)=> setCoreCount(e.target.value));
+  refs.coreNumber.addEventListener('change', (e)=> setCoreCount(e.target.value));
+
+  // theme swatches
+  refs.swSporty.addEventListener('click', ()=> applyTheme('Sporty'));
+  refs.swCalm.addEventListener('click', ()=> applyTheme('Calm'));
+  refs.swVibrant.addEventListener('click', ()=> applyTheme('Vibrant'));
+  refs.swDark.addEventListener('click', ()=> applyTheme('Dark'));
+  refs.swLight.addEventListener('click', ()=> applyTheme('Light'));
+
+  // DB replace index setter
+  function openDBForReplace(idx){ dbReplaceIndex=idx; openDB(); }
+
   // keyboard shortcuts
   document.addEventListener('keydown',e=>{ if(e.key.toLowerCase()==='s') shuffleCore(); if(e.key.toLowerCase()==='d') openDB(); });
 
   /* Init */
-  function init(){ if(state.settings.theme==='light') document.body.setAttribute('data-theme','light'); if(!state.settings.defaultCount) state.settings.defaultCount=DEFAULTS.defaultCount; document.getElementById('weight').value=state.settings.profile.weight||DEFAULTS.profile.weight; document.getElementById('bf').value=state.settings.profile.bf||DEFAULTS.profile.bf; document.getElementById('bf-target').value=state.settings.profile.bfTarget||DEFAULTS.profile.bfTarget; ensureToday(); renderDate(); renderLists(); renderDB(''); computeProgress(); }
+  function init(){
+    // apply saved theme
+    applyTheme(state.settings.theme || 'Dark');
+    // set core controls
+    const n = state.settings.defaultCount || DEFAULTS.defaultCount;
+    refs.coreRange.value = n;
+    refs.coreNumber.value = n;
+    // profile
+    document.getElementById('weight').value = state.settings.profile.weight || DEFAULTS.profile.weight;
+    document.getElementById('bf').value = state.settings.profile.bf || DEFAULTS.profile.bf;
+    document.getElementById('bf-target').value = state.settings.profile.bfTarget || DEFAULTS.profile.bfTarget;
+    ensureToday();
+    renderDate();
+    renderLists();
+    renderDB('');
+    computeProgress();
+  }
+
   init();
 
   // expose for debugging
-  window.__FieldIron = window.__FieldIron||{}; window.__FieldIron.state=state; window.__FieldIron.showRunner=showRunner;
+  window.__FieldIron = window.__FieldIron || {};
+  window.__FieldIron.state = state;
+  window.__FieldIron.setCoreCount = setCoreCount;
+  window.__FieldIron.applyTheme = applyTheme;
 
 })();
 </script>
