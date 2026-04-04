@@ -2,200 +2,320 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Field+Iron — Core + Stretches</title>
-<meta name="theme-color" content="#0b1720">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Field+Iron — Polished Mobile UI</title>
+<meta name="theme-color" content="#071018">
 <style>
+  /* -------------------------
+     Design tokens (mobile-first)
+     ------------------------- */
   :root{
-    --bg:#071018; --panel:#0b1a24; --muted:#9fb3c8; --text:#e6eef6;
-    --accent:#00d4a6; --accent-2:#3b82f6; --radius:12px; --glass: rgba(255,255,255,0.03);
-    --ui:220ms cubic-bezier(.2,.9,.2,1); --max-width:1100px;
+    --bg:#071018;
+    --panel:#0b1a24;
+    --muted:#9fb3c8;
+    --text:#e6eef6;
+    --accent:#00d4a6;
+    --accent-2:#3b82f6;
+    --danger:#ff6b6b;
+    --radius:14px;
+    --glass: rgba(255,255,255,0.04);
+    --ui:220ms cubic-bezier(.2,.9,.2,1);
+    --max-width:980px;
+    --touch:56px; /* comfortable touch target */
+    --safe-top: env(safe-area-inset-top);
+    --safe-bottom: env(safe-area-inset-bottom);
   }
-  body[data-theme="light"]{ --bg:#f6f8fa; --panel:#fff; --muted:#6b7f8f; --text:#0b1a24; --accent:#ff6a00; --glass: rgba(0,0,0,0.04); }
+
+  /* Light theme */
+  body[data-theme="light"]{
+    --bg:#f6f8fa; --panel:#ffffff; --muted:#6b7f8f; --text:#0b1a24; --accent:#ff6a00; --glass: rgba(0,0,0,0.04);
+  }
+
+  /* Base */
   html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;box-sizing:border-box;}
-  .wrap{max-width:var(--max-width);margin:18px auto;padding:18px;display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start;}
-  @media (max-width:980px){ .wrap{grid-template-columns:1fr;padding:12px;} .right-col{order:2;} .left-col{order:1;} }
-  header{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
-  .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(90deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:18px;box-shadow:0 8px 30px rgba(0,0,0,0.35);}
-  .brand{display:flex;flex-direction:column;}
-  .brand h1{margin:0;font-size:18px;}
-  .brand p{margin:0;color:var(--muted);font-size:13px;}
-  .panel{background:var(--panel);border-radius:var(--radius);padding:14px;border:1px solid var(--glass);transition:box-shadow var(--ui), transform var(--ui);}
-  .panel:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(0,0,0,0.45);}
-  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-  .btn{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text);padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:700;transition:transform var(--ui);}
-  .btn:active{transform:scale(.98);}
-  .btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,0.2);}
-  .small{font-size:13px;color:var(--muted);}
-  .ex-list{display:flex;flex-direction:column;gap:10px;margin-top:12px;}
-  .ex-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border:1px solid rgba(255,255,255,0.02);}
-  .ex-left{flex:1;min-width:0;}
-  .ex-title{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .ex-meta{color:var(--muted);font-size:13px;margin-top:6px;}
-  .ex-actions{display:flex;gap:8px;align-items:center;}
-  .search{padding:8px;border-radius:8px;border:1px solid var(--glass);background:transparent;color:var(--text);width:100%;}
-  .swap-select{padding:8px;border-radius:8px;border:1px solid var(--glass);background:transparent;color:var(--text);min-width:220px;}
-  .stat{display:flex;flex-direction:column;gap:6px;}
-  .stat-row{display:flex;justify-content:space-between;align-items:center;}
-  .progress{height:12px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden;}
-  .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;transition:width 600ms var(--ui);}
-  .modal{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;}
-  .modal-card{width:920px;max-width:96%;max-height:86vh;overflow:auto;border-radius:12px;padding:14px;background:var(--panel);border:1px solid var(--glass);}
-  footer{grid-column:1/-1;margin-top:6px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;align-items:center;}
-  .kbd{background:rgba(255,255,255,0.03);padding:4px 8px;border-radius:6px;font-weight:700;font-size:12px;color:var(--muted);}
-  .muted{color:var(--muted);}
-  .hidden{display:none !important;}
+  *{box-sizing:border-box}
+  a{color:inherit}
+  .app{max-width:var(--max-width);margin:0 auto;padding:calc(12px + var(--safe-top)) 12px calc(12px + var(--safe-bottom));display:flex;gap:12px;flex-direction:column;min-height:100vh;}
+
+  /* Header */
+  header{display:flex;align-items:center;gap:12px;padding:8px 6px;border-radius:12px;}
+  .brand{display:flex;gap:12px;align-items:center;flex:1}
+  .logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(90deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:18px;box-shadow:0 10px 30px rgba(0,0,0,0.35)}
+  .title{display:flex;flex-direction:column}
+  .title h1{margin:0;font-size:18px;letter-spacing:-0.01em}
+  .title p{margin:0;color:var(--muted);font-size:13px}
+
+  /* Layout */
+  main{display:grid;grid-template-columns:1fr 360px;gap:12px;align-items:start;}
+  @media (max-width:980px){ main{grid-template-columns:1fr;} .right-col{order:2} .left-col{order:1} }
+
+  /* Panels */
+  .panel{background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border-radius:14px;padding:12px;border:1px solid var(--glass);transition:transform var(--ui), box-shadow var(--ui);overflow:hidden;}
+  .panel:focus-within{box-shadow:0 18px 40px rgba(0,0,0,0.45);transform:translateY(-6px)}
+  .panel-header{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .muted{color:var(--muted);font-size:13px}
+  .small{font-size:13px;color:var(--muted)}
+
+  /* Controls */
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .btn{height:var(--touch);min-width:48px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text);font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+  .btn:active{transform:scale(.98)}
+  .btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,0.25)}
+  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+
+  /* Lists */
+  .ex-list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+  .ex-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.02);transition:transform 260ms,var(--ui);cursor:grab}
+  .ex-item:active{cursor:grabbing}
+  .ex-item:hover{transform:translateY(-4px)}
+  .ex-left{flex:1;min-width:0}
+  .ex-title{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ex-meta{color:var(--muted);font-size:13px;margin-top:6px}
+  .ex-actions{display:flex;gap:8px;align-items:center}
+
+  /* Stretch panel smaller items */
+  .stretch-item .ex-title{font-weight:700}
+
+  /* Swap controls */
+  .swap-row{display:flex;gap:8px;align-items:center;margin-top:10px}
+  .swap-select,.search{padding:10px;border-radius:10px;border:1px solid var(--glass);background:transparent;color:var(--text);font-size:15px}
+
+  /* Right column */
+  .stat{display:flex;flex-direction:column;gap:8px}
+  .stat-row{display:flex;justify-content:space-between;align-items:center}
+  .progress{height:12px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden}
+  .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;transition:width 700ms var(--ui)}
+
+  /* Footer / sticky start */
+  .sticky-start{position:fixed;left:12px;right:12px;bottom:calc(12px + var(--safe-bottom));display:flex;justify-content:center;z-index:999;pointer-events:auto}
+  .sticky-start .btn-primary{width:100%;height:var(--touch);font-size:16px;border-radius:12px}
+
+  /* Modal */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999;padding:12px}
+  .modal-card{width:980px;max-width:100%;max-height:92vh;overflow:auto;border-radius:12px;padding:12px;background:var(--panel);border:1px solid var(--glass)}
+  @media (max-width:640px){ .modal-card{width:100%;height:100%;border-radius:0;padding:16px} }
+
+  /* Runner overlay */
+  .runner{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6));z-index:10000;padding:12px}
+  .runner-card{width:760px;max-width:100%;border-radius:12px;padding:16px;background:var(--panel);border:1px solid var(--glass)}
+  @media (max-width:640px){ .runner-card{height:100%;border-radius:0;padding:18px;overflow:auto} }
+
+  /* micro interactions */
+  .fade-in{animation:fadeIn .36s ease both}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* focus */
+  :focus{outline:3px solid rgba(255,255,255,0.06);outline-offset:3px;border-radius:8px}
+
+  /* small helpers */
+  .hidden{display:none !important}
+  .center{display:flex;align-items:center;justify-content:center}
 </style>
 </head>
 <body data-theme="dark">
-  <div class="wrap" id="app">
-    <div class="left-col">
-      <header>
-        <div class="logo">FI</div>
-        <div class="brand">
+  <div class="app" id="app">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">FI</div>
+        <div class="title">
           <h1>Field+Iron</h1>
-          <p class="small">Core 5 + separate stretches • swap, save, run</p>
+          <p class="small">Core 5 • Stretches separated • Tap to start</p>
         </div>
+      </div>
 
-        <div style="flex:1"></div>
+      <div class="controls" role="toolbar" aria-label="Top controls">
+        <button id="shuffle-btn" class="btn" title="Shuffle core">Shuffle</button>
+        <button id="open-db" class="btn" title="Browse exercises">Browse DB</button>
+        <button id="export-btn" class="btn" title="Export data">Export</button>
+      </div>
+    </header>
 
-        <div class="controls">
-          <button id="shuffle-btn" class="btn">Shuffle</button>
-          <button id="start-workout" class="btn-primary btn">Start Workout</button>
-          <button id="open-db" class="btn">Browse DB</button>
-          <button id="export-btn" class="btn">Export</button>
-        </div>
-      </header>
-
-      <!-- Core exercises panel -->
-      <section class="panel" aria-labelledby="today">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div>
-            <div class="small">Today</div>
-            <div style="font-weight:900;font-size:20px" id="date-label"></div>
-            <div class="small muted" id="routine-name">Random set</div>
-          </div>
-          <div style="text-align:right">
-            <div class="small">Core exercises</div>
-            <div style="font-weight:900;font-size:20px" id="default-count-label">5</div>
-            <div class="small muted">Swap any core slot</div>
-          </div>
-        </div>
-
-        <div class="ex-list" id="core-list" aria-live="polite"></div>
-
-        <div style="display:flex;gap:8px;margin-top:12px;align-items:center;">
-          <input id="quick-add-core" class="search" placeholder="Add custom core exercise (press Enter)" />
-          <button id="add-core" class="btn">Add Core</button>
-          <div style="flex:1"></div>
-          <button id="save-routine" class="btn-primary btn">Save Routine</button>
-        </div>
-      </section>
-
-      <!-- Stretches panel (separate) -->
-      <section class="panel" style="margin-top:12px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div>
-            <strong>Stretches</strong>
-            <div class="small muted">Separated from core workout</div>
-          </div>
-          <div class="small muted">Editable</div>
-        </div>
-
-        <div class="ex-list" id="stretch-list" aria-live="polite"></div>
-
-        <div style="display:flex;gap:8px;margin-top:12px;align-items:center;">
-          <input id="quick-add-stretch" class="search" placeholder="Add custom stretch (press Enter)" />
-          <button id="add-stretch" class="btn">Add Stretch</button>
-          <div style="flex:1"></div>
-          <button id="export-stretches" class="btn">Export Stretches</button>
-        </div>
-      </section>
-
-      <!-- Swap controls -->
-      <section class="panel" style="margin-top:12px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div><strong>Swap Controls</strong><div class="small muted">Replace a core slot with any DB exercise</div></div>
-          <div class="small muted">Tip: double‑click a core item to quick replace</div>
-        </div>
-
-        <div style="display:flex;gap:8px;margin-top:10px;align-items:center;">
-          <select id="swap-target" class="swap-select"></select>
-          <input id="swap-search" class="search" placeholder="Search DB to swap" />
-          <button id="swap-btn" class="btn-primary btn">Replace</button>
-        </div>
-      </section>
-    </div>
-
-    <div class="right-col">
-      <section class="panel stat">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div><strong>Profile</strong><div class="small muted">83 kg • 15.3% BF • target 12% BF</div></div>
-          <div class="small muted">v1.1</div>
-        </div>
-
-        <div style="margin-top:10px;">
-          <div class="stat-row"><div class="small">Weight</div><div><input id="weight" type="number" style="width:90px;padding:6px;border-radius:8px;border:1px solid var(--glass);background:transparent;color:var(--text)" /></div></div>
-          <div class="stat-row" style="margin-top:8px;"><div class="small">Bodyfat</div><div><input id="bf" type="number" step="0.1" style="width:90px;padding:6px;border-radius:8px;border:1px solid var(--glass);background:transparent;color:var(--text)" /></div></div>
-          <div class="stat-row" style="margin-top:8px;"><div class="small">Target BF</div><div><input id="bf-target" type="number" step="0.1" style="width:90px;padding:6px;border-radius:8px;border:1px solid var(--glass);background:transparent;color:var(--text)" /></div></div>
-
-          <div style="margin-top:12px;">
-            <div class="small">Progress to target</div>
-            <div class="progress" style="margin-top:8px;"><i id="progress-bar"></i></div>
-            <div class="small muted" id="progress-text" style="margin-top:8px"></div>
+    <main>
+      <div class="left-col">
+        <!-- Core panel -->
+        <section class="panel" aria-labelledby="core-heading">
+          <div class="panel-header">
+            <div>
+              <div class="small">Today</div>
+              <div style="font-weight:900;font-size:20px" id="date-label">Loading…</div>
+              <div class="small muted" id="routine-name">Random set</div>
+            </div>
+            <div style="text-align:right">
+              <div class="small">Core</div>
+              <div style="font-weight:900;font-size:18px" id="default-count-label">5</div>
+              <div class="small muted">Tap an item to swap</div>
+            </div>
           </div>
 
-          <div style="margin-top:12px;display:flex;gap:8px;">
-            <button id="apply-profile" class="btn-primary btn">Apply</button>
-            <button id="reset-profile" class="btn">Reset</button>
+          <div class="ex-list" id="core-list" aria-live="polite"></div>
+
+          <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+            <input id="quick-add-core" class="search" placeholder="Add custom core exercise (Enter)" aria-label="Add core exercise" />
+            <button id="add-core" class="btn">Add Core</button>
+            <div style="flex:1"></div>
+            <button id="save-routine" class="btn-primary btn">Save Routine</button>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section class="panel" style="margin-top:12px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div><strong>Theme</strong><div class="small muted">Pick a look</div></div>
-          <div class="controls">
-            <button id="theme-dark" class="btn">Dark</button>
-            <button id="theme-light" class="btn">Light</button>
+        <!-- Stretches panel -->
+        <section class="panel" style="margin-top:12px" aria-labelledby="stretch-heading">
+          <div class="panel-header">
+            <div>
+              <strong>Stretches</strong>
+              <div class="small muted">Separate from core workout</div>
+            </div>
+            <div class="small muted">Editable</div>
           </div>
-        </div>
 
-        <div style="margin-top:12px;">
-          <div><strong>Routines</strong></div>
-          <div class="small muted" id="saved-list" style="margin-top:8px"></div>
-        </div>
-      </section>
-    </div>
+          <div class="ex-list" id="stretch-list" aria-live="polite"></div>
 
-    <footer>
-      <div class="small muted">Core 5 separated from stretches • Start Workout runs core only</div>
-      <div class="small muted">Shortcuts: <span class="kbd">S</span> shuffle <span class="kbd">D</span> open DB</div>
+          <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+            <input id="quick-add-stretch" class="search" placeholder="Add custom stretch (Enter)" aria-label="Add stretch" />
+            <button id="add-stretch" class="btn">Add Stretch</button>
+            <div style="flex:1"></div>
+            <button id="export-stretches" class="btn">Export Stretches</button>
+          </div>
+        </section>
+
+        <!-- Swap controls -->
+        <section class="panel" style="margin-top:12px">
+          <div class="panel-header">
+            <div><strong>Swap Controls</strong><div class="small muted">Replace a core slot with any DB exercise</div></div>
+            <div class="small muted">Tip: double‑tap a core item to quick replace</div>
+          </div>
+
+          <div class="swap-row">
+            <select id="swap-target" class="swap-select" aria-label="Swap target"></select>
+            <input id="swap-search" class="search" placeholder="Search DB to swap" aria-label="Search DB" />
+            <button id="swap-btn" class="btn-primary btn">Replace</button>
+          </div>
+        </section>
+      </div>
+
+      <aside class="right-col">
+        <section class="panel stat">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong>Profile</strong><div class="small muted">Track bodyfat progress</div></div>
+            <div class="small muted">v1.2</div>
+          </div>
+
+          <div style="margin-top:10px">
+            <div class="stat-row"><div class="small">Weight (kg)</div><div><input id="weight" type="number" inputmode="decimal" style="width:110px;padding:8px;border-radius:10px;border:1px solid var(--glass);background:transparent;color:var(--text)" /></div></div>
+            <div class="stat-row" style="margin-top:8px"><div class="small">Bodyfat %</div><div><input id="bf" type="number" step="0.1" inputmode="decimal" style="width:110px;padding:8px;border-radius:10px;border:1px solid var(--glass);background:transparent;color:var(--text)" /></div></div>
+            <div class="stat-row" style="margin-top:8px"><div class="small">Target BF %</div><div><input id="bf-target" type="number" step="0.1" inputmode="decimal" style="width:110px;padding:8px;border-radius:10px;border:1px solid var(--glass);background:transparent;color:var(--text)" /></div></div>
+
+            <div style="margin-top:12px">
+              <div class="small">Progress to target</div>
+              <div class="progress" style="margin-top:8px"><i id="progress-bar"></i></div>
+              <div class="small muted" id="progress-text" style="margin-top:8px"></div>
+            </div>
+
+            <div style="margin-top:12px;display:flex;gap:8px">
+              <button id="apply-profile" class="btn-primary btn">Apply</button>
+              <button id="reset-profile" class="btn">Reset</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" style="margin-top:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong>Theme</strong><div class="small muted">Pick a look</div></div>
+            <div class="controls">
+              <button id="theme-dark" class="btn">Dark</button>
+              <button id="theme-light" class="btn">Light</button>
+            </div>
+          </div>
+
+          <div style="margin-top:12px">
+            <div><strong>Routines</strong></div>
+            <div class="small muted" id="saved-list" style="margin-top:8px"></div>
+          </div>
+        </section>
+      </aside>
+    </main>
+
+    <footer style="display:flex;justify-content:space-between;align-items:center;padding-top:6px">
+      <div class="small muted">Polished mobile UI • Swipe runner • Haptics on supported devices</div>
+      <div class="small muted">Shortcuts: S shuffle • D open DB</div>
     </footer>
   </div>
 
-  <!-- Database modal -->
-  <div id="db-modal" class="modal hidden" aria-hidden="true">
+  <!-- Sticky Start for mobile -->
+  <div class="sticky-start" id="sticky-start" aria-hidden="false">
+    <button id="start-workout" class="btn-primary btn" aria-label="Start Workout">Start Workout</button>
+  </div>
+
+  <!-- DB modal -->
+  <div id="db-modal" class="modal hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Exercise database">
     <div class="modal-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div><strong>Exercise Database</strong><div class="small muted">125 exercises — click to preview or add</div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong>Exercise Database</strong><div class="small muted">125 exercises — tap to preview or add</div></div>
         <div><button id="close-db" class="btn">Close</button></div>
       </div>
-      <div style="margin-top:12px;">
-        <input id="db-filter" class="search" placeholder="Filter exercises by name or tag" />
+      <div style="margin-top:12px">
+        <input id="db-filter" class="search" placeholder="Filter exercises by name" aria-label="Filter exercises" />
       </div>
-      <div id="db-list" style="margin-top:12px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;"></div>
+      <div id="db-list" style="margin-top:12px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px"></div>
     </div>
   </div>
 
-  <div id="toast" class="hidden" style="position:fixed;left:50%;transform:translateX(-50%);bottom:28px;background:rgba(0,0,0,0.6);color:#fff;padding:10px 14px;border-radius:10px;z-index:9999;"></div>
+  <!-- Runner overlay -->
+  <div id="runner" class="runner" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Workout runner">
+    <div class="runner-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-weight:900;font-size:18px">Workout Runner</div><div class="small muted">Core only • swipe to navigate</div></div>
+        <div><button id="runner-close" class="btn">Close</button></div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:12px;align-items:flex-start">
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:18px" id="runner-ex">Exercise</div>
+          <div class="muted small" id="runner-presc" style="margin-top:6px">Sets × Reps</div>
+
+          <div style="display:flex;gap:8px;align-items:center;margin-top:12px">
+            <div class="small muted">Set</div>
+            <div id="runner-set" style="font-weight:900;font-size:20px">1 / 1</div>
+            <div style="flex:1"></div>
+            <div class="small muted">Rest</div>
+            <div id="runner-rest" style="font-weight:900">00:00</div>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <button id="runner-start" class="btn-primary btn">Start Set</button>
+            <button id="runner-done" class="btn">Complete Set</button>
+            <button id="runner-prev" class="btn">Prev</button>
+            <button id="runner-next" class="btn">Next</button>
+          </div>
+
+          <div style="margin-top:12px">
+            <label class="small muted">Rest seconds</label>
+            <input id="runner-rest-input" type="number" value="60" min="10" style="width:110px;padding:8px;border-radius:10px;border:1px solid var(--glass);background:transparent;color:var(--text)" />
+          </div>
+        </div>
+
+        <div style="width:300px">
+          <div style="font-weight:800">Summary</div>
+          <div class="small muted" style="margin-top:8px">Core exercises</div>
+          <div id="runner-summary" style="margin-top:10px;display:flex;flex-direction:column;gap:8px;max-height:320px;overflow:auto"></div>
+
+          <div style="margin-top:12px;display:flex;gap:8px">
+            <button id="runner-finish" class="btn-primary btn">Finish</button>
+            <button id="runner-save" class="btn">Save Log</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="hidden" style="position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + var(--safe-bottom));background:rgba(0,0,0,0.7);color:#fff;padding:10px 14px;border-radius:12px;z-index:11000"></div>
 
 <script>
 (() => {
   'use strict';
 
   /* -------------------------
-     DB (125 exercises)
+     Exercise DB (125 items)
      ------------------------- */
   const EXERCISES = [
     "Goblet Squat — 3 sets × 10","Back Squat — 5 sets × 5","Front Squat — 4 sets × 6","Romanian Deadlift — 4 sets × 8",
@@ -234,7 +354,7 @@
   /* -------------------------
      Storage keys & defaults
      ------------------------- */
-  const STORAGE = { byDate: 'fi.byDate.v2', routines: 'fi.routines.v2', settings: 'fi.settings.v2', sessions: 'fi.sessions.v1' };
+  const STORAGE = { byDate: 'fi.byDate.v3', routines: 'fi.routines.v3', settings: 'fi.settings.v3', sessions: 'fi.sessions.v1' };
   const DEFAULTS = {
     defaultCount: 5,
     stretches: [
@@ -252,15 +372,14 @@
   function todayISO(){ return new Date().toISOString().slice(0,10); }
   function loadJSON(key, fallback){ try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } }
   function saveJSON(key, obj){ try{ localStorage.setItem(key, JSON.stringify(obj)); }catch(e){ console.warn('save failed', e); } }
-  function sampleShuffle(arr, n){ const copy = arr.slice(); for(let i=copy.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [copy[i],copy[j]]=[copy[j],copy[i]]; } return copy.slice(0,n); }
-  function showToast(msg, ms=1600){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.remove('hidden'); clearTimeout(t._t); t._t = setTimeout(()=> t.classList.add('hidden'), ms); }
+  function sampleShuffle(arr, n){ const copy = arr.slice(); for(let i=copy.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [copy[i],copy[j]]=[copy[j],copy[i]] } return copy.slice(0,n) }
+  function showToast(msg, ms=1600){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.remove('hidden'); clearTimeout(t._t); t._t = setTimeout(()=> t.classList.add('hidden'), ms) }
 
   /* -------------------------
      App state
      ------------------------- */
   let state = {
     selectedDate: todayISO(),
-    defaultCount: DEFAULTS.defaultCount,
     settings: loadJSON(STORAGE.settings, { profile: DEFAULTS.profile, theme: 'dark', defaultCount: DEFAULTS.defaultCount }),
     routines: loadJSON(STORAGE.routines, {}),
   };
@@ -283,11 +402,13 @@
     bfInput: document.getElementById('bf'),
     bfTargetInput: document.getElementById('bf-target'),
     progressBar: document.getElementById('progress-bar'),
-    progressText: document.getElementById('progress-text')
+    progressText: document.getElementById('progress-text'),
+    runner: document.getElementById('runner'),
+    runnerSummary: document.getElementById('runner-summary')
   };
 
   /* -------------------------
-     Initialize data for today
+     Ensure today's data
      ------------------------- */
   function ensureToday(){
     const all = loadJSON(STORAGE.byDate, {});
@@ -317,28 +438,40 @@
 
   function renderLists(){
     const today = loadToday();
-    // core
     refs.coreList.innerHTML = '';
     today.core.forEach((ex, idx) => {
-      const item = document.createElement('div'); item.className = 'ex-item';
+      const item = document.createElement('div'); item.className = 'ex-item fade-in';
       const left = document.createElement('div'); left.className = 'ex-left';
       const title = document.createElement('div'); title.className = 'ex-title'; title.textContent = ex;
       const meta = document.createElement('div'); meta.className = 'ex-meta muted'; meta.textContent = `Core • slot ${idx+1}`;
       left.appendChild(title); left.appendChild(meta);
+
       const actions = document.createElement('div'); actions.className = 'ex-actions';
       const swapBtn = document.createElement('button'); swapBtn.className='btn'; swapBtn.textContent='Swap'; swapBtn.onclick = ()=> openSwapFor(idx);
       const replaceBtn = document.createElement('button'); replaceBtn.className='btn'; replaceBtn.textContent='Replace'; replaceBtn.onclick = ()=> openDBAndReplace(idx);
       const removeBtn = document.createElement('button'); removeBtn.className='btn'; removeBtn.textContent='Remove'; removeBtn.onclick = ()=> removeCore(idx);
       actions.appendChild(swapBtn); actions.appendChild(replaceBtn); actions.appendChild(removeBtn);
+
       item.appendChild(left); item.appendChild(actions);
+
+      // double-tap quick replace (mobile friendly)
+      let lastTap = 0;
+      item.addEventListener('touchend', (ev) => {
+        const now = Date.now();
+        if(now - lastTap < 300) quickReplace(idx);
+        lastTap = now;
+      });
+
+      // desktop double-click
       item.addEventListener('dblclick', ()=> quickReplace(idx));
+
       refs.coreList.appendChild(item);
     });
 
     // stretches
     refs.stretchList.innerHTML = '';
     today.stretches.forEach((ex, idx) => {
-      const item = document.createElement('div'); item.className = 'ex-item';
+      const item = document.createElement('div'); item.className = 'ex-item stretch-item fade-in';
       const left = document.createElement('div'); left.className = 'ex-left';
       const title = document.createElement('div'); title.className = 'ex-title'; title.textContent = ex;
       const meta = document.createElement('div'); meta.className = 'ex-meta muted'; meta.textContent = `Stretch`;
@@ -405,7 +538,7 @@
     if(!v) return;
     const all = loadJSON(STORAGE.byDate, {});
     const arr = all[state.selectedDate] || ensureToday();
-    arr.splice(state.settings.defaultCount, 0, v); // insert before stretches
+    arr.splice(state.settings.defaultCount, 0, v);
     all[state.selectedDate] = arr;
     saveJSON(STORAGE.byDate, all);
     document.getElementById('quick-add-core').value = '';
@@ -572,82 +705,24 @@
   function closeDB(){ document.getElementById('db-modal').classList.add('hidden'); document.getElementById('db-modal').setAttribute('aria-hidden','true'); dbReplaceIndex = null; }
 
   /* -------------------------
-     Workout runner (core only)
+     Runner (core only) with swipe & haptics
      ------------------------- */
-  // Runner overlay (simple, integrated)
-  const RUNNER_CORE_COUNT = state.settings.defaultCount || DEFAULTS.defaultCount;
-  const DEFAULT_REST = 60;
-
-  const runnerOverlay = document.createElement('div');
-  runnerOverlay.id = 'runner-overlay';
-  runnerOverlay.style.position = 'fixed';
-  runnerOverlay.style.left = '0';
-  runnerOverlay.style.top = '0';
-  runnerOverlay.style.right = '0';
-  runnerOverlay.style.bottom = '0';
-  runnerOverlay.style.display = 'none';
-  runnerOverlay.style.alignItems = 'center';
-  runnerOverlay.style.justifyContent = 'center';
-  runnerOverlay.style.background = 'rgba(0,0,0,0.6)';
-  runnerOverlay.style.zIndex = '99999';
-  runnerOverlay.innerHTML = `
-    <div style="width:760px;max-width:96%;background:var(--panel);border-radius:12px;padding:18px;border:1px solid var(--glass);">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div><div style="font-weight:900;font-size:18px">Workout Runner</div><div class="small muted">Core ${RUNNER_CORE_COUNT} only</div></div>
-        <div><button id="runner-close" class="btn">Close</button></div>
-      </div>
-      <div style="margin-top:12px;display:flex;gap:12px;">
-        <div style="flex:1;">
-          <div style="font-weight:800;font-size:16px" id="runner-ex">Exercise</div>
-          <div class="muted small" id="runner-presc" style="margin-top:6px">Sets × Reps</div>
-          <div style="display:flex;gap:8px;margin-top:12px;align-items:center;">
-            <div class="small muted">Set</div><div id="runner-set" style="font-weight:900;font-size:20px">1 / 1</div><div style="flex:1"></div>
-            <div class="small muted">Rest</div><div id="runner-rest" style="font-weight:900">00:00</div>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:12px;">
-            <button id="runner-start" class="btn-primary btn">Start Set</button>
-            <button id="runner-done" class="btn">Complete Set</button>
-            <button id="runner-prev" class="btn">Prev</button>
-            <button id="runner-next" class="btn">Next</button>
-          </div>
-          <div style="margin-top:12px;">
-            <label class="small muted">Rest seconds</label>
-            <input id="runner-rest-input" type="number" value="${DEFAULT_REST}" min="10" style="width:90px;padding:6px;border-radius:8px;border:1px solid var(--glass);background:transparent;color:var(--text)" />
-          </div>
-        </div>
-        <div style="width:300px;">
-          <div style="font-weight:800">Summary</div>
-          <div class="small muted" style="margin-top:8px">Core exercises</div>
-          <div id="runner-summary" style="margin-top:10px;display:flex;flex-direction:column;gap:8px;max-height:320px;overflow:auto"></div>
-          <div style="margin-top:12px;display:flex;gap:8px;">
-            <button id="runner-finish" class="btn-primary btn">Finish</button>
-            <button id="runner-save" class="btn">Save Log</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(runnerOverlay);
-
+  const RUNNER_COUNT = state.settings.defaultCount || DEFAULTS.defaultCount;
+  const runnerEl = refs.runner;
+  const runnerSummary = refs.runnerSummary;
   let runnerState = { exercises: [], index: 0, setIndex: 1, setsTotal: 1, restTimer: null, restRemaining: 0, inSet: false, sessionStart: null, log: [] };
 
-  function parseSets(text){
-    const m = text.match(/(\d+)\s*sets?/i);
-    return m ? Number(m[1]) : 1;
-  }
-  function parseReps(text){
-    const m = text.match(/×\s*([0-9]+(?:-[0-9]+)?)/);
-    return m ? m[1] : '';
-  }
+  function parseSets(text){ const m = text.match(/(\d+)\s*sets?/i); return m ? Number(m[1]) : 1; }
+  function parseReps(text){ const m = text.match(/×\s*([0-9]+(?:-[0-9]+)?)/); return m ? m[1] : ''; }
 
   function loadRunnerExercises(){
     const today = loadToday();
-    runnerState.exercises = today.core.slice(0, RUNNER_CORE_COUNT);
-    const summary = document.getElementById('runner-summary'); summary.innerHTML = '';
+    runnerState.exercises = today.core.slice(0, RUNNER_COUNT);
+    runnerSummary.innerHTML = '';
     runnerState.exercises.forEach((ex,i)=> {
       const el = document.createElement('div'); el.style.display='flex'; el.style.justifyContent='space-between'; el.style.alignItems='center';
       el.innerHTML = `<div style="flex:1;min-width:0"><strong style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${i+1}. ${ex}</strong></div><div class="small muted">slot ${i+1}</div>`;
-      summary.appendChild(el);
+      runnerSummary.appendChild(el);
     });
   }
 
@@ -655,12 +730,17 @@
     loadRunnerExercises();
     runnerState.index = 0; runnerState.setIndex = 1; runnerState.sessionStart = Date.now(); runnerState.log = [];
     updateRunnerUI();
-    runnerOverlay.style.display = 'flex';
+    runnerEl.style.display = 'flex';
+    runnerEl.setAttribute('aria-hidden','false');
+    // attach swipe handlers
+    attachSwipe();
   }
 
   function hideRunner(){
-    runnerOverlay.style.display = 'none';
+    runnerEl.style.display = 'none';
+    runnerEl.setAttribute('aria-hidden','true');
     stopRest();
+    detachSwipe();
   }
 
   function updateRunnerUI(){
@@ -671,7 +751,7 @@
     document.getElementById('runner-presc').textContent = `${sets} sets • ${parseReps(ex)}`;
     document.getElementById('runner-set').textContent = `${runnerState.setIndex} / ${runnerState.setsTotal}`;
     document.getElementById('runner-rest').textContent = formatTime(runnerState.restRemaining || 0);
-    const summaryChildren = document.getElementById('runner-summary').children;
+    const summaryChildren = runnerSummary.children;
     for(let i=0;i<summaryChildren.length;i++){
       summaryChildren[i].style.opacity = (i === runnerState.index) ? '1' : '0.6';
       summaryChildren[i].style.background = (i === runnerState.index) ? 'rgba(255,255,255,0.02)' : 'transparent';
@@ -696,7 +776,7 @@
     const ex = runnerState.exercises[runnerState.index] || '—';
     runnerState.log.push({ exercise: ex, set: runnerState.setIndex, ts: Date.now() });
     if(runnerState.setIndex < runnerState.setsTotal){
-      const restSec = Number(document.getElementById('runner-rest-input').value) || DEFAULT_REST;
+      const restSec = Number(document.getElementById('runner-rest-input').value) || 60;
       runnerState.restRemaining = restSec;
       startRest();
       runnerState.setIndex++;
@@ -715,7 +795,13 @@
     document.getElementById('runner-done').disabled = true;
     runnerState.restTimer = setInterval(()=> {
       runnerState.restRemaining -= 1;
-      if(runnerState.restRemaining <= 0){ stopRest(); document.getElementById('runner-done').disabled = false; showToast('Rest complete'); }
+      if(runnerState.restRemaining <= 0){
+        stopRest();
+        document.getElementById('runner-done').disabled = false;
+        // haptic feedback if supported
+        try{ if(navigator.vibrate) navigator.vibrate(40); }catch(e){}
+        showToast('Rest complete');
+      }
       updateRunnerUI();
     }, 1000);
   }
@@ -730,15 +816,36 @@
     const duration = Math.round((Date.now() - runnerState.sessionStart)/1000);
     sessions.unshift({ startedAt: new Date(runnerState.sessionStart).toISOString(), durationSec: duration, exercises: runnerState.log });
     saveJSON(STORAGE.sessions, sessions);
-    showToast('Workout saved to session log');
+    showToast('Workout saved');
     hideRunner();
+  }
+
+  /* Swipe handlers for runner */
+  let touchStartX = 0, touchStartY = 0;
+  function attachSwipe(){
+    const card = document.querySelector('.runner-card');
+    if(!card) return;
+    card.addEventListener('touchstart', onTouchStart, {passive:true});
+    card.addEventListener('touchend', onTouchEnd, {passive:true});
+  }
+  function detachSwipe(){
+    const card = document.querySelector('.runner-card');
+    if(!card) return;
+    card.removeEventListener('touchstart', onTouchStart);
+    card.removeEventListener('touchend', onTouchEnd);
+  }
+  function onTouchStart(e){ const t = e.touches[0]; touchStartX = t.clientX; touchStartY = t.clientY; }
+  function onTouchEnd(e){
+    const t = e.changedTouches[0]; const dx = t.clientX - touchStartX; const dy = t.clientY - touchStartY;
+    if(Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)){
+      if(dx < 0) nextExercise(); else prevExercise();
+    }
   }
 
   /* -------------------------
      Wiring & init
      ------------------------- */
   document.getElementById('shuffle-btn').addEventListener('click', shuffleCore);
-  document.getElementById('start-workout').addEventListener('click', showRunner);
   document.getElementById('open-db').addEventListener('click', openDB);
   document.getElementById('close-db').addEventListener('click', closeDB);
   document.getElementById('db-filter').addEventListener('input', (e)=> renderDB(e.target.value));
@@ -762,16 +869,15 @@
     if(dbReplaceIndex !== null){ replaceCoreSlot(dbReplaceIndex, title); dbReplaceIndex = null; closeDB(); }
   });
 
-  // runner overlay buttons
-  runnerOverlay.addEventListener('click', (e)=> {
-    if(e.target.id === 'runner-close') hideRunner();
-    if(e.target.id === 'runner-start') startSet();
-    if(e.target.id === 'runner-done') completeSet();
-    if(e.target.id === 'runner-next') nextExercise();
-    if(e.target.id === 'runner-prev') prevExercise();
-    if(e.target.id === 'runner-finish') finishWorkout();
-    if(e.target.id === 'runner-save') { const sessions = loadJSON(STORAGE.sessions, []); alert('Saved sessions: ' + sessions.length); }
-  });
+  // Runner buttons
+  document.getElementById('start-workout').addEventListener('click', showRunner);
+  document.getElementById('runner-close').addEventListener('click', hideRunner);
+  document.getElementById('runner-start').addEventListener('click', startSet);
+  document.getElementById('runner-done').addEventListener('click', completeSet);
+  document.getElementById('runner-next').addEventListener('click', nextExercise);
+  document.getElementById('runner-prev').addEventListener('click', prevExercise);
+  document.getElementById('runner-finish').addEventListener('click', finishWorkout);
+  document.getElementById('runner-save').addEventListener('click', ()=> { const sessions = loadJSON(STORAGE.sessions, []); alert('Saved sessions: ' + sessions.length); });
 
   // DB replace index setter
   function openDBForReplace(idx){ dbReplaceIndex = idx; openDB(); }
