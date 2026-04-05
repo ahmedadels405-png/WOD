@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IGNITE Workout</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>IGNITE — Explosive Fat Loss</title>
     <style>
         * {
             margin: 0;
@@ -56,6 +56,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .exercise-name {
@@ -83,6 +85,7 @@
             cursor: pointer;
             font-size: 12px;
             font-weight: 600;
+            transition: all 0.2s;
         }
 
         button.primary {
@@ -90,8 +93,9 @@
             color: #0a0c10;
         }
 
-        button.danger {
-            background: #3a2a2a;
+        button:hover {
+            transform: scale(0.97);
+            opacity: 0.9;
         }
 
         .theme-buttons {
@@ -121,6 +125,50 @@
             margin-top: 5px;
         }
 
+        .metrics-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .metric-input {
+            flex: 1;
+        }
+
+        .metric-input label {
+            display: block;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .metric-input input {
+            width: 100%;
+            background: #252a33;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .progress-bar {
+            background: #252a33;
+            border-radius: 20px;
+            height: 8px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #ff6b35, #f7b05e);
+            width: 0%;
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.3s;
+        }
+
         .toast {
             position: fixed;
             bottom: 30px;
@@ -131,6 +179,7 @@
             border-radius: 40px;
             font-size: 14px;
             display: none;
+            z-index: 2000;
         }
 
         .toast.show {
@@ -145,6 +194,12 @@
             color: white;
             flex: 1;
         }
+
+        .flex-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
@@ -152,6 +207,7 @@
     <h1>⚡ IGNITE</h1>
     <div class="sub">explosive · compound · fat loss</div>
 
+    <!-- Stats Display -->
     <div class="stats">
         <div class="stat-card">
             <div>🔥 CALORIES</div>
@@ -163,33 +219,68 @@
         </div>
         <div class="stat-card">
             <div>🎯 BODY FAT</div>
-            <div class="stat-value" id="bodyfat">18%</div>
+            <div class="stat-value" id="bodyfatDisplay">0%</div>
         </div>
     </div>
 
+    <!-- Body Metrics Card -->
+    <div class="card">
+        <h2>📊 BODY METRICS</h2>
+        <div class="metrics-row">
+            <div class="metric-input">
+                <label>Weight (kg)</label>
+                <input type="number" id="weightInput" step="0.5" placeholder="Enter weight">
+            </div>
+            <div class="metric-input">
+                <label>Body Fat %</label>
+                <input type="number" id="bodyfatInput" step="0.5" placeholder="Enter body fat %">
+            </div>
+            <div class="metric-input">
+                <label>Target BF %</label>
+                <input type="number" id="targetBfInput" step="0.5" placeholder="Target">
+            </div>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div id="progressText" style="font-size: 12px; color: #888; text-align: center;"></div>
+        <div class="flex-row">
+            <button id="saveMetricsBtn" class="primary" style="flex:1">💾 Save Metrics</button>
+            <button id="resetMetricsBtn" style="flex:1">↺ Reset</button>
+        </div>
+    </div>
+
+    <!-- Workout Card -->
     <div class="card">
         <h2>💥 TODAY'S WORKOUT (5 EXERCISES)</h2>
         
         <div class="theme-buttons">
             <button id="btnExplosive" class="primary">⚡ Explosive</button>
-            <button id="BtnFatLoss">🔥 Fat Loss</button>
-            <button id="BtnStrength">💪 Strength</button>
+            <button id="btnFatLoss">🔥 Fat Loss</button>
+            <button id="btnStrength">💪 Strength</button>
             <button id="btnGenerate">✨ Generate New</button>
         </div>
 
         <div id="workoutList"></div>
 
-        <div style="display: flex; gap: 10px; margin-top: 15px;">
+        <div class="flex-row">
             <input type="text" id="customExercise" placeholder="Add custom exercise...">
             <button id="btnAdd">+ Add</button>
             <button id="btnSave">💾 Save</button>
         </div>
     </div>
 
+    <!-- Mobility Card -->
     <div class="card">
         <h2>🧘 MOBILITY (3)</h2>
         <div id="mobilityList"></div>
         <button id="btnAddMobility" style="margin-top: 10px;">+ Add Mobility</button>
+    </div>
+
+    <!-- Saved Routines -->
+    <div class="card">
+        <h2>📁 SAVED ROUTINES</h2>
+        <div id="savedRoutinesList"></div>
     </div>
 
     <button id="btnStartWorkout" class="primary" style="width: 100%; padding: 15px; font-size: 16px;">🚀 START WORKOUT</button>
@@ -213,7 +304,9 @@
         { name: "Clean & Jerk", type: "explosive", cals: 13, sets: 4, reps: "5-6" },
         { name: "Front Squat", type: "strength", cals: 8, sets: 3, reps: "8-10" },
         { name: "Pull-up", type: "strength", cals: 7, sets: 3, reps: "6-8" },
-        { name: "Dip", type: "strength", cals: 7, sets: 3, reps: "8-10" }
+        { name: "Dip", type: "strength", cals: 7, sets: 3, reps: "8-10" },
+        { name: "Lunge Jump", type: "explosive", cals: 11, sets: 4, reps: "8-10" },
+        { name: "Medicine Ball Slam", type: "explosive", cals: 10, sets: 4, reps: "10-12" }
     ];
 
     const ISOLATION_EXERCISES = [
@@ -222,16 +315,24 @@
         { name: "Lateral Raise", type: "isolation", cals: 5, sets: 3, reps: "12-15" },
         { name: "Leg Curl", type: "isolation", cals: 5, sets: 3, reps: "10-12" },
         { name: "Calf Raise", type: "isolation", cals: 4, sets: 3, reps: "15-20" },
-        { name: "Face Pull", type: "isolation", cals: 5, sets: 3, reps: "12-15" }
+        { name: "Face Pull", type: "isolation", cals: 5, sets: 3, reps: "12-15" },
+        { name: "Skull Crusher", type: "isolation", cals: 5, sets: 3, reps: "10-12" }
     ];
 
-    const MOBILITY_EXERCISES = ["Deep Squat Hold", "Cat-Cow Stretch", "World's Greatest Stretch"];
+    const DEFAULT_MOBILITY = ["Deep Squat Hold", "Cat-Cow Stretch", "World's Greatest Stretch"];
 
     // STATE
     let currentWorkout = [];
-    let mobilityList = [...MOBILITY_EXERCISES];
+    let mobilityList = [...DEFAULT_MOBILITY];
     let currentTheme = "explosive";
     let savedRoutines = {};
+    
+    // BODY METRICS STATE
+    let bodyMetrics = {
+        weight: 80,
+        bodyfat: 18,
+        targetBodyfat: 12
+    };
 
     // Helper
     function showToast(msg) {
@@ -239,6 +340,65 @@
         toast.textContent = msg;
         toast.classList.add("show");
         setTimeout(() => toast.classList.remove("show"), 2000);
+    }
+
+    // Load/Save Metrics
+    function loadMetrics() {
+        const saved = localStorage.getItem("ignite_metrics");
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                bodyMetrics = parsed;
+            } catch(e) {}
+        }
+        
+        document.getElementById("weightInput").value = bodyMetrics.weight;
+        document.getElementById("bodyfatInput").value = bodyMetrics.bodyfat;
+        document.getElementById("targetBfInput").value = bodyMetrics.targetBodyfat;
+        updateMetricsDisplay();
+    }
+
+    function saveMetrics() {
+        const weight = parseFloat(document.getElementById("weightInput").value);
+        const bodyfat = parseFloat(document.getElementById("bodyfatInput").value);
+        const target = parseFloat(document.getElementById("targetBfInput").value);
+        
+        if (!isNaN(weight)) bodyMetrics.weight = weight;
+        if (!isNaN(bodyfat)) bodyMetrics.bodyfat = bodyfat;
+        if (!isNaN(target)) bodyMetrics.targetBodyfat = target;
+        
+        localStorage.setItem("ignite_metrics", JSON.stringify(bodyMetrics));
+        updateMetricsDisplay();
+        showToast("Metrics saved!");
+    }
+
+    function resetMetrics() {
+        bodyMetrics = { weight: 80, bodyfat: 18, targetBodyfat: 12 };
+        document.getElementById("weightInput").value = 80;
+        document.getElementById("bodyfatInput").value = 18;
+        document.getElementById("targetBfInput").value = 12;
+        updateMetricsDisplay();
+        localStorage.setItem("ignite_metrics", JSON.stringify(bodyMetrics));
+        showToast("Metrics reset to defaults");
+    }
+
+    function updateMetricsDisplay() {
+        // Update stat card
+        document.getElementById("bodyfatDisplay").textContent = bodyMetrics.bodyfat + "%";
+        
+        // Update progress bar
+        const current = bodyMetrics.bodyfat;
+        const target = bodyMetrics.targetBodyfat;
+        const start = Math.max(target + 15, current);
+        const progress = Math.min(100, Math.max(0, ((start - current) / (start - target)) * 100));
+        document.getElementById("progressFill").style.width = progress + "%";
+        
+        const toLose = current - target;
+        if (toLose > 0) {
+            document.getElementById("progressText").textContent = `${toLose.toFixed(1)}% to goal · ${((current - target) * 0.8).toFixed(1)} kg to lose`;
+        } else {
+            document.getElementById("progressText").textContent = `✓ Goal achieved! Maintain at ${current}%`;
+        }
     }
 
     // Generate workout
@@ -268,7 +428,7 @@
         
         renderWorkout();
         updateStats();
-        showToast(`Generated ${currentTheme} workout!`);
+        showToast(`🔥 ${currentTheme.toUpperCase()} workout generated!`);
     }
 
     // Render workout list
@@ -338,7 +498,7 @@
         showToast(`Replaced with ${newEx.name}`);
     }
 
-    // Manual replace (simple prompt)
+    // Manual replace
     function manualReplace(index) {
         const allExercises = [...COMPOUND_EXERCISES, ...ISOLATION_EXERCISES];
         let message = "Choose an exercise:\n\n";
@@ -429,7 +589,62 @@
         const name = prompt("Name this routine:");
         if (name) {
             savedRoutines[name] = JSON.parse(JSON.stringify(currentWorkout));
+            localStorage.setItem("ignite_routines", JSON.stringify(savedRoutines));
+            renderSavedRoutines();
             showToast(`Saved "${name}"`);
+        }
+    }
+
+    function renderSavedRoutines() {
+        const container = document.getElementById("savedRoutinesList");
+        const names = Object.keys(savedRoutines);
+        if (names.length === 0) {
+            container.innerHTML = '<div style="color:#888;">No saved routines</div>';
+            return;
+        }
+        
+        let html = "";
+        for (const name of names) {
+            html += `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 8px; background: #252a33; border-radius: 12px;">
+                    <span>📁 ${name}</span>
+                    <div>
+                        <button class="load-routine" data-name="${name}" style="margin-right: 5px;">Load</button>
+                        <button class="delete-routine" data-name="${name}">Delete</button>
+                    </div>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+        
+        document.querySelectorAll(".load-routine").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const name = btn.dataset.name;
+                currentWorkout = JSON.parse(JSON.stringify(savedRoutines[name]));
+                renderWorkout();
+                updateStats();
+                showToast(`Loaded "${name}"`);
+            });
+        });
+        
+        document.querySelectorAll(".delete-routine").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const name = btn.dataset.name;
+                delete savedRoutines[name];
+                localStorage.setItem("ignite_routines", JSON.stringify(savedRoutines));
+                renderSavedRoutines();
+                showToast(`Deleted "${name}"`);
+            });
+        });
+    }
+
+    function loadSavedRoutines() {
+        const saved = localStorage.getItem("ignite_routines");
+        if (saved) {
+            try {
+                savedRoutines = JSON.parse(saved);
+                renderSavedRoutines();
+            } catch(e) {}
         }
     }
 
@@ -461,10 +676,10 @@
                     <div style="font-size: 48px; font-weight: bold;">Set ${runnerSet} / ${ex.sets}</div>
                     <div style="color: #888;">Rest 45s between sets</div>
                 </div>
-                <div style="display: flex; gap: 10px; justify-content: center;">
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
                     <button id="runnerComplete" style="padding: 12px 24px; background: #ff6b35; border: none; border-radius: 40px; color: white; font-weight: bold;">✅ Complete Set</button>
-                    <button id="runnerNext" style="padding: 12px 24px; background: #2f3540; border: none; border-radius: 40px; color: white;">➡️ Next Exercise</button>
-                    <button id="runnerPrev" style="padding: 12px 24px; background: #2f3540; border: none; border-radius: 40px; color: white;">⬅️ Previous</button>
+                    <button id="runnerNext" style="padding: 12px 24px; background: #2f3540; border: none; border-radius: 40px; color: white;">➡️ Next</button>
+                    <button id="runnerPrev" style="padding: 12px 24px; background: #2f3540; border: none; border-radius: 40px; color: white;">⬅️ Prev</button>
                     <button id="runnerClose" style="padding: 12px 24px; background: #3a2a2a; border: none; border-radius: 40px; color: white;">Close</button>
                 </div>
             </div>
@@ -484,7 +699,7 @@
                     runnerSet = 1;
                     showRunner();
                 } else {
-                    showToast("🏆 WORKOUT COMPLETE!");
+                    showToast("🏆 WORKOUT COMPLETE! Great job!");
                     document.getElementById("runnerOverlay")?.remove();
                 }
             }
@@ -517,16 +732,28 @@
 
     // INIT
     function init() {
+        // Load saved data
+        loadMetrics();
+        loadSavedRoutines();
+        
+        // Load saved workout if exists
+        const savedWorkout = localStorage.getItem("ignite_workout");
+        if (savedWorkout) {
+            try {
+                currentWorkout = JSON.parse(savedWorkout);
+            } catch(e) {}
+        }
+        
         // Set theme buttons
         document.getElementById("btnExplosive").onclick = () => {
             currentTheme = "explosive";
             generateWorkout();
         };
-        document.getElementById("BtnFatLoss").onclick = () => {
+        document.getElementById("btnFatLoss").onclick = () => {
             currentTheme = "fatloss";
             generateWorkout();
         };
-        document.getElementById("BtnStrength").onclick = () => {
+        document.getElementById("btnStrength").onclick = () => {
             currentTheme = "strength";
             generateWorkout();
         };
@@ -535,11 +762,33 @@
         document.getElementById("btnSave").onclick = () => saveRoutine();
         document.getElementById("btnAddMobility").onclick = () => addMobility();
         document.getElementById("btnStartWorkout").onclick = () => startWorkout();
+        document.getElementById("saveMetricsBtn").onclick = () => saveMetrics();
+        document.getElementById("resetMetricsBtn").onclick = () => resetMetrics();
         
-        // Generate initial workout
-        generateWorkout();
+        // Generate initial workout if empty
+        if (currentWorkout.length === 0) {
+            generateWorkout();
+        } else {
+            renderWorkout();
+            updateStats();
+        }
+        
         renderMobility();
     }
+    
+    // Save workout when changed
+    function saveWorkoutToLocal() {
+        localStorage.setItem("ignite_workout", JSON.stringify(currentWorkout));
+    }
+    
+    // Override save
+    const origReplace = autoReplace;
+    window.autoReplace = autoReplace;
+    
+    // Add save on workout change
+    setInterval(() => {
+        localStorage.setItem("ignite_workout", JSON.stringify(currentWorkout));
+    }, 1000);
     
     init();
 </script>
