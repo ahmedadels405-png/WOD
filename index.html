@@ -318,10 +318,7 @@
           <button class="btn btn-primary" id="smartGenBtn">✨ Generate New</button>
         </div>
 
-        <div id="exerciseList" class="ex-list">
-          <!-- Exercises will appear here -->
-          <div class="text-muted" style="text-align: center; padding: 20px;">Loading workout...</div>
-        </div>
+        <div id="exerciseList" class="ex-list"></div>
 
         <div class="flex-between gap-2 mt-3">
           <input type="text" id="customExInput" placeholder="Add custom exercise..." style="flex:1">
@@ -380,336 +377,346 @@
 <div id="toast" class="toast"></div>
 
 <script>
-  (function() {
-    // ========== EXERCISE DATABASE ==========
-    const EXERCISE_DB = [
-      { name: "Power Clean", type: "explosive", compound: true, calsPerMin: 12, sets: 4, reps: "6-8" },
-      { name: "Thruster", type: "explosive", compound: true, calsPerMin: 11, sets: 4, reps: "8-10" },
-      { name: "Deadlift", type: "strength", compound: true, calsPerMin: 9, sets: 3, reps: "8-10" },
-      { name: "Back Squat", type: "strength", compound: true, calsPerMin: 8, sets: 3, reps: "8-10" },
-      { name: "Barbell Row", type: "strength", compound: true, calsPerMin: 7, sets: 3, reps: "8-10" },
-      { name: "Bench Press", type: "strength", compound: true, calsPerMin: 7, sets: 3, reps: "8-10" },
-      { name: "Push Press", type: "explosive", compound: true, calsPerMin: 10, sets: 4, reps: "6-8" },
-      { name: "Kettlebell Swing", type: "explosive", compound: true, calsPerMin: 11, sets: 4, reps: "12-15" },
-      { name: "Box Jump", type: "explosive", compound: false, calsPerMin: 12, sets: 4, reps: "5-6" },
-      { name: "Burpee", type: "fatloss", compound: true, calsPerMin: 14, sets: 3, reps: "10-12" },
-      { name: "Clean & Jerk", type: "explosive", compound: true, calsPerMin: 13, sets: 4, reps: "5-6" },
-      { name: "Front Squat", type: "strength", compound: true, calsPerMin: 8, sets: 3, reps: "8-10" },
-      { name: "Romanian Deadlift", type: "strength", compound: true, calsPerMin: 7, sets: 3, reps: "10-12" },
-      { name: "Pull-up", type: "strength", compound: true, calsPerMin: 7, sets: 3, reps: "6-8" },
-      { name: "Dip", type: "strength", compound: true, calsPerMin: 7, sets: 3, reps: "8-10" },
-      { name: "Lunge Jump", type: "explosive", compound: true, calsPerMin: 11, sets: 4, reps: "8-10" },
-      { name: "Medicine Ball Slam", type: "explosive", compound: true, calsPerMin: 10, sets: 4, reps: "10-12" },
-      { name: "Barbell Curl", type: "isolation", compound: false, calsPerMin: 5, sets: 3, reps: "10-12" },
-      { name: "Triceps Extension", type: "isolation", compound: false, calsPerMin: 5, sets: 3, reps: "10-12" },
-      { name: "Lateral Raise", type: "isolation", compound: false, calsPerMin: 5, sets: 3, reps: "12-15" },
-      { name: "Leg Curl", type: "isolation", compound: false, calsPerMin: 5, sets: 3, reps: "10-12" },
-      { name: "Leg Extension", type: "isolation", compound: false, calsPerMin: 5, sets: 3, reps: "10-12" },
-      { name: "Calf Raise", type: "isolation", compound: false, calsPerMin: 4, sets: 3, reps: "15-20" },
-      { name: "Face Pull", type: "isolation", compound: false, calsPerMin: 5, sets: 3, reps: "12-15" }
-    ];
+  // EXERCISE DATABASE - COMPOUND + ISOLATION FOCUS
+  const COMPOUND_EXERCISES = [
+    { name: "Power Clean", type: "explosive", calsPerMin: 12, sets: 4, reps: "6-8" },
+    { name: "Thruster", type: "explosive", calsPerMin: 11, sets: 4, reps: "8-10" },
+    { name: "Deadlift", type: "strength", calsPerMin: 9, sets: 3, reps: "8-10" },
+    { name: "Back Squat", type: "strength", calsPerMin: 8, sets: 3, reps: "8-10" },
+    { name: "Barbell Row", type: "strength", calsPerMin: 7, sets: 3, reps: "8-10" },
+    { name: "Bench Press", type: "strength", calsPerMin: 7, sets: 3, reps: "8-10" },
+    { name: "Push Press", type: "explosive", calsPerMin: 10, sets: 4, reps: "6-8" },
+    { name: "Kettlebell Swing", type: "explosive", calsPerMin: 11, sets: 4, reps: "12-15" },
+    { name: "Box Jump", type: "explosive", calsPerMin: 12, sets: 4, reps: "5-6" },
+    { name: "Burpee", type: "fatloss", calsPerMin: 14, sets: 3, reps: "10-12" },
+    { name: "Clean & Jerk", type: "explosive", calsPerMin: 13, sets: 4, reps: "5-6" },
+    { name: "Front Squat", type: "strength", calsPerMin: 8, sets: 3, reps: "8-10" },
+    { name: "Romanian Deadlift", type: "strength", calsPerMin: 7, sets: 3, reps: "10-12" },
+    { name: "Pull-up", type: "strength", calsPerMin: 7, sets: 3, reps: "6-8" },
+    { name: "Dip", type: "strength", calsPerMin: 7, sets: 3, reps: "8-10" },
+    { name: "Lunge Jump", type: "explosive", calsPerMin: 11, sets: 4, reps: "8-10" },
+    { name: "Medicine Ball Slam", type: "explosive", calsPerMin: 10, sets: 4, reps: "10-12" }
+  ];
 
-    const DEFAULT_MOBILITY = ["Deep Squat Hold", "Cat-Cow Stretch", "World's Greatest Stretch"];
+  const ISOLATION_EXERCISES = [
+    { name: "Barbell Curl", type: "isolation", calsPerMin: 5, sets: 3, reps: "10-12" },
+    { name: "Triceps Extension", type: "isolation", calsPerMin: 5, sets: 3, reps: "10-12" },
+    { name: "Lateral Raise", type: "isolation", calsPerMin: 5, sets: 3, reps: "12-15" },
+    { name: "Leg Curl", type: "isolation", calsPerMin: 5, sets: 3, reps: "10-12" },
+    { name: "Leg Extension", type: "isolation", calsPerMin: 5, sets: 3, reps: "10-12" },
+    { name: "Calf Raise", type: "isolation", calsPerMin: 4, sets: 3, reps: "15-20" },
+    { name: "Face Pull", type: "isolation", calsPerMin: 5, sets: 3, reps: "12-15" },
+    { name: "Skull Crusher", type: "isolation", calsPerMin: 5, sets: 3, reps: "10-12" },
+    { name: "Hammer Curl", type: "isolation", calsPerMin: 5, sets: 3, reps: "10-12" }
+  ];
 
-    // ========== STATE ==========
-    let exercises = [];
-    let mobility = [...DEFAULT_MOBILITY];
-    let profile = { weight: 80, bf: 18, targetBf: 12 };
-    let routines = {};
-    let currentTheme = "explosive";
-    let pendingReplaceIndex = null;
+  const DEFAULT_MOBILITY = ["Deep Squat Hold", "Cat-Cow Stretch", "World's Greatest Stretch"];
 
-    // ========== STORAGE ==========
-    function saveToLocal() {
-      localStorage.setItem("ignite_data", JSON.stringify({
-        exercises: exercises,
-        mobility: mobility,
-        profile: profile,
-        routines: routines
-      }));
+  // GLOBAL VARIABLES
+  let currentExercises = [];
+  let mobilityList = [...DEFAULT_MOBILITY];
+  let profile = { weight: 80, bf: 18, targetBf: 12 };
+  let savedRoutines = {};
+  let currentTheme = "explosive";
+  let pendingReplaceIndex = null;
+
+  // SHOW TOAST MESSAGE
+  function showToast(msg) {
+    const toast = document.getElementById("toast");
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2000);
+  }
+
+  // GENERATE WORKOUT - ALWAYS 5 EXERCISES (4 COMPOUND + 1 ISOLATION)
+  function generateWorkout() {
+    console.log("Generating workout with theme:", currentTheme);
+    
+    // Filter compounds based on theme
+    let availableCompounds = [...COMPOUND_EXERCISES];
+    
+    if (currentTheme === "explosive") {
+      availableCompounds = COMPOUND_EXERCISES.filter(e => e.type === "explosive" || e.type === "fatloss");
+    } else if (currentTheme === "fatloss") {
+      availableCompounds = COMPOUND_EXERCISES.filter(e => e.type === "fatloss" || e.type === "explosive");
     }
-
-    function loadFromLocal() {
-      const data = localStorage.getItem("ignite_data");
-      if (data) {
-        try {
-          const p = JSON.parse(data);
-          if (p.exercises && p.exercises.length === 5) exercises = p.exercises;
-          if (p.mobility && p.mobility.length === 3) mobility = p.mobility;
-          if (p.profile) profile = p.profile;
-          if (p.routines) routines = p.routines;
-        } catch(e) { console.log("Parse error", e); }
-      }
+    
+    // Make sure we have enough
+    if (availableCompounds.length < 4) {
+      availableCompounds = [...COMPOUND_EXERCISES];
     }
-
-    // ========== GENERATE WORKOUT (ALWAYS 5 EXERCISES) ==========
-    function generateWorkout() {
-      console.log("Generating workout with theme:", currentTheme);
-      
-      // Filter compound exercises based on theme
-      let compoundPool = [];
-      const isolationPool = EXERCISE_DB.filter(e => e.type === "isolation");
-      
-      if (currentTheme === "explosive") {
-        compoundPool = EXERCISE_DB.filter(e => e.compound && (e.type === "explosive" || e.type === "fatloss"));
-      } else if (currentTheme === "fatloss") {
-        compoundPool = EXERCISE_DB.filter(e => e.compound && (e.type === "fatloss" || e.type === "explosive"));
-      } else {
-        compoundPool = EXERCISE_DB.filter(e => e.compound);
-      }
-      
-      // Fallback if not enough
-      if (compoundPool.length < 4) {
-        compoundPool = EXERCISE_DB.filter(e => e.compound);
-      }
-      
-      // Shuffle compound pool
-      for (let i = compoundPool.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [compoundPool[i], compoundPool[j]] = [compoundPool[j], compoundPool[i]];
-      }
-      
-      // Pick 4 unique compounds
-      const compounds = compoundPool.slice(0, 4);
-      
-      // Pick 1 isolation
-      const isolation = isolationPool[Math.floor(Math.random() * isolationPool.length)];
-      
-      // Build workout
-      exercises = compounds.map(ex => ({ ...ex }));
-      exercises.push({ ...isolation });
-      
-      saveToLocal();
-      renderWorkout();
-      updateStats();
-      showToast(`🔥 ${currentTheme.toUpperCase()} workout ready!`, 1500);
+    
+    // Shuffle
+    for (let i = availableCompounds.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [availableCompounds[i], availableCompounds[j]] = [availableCompounds[j], availableCompounds[i]];
     }
+    
+    // Pick 4 compounds
+    const compounds = availableCompounds.slice(0, 4);
+    
+    // Pick 1 isolation
+    const isolation = ISOLATION_EXERCISES[Math.floor(Math.random() * ISOLATION_EXERCISES.length)];
+    
+    // Build workout
+    currentExercises = [...compounds, isolation];
+    
+    // Save to localStorage
+    localStorage.setItem("ignite_workout", JSON.stringify(currentExercises));
+    
+    // Update UI
+    renderWorkout();
+    updateStats();
+    showToast(`🔥 ${currentTheme.toUpperCase()} workout generated!`);
+  }
 
-    // ========== REPLACE FUNCTIONS ==========
-    function replaceExercise(index, newExercise) {
-      if (index >= 0 && index < exercises.length) {
-        exercises[index] = { ...newExercise };
-        saveToLocal();
-        renderWorkout();
-        updateStats();
-        showToast(`Replaced with ${newExercise.name}`, 1200);
-      }
+  // RENDER WORKOUT LIST
+  function renderWorkout() {
+    const container = document.getElementById("exerciseList");
+    if (!container) return;
+    
+    if (!currentExercises || currentExercises.length === 0) {
+      container.innerHTML = '<div class="text-muted" style="text-align: center; padding: 20px;">Click "Generate New" to start</div>';
+      return;
     }
-
-    function autoReplaceExercise(index) {
-      const current = exercises[index];
-      let pool = [];
-      
-      if (current.type === "isolation") {
-        pool = EXERCISE_DB.filter(e => e.type === "isolation" && e.name !== current.name);
-      } else {
-        pool = EXERCISE_DB.filter(e => e.compound && e.name !== current.name);
-      }
-      
-      if (pool.length === 0) pool = EXERCISE_DB.filter(e => e.name !== current.name);
-      
-      const randomEx = pool[Math.floor(Math.random() * pool.length)];
-      replaceExercise(index, randomEx);
-    }
-
-    // ========== RENDER WORKOUT ==========
-    function renderWorkout() {
-      const container = document.getElementById("exerciseList");
-      if (!container) return;
-      
-      if (!exercises || exercises.length === 0) {
-        container.innerHTML = '<div class="text-muted" style="text-align: center; padding: 20px;">Click "Generate New" to start</div>';
-        return;
-      }
-      
-      container.innerHTML = exercises.map((ex, idx) => `
+    
+    let html = "";
+    for (let i = 0; i < currentExercises.length; i++) {
+      const ex = currentExercises[i];
+      const isCompound = i < 4;
+      html += `
         <div class="ex-item">
           <div class="ex-info">
             <div class="ex-name">${ex.name}</div>
             <div class="ex-meta">
               <span>${ex.sets} sets × ${ex.reps} reps</span>
-              <span class="tag">${ex.type.toUpperCase()} ${ex.compound ? '⚡' : '🎯'}</span>
+              <span class="tag">${ex.type.toUpperCase()} ${isCompound ? '⚡ COMPOUND' : '🎯 ISOLATION'}</span>
               <span>🔥 ~${ex.calsPerMin * 4} kcal</span>
             </div>
           </div>
           <div class="btn-group">
-            <button class="btn btn-sm auto-replace" data-index="${idx}">🤖 Auto</button>
-            <button class="btn btn-sm manual-replace" data-index="${idx}">🔄 Swap</button>
+            <button class="btn btn-sm auto-replace" data-index="${i}">🤖 Auto</button>
+            <button class="btn btn-sm manual-replace" data-index="${i}">🔄 Swap</button>
           </div>
         </div>
-      `).join("");
-      
-      // Attach auto-replace events
-      document.querySelectorAll(".auto-replace").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const idx = parseInt(btn.dataset.index);
-          autoReplaceExercise(idx);
-        });
+      `;
+    }
+    
+    container.innerHTML = html;
+    
+    // Auto-replace buttons
+    document.querySelectorAll(".auto-replace").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const idx = parseInt(btn.dataset.index);
+        autoReplaceExercise(idx);
       });
-      
-      // Attach manual swap events
-      document.querySelectorAll(".manual-replace").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const idx = parseInt(btn.dataset.index);
-          pendingReplaceIndex = idx;
-          renderDbList("");
-          document.getElementById("dbModal").classList.add("active");
-        });
+    });
+    
+    // Manual swap buttons
+    document.querySelectorAll(".manual-replace").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const idx = parseInt(btn.dataset.index);
+        pendingReplaceIndex = idx;
+        openDatabaseModal();
       });
-    }
+    });
+  }
 
-    // ========== RENDER MOBILITY ==========
-    function renderMobility() {
-      const container = document.getElementById("mobilityList");
-      if (!container) return;
-      
-      container.innerHTML = mobility.map((item, idx) => `
-        <div class="ex-item">
-          <div class="ex-info">
-            <div class="ex-name">🧘 ${item}</div>
-          </div>
-          <div class="btn-group">
-            <button class="btn btn-sm remove-mobility" data-idx="${idx}">✖️</button>
-          </div>
-        </div>
-      `).join("");
-      
-      document.querySelectorAll(".remove-mobility").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const idx = parseInt(btn.dataset.idx);
-          mobility.splice(idx, 1);
-          saveToLocal();
-          renderMobility();
-          showToast("Mobility removed");
-        });
-      });
+  // AUTO REPLACE EXERCISE
+  function autoReplaceExercise(index) {
+    const current = currentExercises[index];
+    let pool = [];
+    
+    if (index === 4) {
+      // Isolation slot
+      pool = ISOLATION_EXERCISES.filter(e => e.name !== current.name);
+    } else {
+      // Compound slot
+      pool = COMPOUND_EXERCISES.filter(e => e.name !== current.name);
     }
-
-    function addMobility() {
-      const name = prompt("Enter mobility/stretch name:");
-      if (name && name.trim()) {
-        mobility.push(name.trim());
-        saveToLocal();
-        renderMobility();
-        showToast(`Added: ${name}`);
-      }
+    
+    if (pool.length === 0) {
+      showToast("No replacement found");
+      return;
     }
+    
+    const newEx = pool[Math.floor(Math.random() * pool.length)];
+    currentExercises[index] = { ...newEx };
+    localStorage.setItem("ignite_workout", JSON.stringify(currentExercises));
+    renderWorkout();
+    updateStats();
+    showToast(`Replaced with ${newEx.name}`);
+  }
 
-    function addCustomExercise() {
-      const input = document.getElementById("customExInput");
-      const name = input.value.trim();
-      if (!name) return;
-      
-      const newEx = {
-        name: name,
-        type: "strength",
-        compound: true,
-        calsPerMin: 7,
-        sets: 3,
-        reps: "8-10"
-      };
-      
-      exercises.push(newEx);
-      if (exercises.length > 5) exercises.shift();
-      saveToLocal();
-      renderWorkout();
-      updateStats();
-      input.value = "";
-      showToast(`Added: ${name}`);
-    }
-
-    // ========== DATABASE MODAL ==========
-    function renderDbList(filter = "") {
-      const container = document.getElementById("dbList");
-      const filtered = EXERCISE_DB.filter(ex => 
-        ex.name.toLowerCase().includes(filter.toLowerCase())
-      );
-      
-      container.innerHTML = filtered.map(ex => `
-        <div class="ex-item" data-ex='${JSON.stringify(ex)}'>
+  // MANUAL REPLACE (from database)
+  function openDatabaseModal() {
+    renderDatabaseList("");
+    document.getElementById("dbModal").classList.add("active");
+  }
+  
+  function renderDatabaseList(filter) {
+    const container = document.getElementById("dbList");
+    const allExercises = [...COMPOUND_EXERCISES, ...ISOLATION_EXERCISES];
+    const filtered = allExercises.filter(ex => 
+      ex.name.toLowerCase().includes(filter.toLowerCase())
+    );
+    
+    let html = "";
+    for (const ex of filtered) {
+      html += `
+        <div class="ex-item" data-ex-name="${ex.name}">
           <div class="ex-info">
             <div class="ex-name">${ex.name}</div>
-            <div class="ex-meta">${ex.type} · ${ex.compound ? 'Compound' : 'Isolation'} · 🔥 ${ex.calsPerMin} cal/min</div>
+            <div class="ex-meta">${ex.type} · 🔥 ${ex.calsPerMin} cal/min · ${ex.sets}×${ex.reps}</div>
           </div>
           <button class="btn btn-primary btn-sm select-exercise">Select</button>
         </div>
-      `).join("");
-      
-      document.querySelectorAll(".select-exercise").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const exData = JSON.parse(btn.closest(".ex-item").dataset.ex);
-          if (pendingReplaceIndex !== null) {
-            replaceExercise(pendingReplaceIndex, exData);
-            pendingReplaceIndex = null;
-            document.getElementById("dbModal").classList.remove("active");
-          }
-        });
+      `;
+    }
+    container.innerHTML = html;
+    
+    document.querySelectorAll(".select-exercise").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const exDiv = btn.closest(".ex-item");
+        const exName = exDiv.dataset.exName;
+        const allEx = [...COMPOUND_EXERCISES, ...ISOLATION_EXERCISES];
+        const selected = allEx.find(e => e.name === exName);
+        
+        if (selected && pendingReplaceIndex !== null) {
+          currentExercises[pendingReplaceIndex] = { ...selected };
+          localStorage.setItem("ignite_workout", JSON.stringify(currentExercises));
+          renderWorkout();
+          updateStats();
+          showToast(`Replaced with ${selected.name}`);
+          pendingReplaceIndex = null;
+          document.getElementById("dbModal").classList.remove("active");
+        }
       });
-      
-      const searchInput = document.getElementById("dbSearch");
-      if (searchInput) {
-        searchInput.oninput = (e) => renderDbList(e.target.value);
-      }
-    }
+    });
+  }
 
-    // ========== STATS ==========
-    function updateStats() {
-      if (!exercises.length) return;
-      
-      const explosiveCount = exercises.filter(e => e.type === "explosive").length;
-      const score = Math.min(100, 40 + (explosiveCount * 12));
-      document.getElementById("explosiveScore").innerText = score;
-      
-      const totalCals = exercises.reduce((sum, ex) => sum + (ex.calsPerMin * 4), 0);
-      document.getElementById("calorieEstimate").innerText = `~${totalCals}`;
-      
-      const currentBf = profile.bf;
-      const target = profile.targetBf;
-      const startBf = Math.max(target + 12, currentBf);
-      const progress = Math.min(100, Math.max(0, ((startBf - currentBf) / (startBf - target)) * 100));
-      document.getElementById("fatPercent").innerHTML = `${currentBf}%`;
-      document.getElementById("fatFill").style.width = `${progress}%`;
-      
-      document.getElementById("weightInput").value = profile.weight;
-      document.getElementById("bfInput").value = profile.bf;
-      document.getElementById("targetBfInput").value = profile.targetBf;
+  // RENDER MOBILITY
+  function renderMobility() {
+    const container = document.getElementById("mobilityList");
+    if (!container) return;
+    
+    let html = "";
+    for (let i = 0; i < mobilityList.length; i++) {
+      html += `
+        <div class="ex-item">
+          <div class="ex-info">
+            <div class="ex-name">🧘 ${mobilityList[i]}</div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-sm remove-mobility" data-idx="${i}">✖️</button>
+          </div>
+        </div>
+      `;
+    }
+    container.innerHTML = html;
+    
+    document.querySelectorAll(".remove-mobility").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const idx = parseInt(btn.dataset.idx);
+        mobilityList.splice(idx, 1);
+        localStorage.setItem("ignite_mobility", JSON.stringify(mobilityList));
+        renderMobility();
+        showToast("Mobility removed");
+      });
+    });
+  }
+
+  function addMobility() {
+    const name = prompt("Enter mobility/stretch name:");
+    if (name && name.trim()) {
+      mobilityList.push(name.trim());
+      localStorage.setItem("ignite_mobility", JSON.stringify(mobilityList));
+      renderMobility();
+      showToast(`Added: ${name}`);
+    }
+  }
+
+  // ADD CUSTOM EXERCISE
+  function addCustomExercise() {
+    const input = document.getElementById("customExInput");
+    const name = input.value.trim();
+    if (!name) return;
+    
+    const newEx = {
+      name: name,
+      type: "strength",
+      calsPerMin: 7,
+      sets: 3,
+      reps: "8-10"
+    };
+    
+    currentExercises.push(newEx);
+    if (currentExercises.length > 5) currentExercises.shift();
+    localStorage.setItem("ignite_workout", JSON.stringify(currentExercises));
+    renderWorkout();
+    updateStats();
+    input.value = "";
+    showToast(`Added: ${name}`);
+  }
+
+  // UPDATE STATS
+  function updateStats() {
+    if (!currentExercises.length) return;
+    
+    const explosiveCount = currentExercises.filter(e => e.type === "explosive").length;
+    const score = Math.min(100, 40 + (explosiveCount * 12));
+    document.getElementById("explosiveScore").innerText = score;
+    
+    const totalCals = currentExercises.reduce((sum, ex) => sum + (ex.calsPerMin * 4), 0);
+    document.getElementById("calorieEstimate").innerText = `~${totalCals}`;
+    
+    document.getElementById("fatPercent").innerHTML = `${profile.bf}%`;
+    const progress = Math.min(100, Math.max(0, ((profile.bf - profile.targetBf) / profile.bf) * 100));
+    document.getElementById("fatFill").style.width = `${progress}%`;
+    
+    document.getElementById("weightInput").value = profile.weight;
+    document.getElementById("bfInput").value = profile.bf;
+    document.getElementById("targetBfInput").value = profile.targetBf;
+  }
+
+  function updateMetrics() {
+    const w = parseFloat(document.getElementById("weightInput").value);
+    const bf = parseFloat(document.getElementById("bfInput").value);
+    const target = parseFloat(document.getElementById("targetBfInput").value);
+    if (!isNaN(w)) profile.weight = w;
+    if (!isNaN(bf)) profile.bf = bf;
+    if (!isNaN(target)) profile.targetBf = target;
+    localStorage.setItem("ignite_profile", JSON.stringify(profile));
+    updateStats();
+    showToast("Metrics updated");
+  }
+
+  // SAVE/LOAD ROUTINES
+  function saveRoutine() {
+    if (!currentExercises.length) {
+      showToast("No workout to save");
+      return;
+    }
+    const name = prompt("Name this routine:");
+    if (name) {
+      savedRoutines[name] = JSON.parse(JSON.stringify(currentExercises));
+      localStorage.setItem("ignite_routines", JSON.stringify(savedRoutines));
+      renderSavedRoutines();
+      showToast(`Saved "${name}"`);
+    }
+  }
+  
+  function renderSavedRoutines() {
+    const container = document.getElementById("savedRoutinesList");
+    const names = Object.keys(savedRoutines);
+    if (names.length === 0) {
+      container.innerHTML = "<div class='text-muted'>No saved routines</div>";
+      return;
     }
     
-    function updateMetrics() {
-      const w = parseFloat(document.getElementById("weightInput").value);
-      const bf = parseFloat(document.getElementById("bfInput").value);
-      const target = parseFloat(document.getElementById("targetBfInput").value);
-      if (!isNaN(w)) profile.weight = w;
-      if (!isNaN(bf)) profile.bf = bf;
-      if (!isNaN(target)) profile.targetBf = target;
-      saveToLocal();
-      updateStats();
-      showToast("Metrics updated");
-    }
-
-    // ========== ROUTINES ==========
-    function saveRoutine() {
-      if (!exercises.length) {
-        showToast("No workout to save");
-        return;
-      }
-      const name = prompt("Name this routine:", `Routine ${Object.keys(routines).length + 1}`);
-      if (name) {
-        routines[name] = JSON.parse(JSON.stringify(exercises));
-        saveToLocal();
-        renderSavedRoutines();
-        showToast(`Saved "${name}"`);
-      }
-    }
-    
-    function renderSavedRoutines() {
-      const container = document.getElementById("savedRoutinesList");
-      const names = Object.keys(routines);
-      if (names.length === 0) {
-        container.innerHTML = "<div class='text-muted'>No saved routines</div>";
-        return;
-      }
-      container.innerHTML = names.map(name => `
+    let html = "";
+    for (const name of names) {
+      html += `
         <div class="flex-between" style="margin-bottom: 8px;">
           <span style="font-size:12px">📁 ${name}</span>
           <div class="btn-group">
@@ -717,150 +724,158 @@
             <button class="btn btn-sm btn-danger del-routine" data-name="${name}">Del</button>
           </div>
         </div>
-      `).join("");
-      
-      document.querySelectorAll(".load-routine").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const name = btn.dataset.name;
-          exercises = JSON.parse(JSON.stringify(routines[name]));
-          saveToLocal();
-          renderWorkout();
-          updateStats();
-          showToast(`Loaded "${name}"`);
-        });
-      });
-      document.querySelectorAll(".del-routine").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const name = btn.dataset.name;
-          delete routines[name];
-          saveToLocal();
-          renderSavedRoutines();
-          showToast(`Deleted "${name}"`);
-        });
-      });
+      `;
     }
+    container.innerHTML = html;
+    
+    document.querySelectorAll(".load-routine").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const name = btn.dataset.name;
+        currentExercises = JSON.parse(JSON.stringify(savedRoutines[name]));
+        localStorage.setItem("ignite_workout", JSON.stringify(currentExercises));
+        renderWorkout();
+        updateStats();
+        showToast(`Loaded "${name}"`);
+      });
+    });
+    
+    document.querySelectorAll(".del-routine").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const name = btn.dataset.name;
+        delete savedRoutines[name];
+        localStorage.setItem("ignite_routines", JSON.stringify(savedRoutines));
+        renderSavedRoutines();
+        showToast(`Deleted "${name}"`);
+      });
+    });
+  }
 
-    // ========== WORKOUT RUNNER ==========
-    let currentExIdx = 0;
-    let currentSetNum = 1;
-    let runnerDiv = null;
-    
-    function startWorkout() {
-      if (!exercises.length) {
-        showToast("No exercises! Generate first.");
-        return;
-      }
-      currentExIdx = 0;
-      currentSetNum = 1;
-      showRunner();
+  // WORKOUT RUNNER
+  let runnerActive = false;
+  let runnerExIdx = 0;
+  let runnerSetNum = 1;
+  
+  function startWorkout() {
+    if (!currentExercises.length) {
+      showToast("No exercises! Generate first.");
+      return;
     }
+    runnerExIdx = 0;
+    runnerSetNum = 1;
+    showRunner();
+  }
+  
+  function showRunner() {
+    const ex = currentExercises[runnerExIdx];
+    if (!ex) return;
     
-    function showRunner() {
-      if (runnerDiv) runnerDiv.remove();
-      
-      const ex = exercises[currentExIdx];
-      if (!ex) return;
-      
-      runnerDiv = document.createElement("div");
-      runnerDiv.id = "runnerPanel";
-      runnerDiv.style.cssText = "position: fixed; bottom: 0; left: 0; right: 0; background: #12161c; border-top: 3px solid #ff6b35; padding: 24px; z-index: 2000; max-height: 80vh; overflow-y: auto;";
-      runnerDiv.innerHTML = `
+    const runnerHTML = `
+      <div style="position: fixed; bottom: 0; left: 0; right: 0; background: #12161c; border-top: 3px solid #ff6b35; padding: 24px; z-index: 2000; max-height: 80vh; overflow-y: auto;">
         <div class="flex-between" style="margin-bottom: 20px;">
-          <h3>🏋️ WORKOUT IN PROGRESS</h3>
-          <button class="btn" id="closeRunnerBtn">Close</button>
+          <h3>🏋️ WORKOUT</h3>
+          <button class="btn" id="closeRunner">Close</button>
         </div>
         <div style="text-align: center; margin-bottom: 24px;">
           <div style="font-size: 26px; font-weight: 800;">${ex.name}</div>
           <div class="text-muted">${ex.type.toUpperCase()} · ${ex.sets} sets × ${ex.reps} reps</div>
         </div>
         <div class="flex-between" style="margin: 16px 0;">
-          <span>Set ${currentSetNum} / ${ex.sets}</span>
+          <span>Set ${runnerSetNum} / ${ex.sets}</span>
           <span>⚡ Rest 45s between sets</span>
         </div>
-        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-          <button class="btn btn-primary" id="completeSetBtn">✅ Complete Set</button>
-          <button class="btn" id="nextExBtn">➡️ Next Exercise</button>
-          <button class="btn" id="prevExBtn">⬅️ Previous</button>
+        <div style="display: flex; gap: 12px; justify-content: center;">
+          <button class="btn btn-primary" id="completeSet">✅ Complete Set</button>
+          <button class="btn" id="nextEx">➡️ Next</button>
+          <button class="btn" id="prevEx">⬅️ Prev</button>
         </div>
-        <div class="text-muted" style="margin-top: 20px; text-align: center;">Complete all sets to move to next exercise</div>
-      `;
-      document.body.appendChild(runnerDiv);
-      
-      document.getElementById("closeRunnerBtn")?.addEventListener("click", () => {
-        runnerDiv.remove();
-        runnerDiv = null;
-      });
-      
-      document.getElementById("completeSetBtn")?.addEventListener("click", () => {
-        if (currentSetNum < ex.sets) {
-          currentSetNum++;
-          showToast(`Set ${currentSetNum-1} done! Rest 45s`);
+      </div>
+    `;
+    
+    let existing = document.getElementById("runnerPanel");
+    if (existing) existing.remove();
+    
+    const div = document.createElement("div");
+    div.id = "runnerPanel";
+    div.innerHTML = runnerHTML;
+    document.body.appendChild(div);
+    
+    document.getElementById("closeRunner")?.addEventListener("click", () => div.remove());
+    
+    document.getElementById("completeSet")?.addEventListener("click", () => {
+      if (runnerSetNum < ex.sets) {
+        runnerSetNum++;
+        showToast(`Set ${runnerSetNum-1} done!`);
+        showRunner();
+      } else {
+        if (runnerExIdx + 1 < currentExercises.length) {
+          runnerExIdx++;
+          runnerSetNum = 1;
+          showToast(`Next: ${currentExercises[runnerExIdx].name}`);
           showRunner();
         } else {
-          if (currentExIdx + 1 < exercises.length) {
-            currentExIdx++;
-            currentSetNum = 1;
-            showToast(`Next: ${exercises[currentExIdx].name}`);
-            showRunner();
-          } else {
-            showToast("🏆 WORKOUT COMPLETE! Amazing job.");
-            runnerDiv.remove();
-            runnerDiv = null;
-          }
+          showToast("🏆 WORKOUT COMPLETE!");
+          div.remove();
         }
-      });
-      
-      document.getElementById("nextExBtn")?.addEventListener("click", () => {
-        if (currentExIdx + 1 < exercises.length) {
-          currentExIdx++;
-          currentSetNum = 1;
-          showRunner();
-        } else showToast("Already at last exercise");
-      });
-      
-      document.getElementById("prevExBtn")?.addEventListener("click", () => {
-        if (currentExIdx > 0) {
-          currentExIdx--;
-          currentSetNum = 1;
-          showRunner();
-        } else showToast("Already at first exercise");
-      });
-    }
-
-    // ========== TOAST ==========
-    function showToast(msg, duration = 1500) {
-      const toast = document.getElementById("toast");
-      toast.innerText = msg;
-      toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), duration);
-    }
-
-    // ========== INITIALIZATION ==========
-    function init() {
-      console.log("Initializing app...");
-      
-      // Set date
-      document.getElementById("dateDisplay").innerText = new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
-      
-      // Load saved data
-      loadFromLocal();
-      
-      // Generate workout if empty
-      if (exercises.length !== 5) {
-        generateWorkout();
-      } else {
-        renderWorkout();
       }
-      
-      // Render everything
-      renderMobility();
-      updateStats();
-      renderSavedRoutines();
-      
-      // Theme buttons
-      document.querySelectorAll(".theme-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("btn-primary"));
-          btn.classList.add("btn-primary");
-          currentTheme = btn.dataset.theme;
-          generateWorkout();
+    });
+    
+    document.getElementById("nextEx")?.addEventListener("click", () => {
+      if (runnerExIdx + 1 < currentExercises.length) {
+        runnerExIdx++;
+        runnerSetNum = 1;
+        showRunner();
+      } else showToast("Last exercise");
+    });
+    
+    document.getElementById("prevEx")?.addEventListener("click", () => {
+      if (runnerExIdx > 0) {
+        runnerExIdx--;
+        runnerSetNum = 1;
+        showRunner();
+      } else showToast("First exercise");
+    });
+  }
+
+  // LOAD SAVED DATA ON PAGE LOAD
+  function loadSavedData() {
+    const savedWorkout = localStorage.getItem("ignite_workout");
+    if (savedWorkout) {
+      try {
+        currentExercises = JSON.parse(savedWorkout);
+      } catch(e) {}
+    }
+    
+    const savedMobility = localStorage.getItem("ignite_mobility");
+    if (savedMobility) {
+      try {
+        mobilityList = JSON.parse(savedMobility);
+      } catch(e) {}
+    }
+    
+    const savedProfile = localStorage.getItem("ignite_profile");
+    if (savedProfile) {
+      try {
+        profile = JSON.parse(savedProfile);
+      } catch(e) {}
+    }
+    
+    const savedRoutinesData = localStorage.getItem("ignite_routines");
+    if (savedRoutinesData) {
+      try {
+        savedRoutines = JSON.parse(savedRoutinesData);
+      } catch(e) {}
+    }
+  }
+
+  // INITIALIZE
+  function init() {
+    console.log("Initializing...");
+    
+    // Set date
+    document.getElementById("dateDisplay").innerText = new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+    
+    // Load saved data
+    loadSavedData();
+    
+    // Generate workout if empty
+    if (!currentExercises || currentExercises.length
