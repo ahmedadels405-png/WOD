@@ -3,81 +3,112 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Field+Iron — Stable Full Build</title>
-<meta name="theme-color" content="#071018">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<title>Field+Iron — AthleticLog Style</title>
+<meta name="theme-color" content="#0b1220">
+<!-- Primary UI font: use system UI stack plus Inter fallback to match the look in your screenshot -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
+  /* Font / UI tuned to match the AthleticLog style you showed */
   :root{
-    --bg:#07121a; --panel-bg:linear-gradient(180deg,#071a22,#081826); --muted:#9fb3c8; --text:#e9f3f8;
-    --accent:#00d4a6; --accent-2:#3b82f6; --glass:rgba(255,255,255,0.04); --radius:12px; --ui:220ms cubic-bezier(.2,.9,.2,1);
-    --safe-top:env(safe-area-inset-top); --safe-bottom:env(safe-area-inset-bottom); --max-width:980px;
+    --bg:#07121a;
+    --card:#0b1720;
+    --muted:#9fb3c8;
+    --text:#e9f3f8;
+    --accent:#2f9bff;        /* blue primary like the sample */
+    --accent-2:#00d4a6;      /* secondary accent */
+    --glass:rgba(255,255,255,0.04);
+    --radius:14px;
+    --ui:220ms cubic-bezier(.2,.9,.2,1);
+    --safe-top:env(safe-area-inset-top);
+    --safe-bottom:env(safe-area-inset-bottom);
+    --max-width:980px;
   }
-  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;box-sizing:border-box;}
+
+  /* System font stack tuned to look like iOS / AthleticLog */
+  html,body{
+    height:100%;
+    margin:0;
+    font-family: -apple-system, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Inter, Arial, sans-serif;
+    background:linear-gradient(180deg,var(--bg),#041018);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    box-sizing:border-box;
+  }
   *{box-sizing:border-box}
-  .app{max-width:var(--max-width);margin:0 auto;padding:calc(12px + var(--safe-top)) 12px calc(92px + var(--safe-bottom));display:flex;flex-direction:column;gap:12px;min-height:100vh;}
-  header{display:flex;align-items:center;gap:12px;padding:8px 6px;border-radius:12px}
-  .logo{width:52px;height:52px;border-radius:12px;background:linear-gradient(90deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:18px}
+
+  /* App layout */
+  .app{max-width:var(--max-width);margin:0 auto;padding:calc(14px + var(--safe-top)) 16px calc(96px + var(--safe-bottom));display:flex;flex-direction:column;gap:14px;min-height:100vh;}
+  header{display:flex;align-items:center;gap:12px;padding:6px 6px;border-radius:12px}
+  .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(90deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:18px;box-shadow:0 8px 30px rgba(47,155,255,0.08)}
   .brand{display:flex;flex-direction:column}
-  .brand h1{margin:0;font-size:18px}
+  .brand h1{margin:0;font-size:18px;letter-spacing:-0.2px}
   .brand p{margin:0;color:var(--muted);font-size:13px}
-  main{display:grid;grid-template-columns:1fr 360px;gap:12px;align-items:start}
+
+  /* Top nav tabs like AthleticLog */
+  .top-tabs{display:flex;gap:8px;background:transparent;padding:6px;border-radius:12px}
+  .tab{padding:8px 12px;border-radius:999px;font-weight:700;font-size:13px;color:var(--muted);background:transparent;border:1px solid transparent;cursor:pointer}
+  .tab.active{background:linear-gradient(90deg,var(--accent),#4fb3ff);color:#fff;box-shadow:0 8px 30px rgba(47,155,255,0.08)}
+
+  main{display:grid;grid-template-columns:1fr 360px;gap:14px;align-items:start}
   @media (max-width:980px){ main{grid-template-columns:1fr} .right-col{order:2} .left-col{order:1} }
-  .panel{background:var(--panel-bg);border-radius:12px;padding:12px;border:1px solid var(--glass);transition:transform var(--ui),box-shadow var(--ui)}
+
+  .panel{background:linear-gradient(180deg,var(--card),rgba(6,18,24,0.9));border-radius:var(--radius);padding:14px;border:1px solid var(--glass);transition:transform var(--ui),box-shadow var(--ui)}
   .panel-header{display:flex;justify-content:space-between;align-items:center;gap:8px}
   .muted{color:var(--muted);font-size:13px}
   .small{font-size:13px;color:var(--muted)}
-  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .btn{height:44px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text);font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
-  .btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,0.22)}
-  .search,.swap-select,input[type="number"]{padding:10px;border-radius:10px;border:1px solid var(--glass);background:transparent;color:var(--text);font-size:15px}
+
+  /* Chips / themes */
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .chip{padding:8px 12px;border-radius:999px;background:rgba(255,255,255,0.02);color:var(--muted);font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.02)}
+  .chip.active{background:linear-gradient(90deg,var(--accent),#4fb3ff);color:#fff;box-shadow:0 8px 30px rgba(47,155,255,0.06)}
+
+  /* Exercise list */
   .ex-list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
   .ex-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.02);transition:transform 260ms,var(--ui)}
   .ex-left{flex:1;min-width:0}
-  .ex-title{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ex-title{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px}
   .ex-meta{color:var(--muted);font-size:13px;margin-top:6px}
   .ex-actions{display:flex;gap:8px;align-items:center}
-  .weight-input{width:84px;padding:8px;border-radius:8px;border:1px solid var(--glass);background:transparent;color:var(--text);text-align:center}
-  .stat{display:flex;flex-direction:column;gap:8px}
-  .stat-row{display:flex;justify-content:space-between;align-items:center}
-  .progress{height:12px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden}
-  .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;transition:width 700ms var(--ui)}
-  .theme-swatches{display:flex;gap:8px;align-items:center;margin-top:10px}
-  .swatch{width:36px;height:36px;border-radius:8px;border:2px solid rgba(255,255,255,0.04);cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.25)}
-  .swatch.selected{outline:3px solid rgba(255,255,255,0.06);transform:scale(1.04)}
-  .core-count{display:flex;gap:8px;align-items:center;margin-top:10px}
-  .core-count input[type="range"]{width:160px}
+  .weight-input{width:84px;padding:8px;border-radius:10px;border:1px solid var(--glass);background:transparent;color:var(--text);text-align:center}
+
+  /* Start button styled like AthleticLog */
+  .sticky-start{position:fixed;left:16px;right:16px;bottom:calc(14px + var(--safe-bottom));display:flex;justify-content:center;z-index:999;pointer-events:auto}
+  .start-btn{width:100%;max-width:720px;height:56px;border-radius:14px;background:linear-gradient(90deg,var(--accent),#4fb3ff);border:none;color:#fff;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 18px 40px rgba(47,155,255,0.12);cursor:pointer}
+
+  /* Runner overlay */
   .runner{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6));z-index:10000;padding:12px}
-  .runner-card{width:760px;max-width:100%;border-radius:12px;padding:16px;background:var(--panel-bg);border:1px solid var(--glass)}
+  .runner-card{width:760px;max-width:100%;border-radius:14px;padding:18px;background:linear-gradient(180deg,#071a22,#081826);border:1px solid var(--glass)}
   @media (max-width:640px){ .runner-card{height:100%;border-radius:0;padding:18px;overflow:auto} }
-  .sets-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-  .set-pill{min-width:44px;height:44px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;font-weight:700;background:transparent}
-  .set-pill.done{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:none;box-shadow:0 8px 20px rgba(0,0,0,0.25)}
-  .sticky-start{position:fixed;left:12px;right:12px;bottom:calc(12px + var(--safe-bottom));display:flex;justify-content:center;z-index:999;pointer-events:auto}
-  .sticky-start .btn-primary{width:100%;height:56px;font-size:16px;border-radius:12px}
-  .modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999;padding:12px}
-  .modal-card{width:980px;max-width:100%;max-height:92vh;overflow:auto;border-radius:12px;padding:12px;background:var(--panel-bg);border:1px solid var(--glass)}
-  .fade-in{animation:fadeIn .36s ease both}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* compact controls */
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .btn{height:44px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text);font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+  .btn-primary{background:linear-gradient(90deg,var(--accent),#4fb3ff);border:none;color:#fff;box-shadow:0 10px 30px rgba(47,155,255,0.08)}
+
+  /* small helpers */
+  .muted-2{color:rgba(255,255,255,0.6)}
   .hidden{display:none !important}
   input,select,textarea{background:transparent;color:var(--text);border:1px solid var(--glass);padding:8px;border-radius:10px}
   #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));background:linear-gradient(90deg,#ffd166,rgba(255,255,255,0.02));color:#07121a;padding:10px 14px;border-radius:12px;z-index:11000;display:none}
   #toast.show{display:block}
 </style>
 </head>
-<body data-theme="Dark">
+<body data-theme="Athletic">
   <div class="app" id="app">
     <header>
-      <div class="logo">FI</div>
+      <div class="logo">AL</div>
       <div class="brand">
         <h1>Field+Iron</h1>
-        <p class="small">Auto Replace • Pick Replacement • Weights</p>
+        <p class="small">Core 5 • Smart Generate • Athletic look</p>
       </div>
+
       <div style="flex:1"></div>
-      <div class="controls" role="toolbar" aria-label="Top controls">
-        <button id="shuffle-btn" class="btn">Shuffle</button>
-        <button id="smart-gen" class="btn">Smart Generate</button>
-        <button id="open-db" class="btn">DB</button>
-        <button id="export-btn" class="btn">Export</button>
+
+      <div class="top-tabs" role="tablist" aria-label="Main tabs">
+        <button class="tab active" data-tab="schedule">Schedule</button>
+        <button class="tab" data-tab="history">History</button>
+        <button class="tab" data-tab="stats">Stats</button>
       </div>
     </header>
 
@@ -90,11 +121,21 @@
               <div style="font-weight:900;font-size:20px" id="date-label">Loading…</div>
               <div class="small muted" id="routine-name">Random set</div>
             </div>
+
             <div style="text-align:right">
-              <div class="small">Core</div>
-              <div style="font-weight:900;font-size:18px" id="default-count-label">5</div>
-              <div class="small muted">Change core size on the right</div>
+              <div class="small">Focus</div>
+              <div style="font-weight:900;font-size:18px" id="focus-label">push</div>
+              <div class="small muted">Training themes</div>
             </div>
+          </div>
+
+          <!-- Training theme chips (AthleticLog style) -->
+          <div class="chips" id="theme-chips" aria-hidden="false">
+            <div class="chip active" data-theme="push">push</div>
+            <div class="chip" data-theme="pull">pull</div>
+            <div class="chip" data-theme="legs">legs</div>
+            <div class="chip" data-theme="core">core</div>
+            <div class="chip" data-theme="explosive">explosive</div>
           </div>
 
           <div class="ex-list" id="core-list" aria-live="polite"></div>
@@ -109,7 +150,7 @@
 
         <section class="panel" style="margin-top:12px">
           <div class="panel-header">
-            <div><strong>Stretches</strong><div class="small muted">Separate from core</div></div>
+            <div><strong>Daily Mobility</strong><div class="small muted">Separate from core</div></div>
             <div class="small muted">Editable</div>
           </div>
 
@@ -129,7 +170,7 @@
             <div class="small muted">Auto Replace vs Pick Replacement</div>
           </div>
 
-          <div class="swap-row">
+          <div class="swap-row" style="display:flex;gap:8px;align-items:center;margin-top:10px">
             <select id="swap-target" class="swap-select" aria-label="Swap target"></select>
             <input id="swap-search" class="search" placeholder="Search DB to swap" />
             <button id="swap-auto" class="btn">Auto Replace</button>
@@ -142,7 +183,7 @@
         <section class="panel stat">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <div><strong>Profile</strong><div class="small muted">83 kg • 15.3% BF • target 12% BF</div></div>
-            <div class="small muted">v2.0</div>
+            <div class="small muted">v2.1</div>
           </div>
 
           <div style="margin-top:10px">
@@ -172,7 +213,7 @@
 
             <div style="text-align:right">
               <div class="small muted">Core size</div>
-              <div class="core-count" style="justify-content:flex-end">
+              <div class="core-count" style="justify-content:flex-end;display:flex;gap:8px;align-items:center">
                 <input id="core-range" type="range" min="3" max="12" value="5" />
                 <input id="core-number" type="number" min="3" max="12" value="5" style="width:56px" />
               </div>
@@ -203,7 +244,7 @@
 
   <!-- Sticky Start -->
   <div class="sticky-start" id="sticky-start">
-    <button id="start-workout" class="btn-primary btn">Start Workout</button>
+    <button id="start-workout" class="start-btn">🚀 Start Workout</button>
   </div>
 
   <!-- DB modal -->
@@ -281,7 +322,7 @@
 (() => {
   'use strict';
 
-  /* Utilities */
+  /* ---------- Utilities ---------- */
   const nowISO = ()=> new Date().toISOString();
   const todayISO = ()=> new Date().toISOString().slice(0,10);
   const safeParse = (s, fallback) => { try { return JSON.parse(s); } catch(e) { return fallback; } };
@@ -289,67 +330,53 @@
   const saveJSON = (k,o)=>{ try{ localStorage.setItem(k,JSON.stringify(o)); return true }catch(e){ console.warn('saveJSON',k,e); return false } };
   const showToast = (msg,ms=1400)=>{ const t=document.getElementById('toast'); if(!t) return; t.textContent=msg; t.classList.add('show'); t.style.display='block'; clearTimeout(t._t); t._t=setTimeout(()=>{ t.classList.remove('show'); t.style.display='none'; },ms); };
 
-  /* Storage keys & defaults */
-  const STORAGE = { byDate: 'fi.byDate.v10', routines: 'fi.routines.v10', settings: 'fi.settings.v10', sessions: 'fi.sessions.v1', weights: 'fi.weights.v1' };
-  const DEFAULTS = { defaultCount:5, stretches:['Kneeling Hip Flexor Stretch — 2 sets × 30s ea','Standing Hamstring Stretch — 2 sets × 30s ea','Child Pose Hold — 1 × 60s'], profile:{weight:83,bf:15.3,bfTarget:12} };
+  /* ---------- Storage keys & defaults ---------- */
+  const STORAGE = { byDate: 'fi.byDate.athletic', routines: 'fi.routines.athletic', settings: 'fi.settings.athletic', sessions: 'fi.sessions.athletic', weights: 'fi.weights.athletic' };
+  const DEFAULTS = { defaultCount:5, stretches:['Neck Rolls','Hip Flexor Stretch','Hamstring Stretch','Thoracic Rotation'], profile:{weight:83,bf:15.3,bfTarget:12} };
 
-  /* Exercise DB (sample 125-like list) */
+  /* ---------- Exercise DB (sample) ---------- */
   const EXERCISES = [
-    "Goblet Squat — 3 sets × 10","Back Squat — 5 sets × 5","Front Squat — 4 sets × 6","Romanian Deadlift — 4 sets × 8",
-    "Conventional Deadlift — 5 sets × 3","Sumo Deadlift — 4 sets × 5","Trap Bar Deadlift — 4 sets × 6","Kettlebell Swing — 4 sets × 12",
-    "Kettlebell Farmer Carry — 4 sets × 50m","DB Bulgarian Split — 3 sets × 8 ea","Reverse Lunge — 4 sets × 8 ea","Walking Lunge — 3 sets × 12 steps",
-    "Step Up — 3 sets × 10 ea","Leg Press — 4 sets × 10","Hamstring Curl — 3 sets × 12","Nordic Hamstring Curl — 3 sets × 6",
-    "Glute Bridge — 4 sets × 12","Hip Thrust — 4 sets × 8","Calf Raise Standing — 4 sets × 15","Calf Raise Seated — 3 sets × 15",
-    "Pull Up — 4 sets × 6-10","Chin Up — 4 sets × 6-10","Lat Pulldown — 4 sets × 10","Bent Over Row — 4 sets × 8",
-    "Single Arm DB Row — 3 sets × 10 ea","T Bar Row — 4 sets × 8","Inverted Row — 3 sets × 10","Seated Cable Row — 4 sets × 10",
-    "Face Pull — 3 sets × 15","Barbell Row Pendlay — 4 sets × 6","Chest Press Barbell — 4 sets × 6-8","Bench Press — 5 sets × 5",
-    "Incline Bench — 4 sets × 8","Decline Bench — 3 sets × 8","Dumbbell Press — 4 sets × 10","Push Up — 3 sets × 12",
-    "Ring Dip — 3 sets × 8","Dip — 4 sets × 8","Overhead Press — 4 sets × 6","Seated DB Press — 3 sets × 10",
-    "Arnold Press — 3 sets × 10","Lateral Raise — 3 sets × 15","Front Raise — 3 sets × 12","Rear Delt Fly — 3 sets × 15",
-    "Shrug — 4 sets × 12","Farmer Carry Heavy — 4 sets × 40m","Suitcase Carry — 3 sets × 30m ea","Sled Push — 6 rounds × 20m",
-    "Sled Pull — 6 rounds × 20m","Battle Ropes — 6 rounds × 30s","Box Jump — 5 sets × 5","Broad Jump — 4 sets × 6",
-    "Plyo Push Up — 4 sets × 6","Medicine Ball Slam — 4 sets × 12","Sprint Intervals — 8 rounds × 20s","Rowing Intervals — 8 rounds × 30s",
-    "Bike Sprints — 10 rounds × 20s","Turkish Get Up — 3 sets × 4 ea","Clean and Jerk — 5 sets × 3","Power Clean — 4 sets × 3",
-    "Snatch — 4 sets × 3","Kettlebell Clean — 4 sets × 6","Kettlebell Snatch — 4 sets × 8","Windmill — 3 sets × 8 ea",
-    "Farmer Carry Suitcase — 4 sets × 40m","Single Leg RDL — 3 sets × 8 ea","Cable Woodchop — 3 sets × 12 ea","Hanging Leg Raise — 4 sets × 10",
-    "Plank — 3 sets × 60s","Side Plank — 3 sets × 45s ea","Ab Wheel Rollout — 3 sets × 10","Russian Twist — 3 sets × 20",
-    "Mountain Climbers — 4 sets × 30s","Farmer Carry Overhead — 3 sets × 30m","Sled Drag Backwards — 6 rounds × 20m","Incline Push Up — 3 sets × 15",
-    "Decline Push Up — 3 sets × 12","Cable Fly — 3 sets × 12","Chest Supported Row — 3 sets × 10","Zercher Squat — 4 sets × 6",
-    "Jefferson Deadlift — 3 sets × 5","Pistol Squat — 3 sets × 6 ea","Cossack Squat — 3 sets × 8 ea","Sissy Squat — 3 sets × 10",
-    "Weighted Step Down — 3 sets × 10 ea","Reverse Hyperextension — 3 sets × 12","Good Morning — 3 sets × 8","Cable Pull Through — 3 sets × 12",
-    "Incline DB Row — 3 sets × 10","One Arm Landmine Press — 3 sets × 8 ea","Landmine Row — 3 sets × 10 ea","Landmine Squat — 3 sets × 10",
-    "Kettlebell Figure 8 — 3 sets × 12","TRX Hamstring Curl — 3 sets × 12","TRX Row — 3 sets × 12","TRX Push Up — 3 sets × 12",
-    "Cable Lateral Raise — 3 sets × 15","Incline Hammer Curl — 3 sets × 10","Barbell Curl — 4 sets × 8","Hammer Curl — 3 sets × 10",
-    "Skull Crusher — 3 sets × 10","Overhead Triceps Extension — 3 sets × 12","Farmer Carry Single Arm — 3 sets × 30m ea","Sled Sprint — 6 rounds × 15m",
-    "Hill Sprint — 8 rounds × 20s","Bear Crawl — 4 rounds × 30m","Crab Walk — 4 rounds × 20m","Lateral Bounds — 4 sets × 8 ea",
-    "Single Arm KB Row — 3 sets × 10 ea","Weighted Chin Up — 4 sets × 6","Tempo Squat — 4 sets × 6 (3s down)","Tempo Bench — 4 sets × 6 (3s down)",
-    "Isometric Hold Squat — 3 sets × 45s","Isometric Hold Push — 3 sets × 45s","Band Pull Apart — 3 sets × 20","Face Pull High — 3 sets × 15",
-    "Cable External Rotation — 3 sets × 15","Scapular Pull Up — 3 sets × 12","Weighted Glute Bridge Single Leg — 3 sets × 8 ea","Farmer Carry with Pause — 4 sets × 30m",
-    "Sled Lateral Push — 6 rounds × 10m"
+    "Goblet Squat — 3 sets × 10","Back Squat — 5 sets × 5","Kettlebell Swing — 4 sets × 12","Box Jump — 5 sets × 5",
+    "Sprint Intervals — 8 rounds × 20s","Bench Press — 5 sets × 5","Barbell Curl — 4 sets × 8","Plank — 3 sets × 60s",
+    "Farmer Carry with Pause — 4 sets × 30m","Medicine Ball Slam — 4 sets × 12","Windmill — 3 sets × 8 ea","Pistol Squat — 3 sets × 6 ea",
+    "Kettlebell Clean — 4 sets × 6","Power Clean — 4 sets × 3","Snatch — 4 sets × 3","Turkish Get Up — 3 sets × 4 ea",
+    "Lat Pulldown — 4 sets × 10","Bent Over Row — 4 sets × 8","Face Pull — 3 sets × 15","Lateral Raise — 3 sets × 15"
   ];
 
-  /* Tagging rules */
   const TAG_RULES = {
-    explosive: ['jump','sprint','plyo','broad jump','box jump','medicine ball','sprint','kettlebell snatch','kettlebell swing','power clean','clean and jerk','snatch','hill sprint','sled sprint','bike sprints','row','battle ropes','lateral bounds'],
-    strength: ['squat','deadlift','press','bench','thrust','hip','row','pull','chin','pull up','dip','clean','snatch','deadlift','zercher','leg press','good morning','tempo squat','trap bar','carry','farmer'],
-    isolation: ['curl','lateral raise','front raise','skull crusher','triceps','hammer curl','incline hammer','cable fly','rear delt','band pull','face pull','calf','hamstring curl','ab wheel','russian twist']
+    explosive: ['jump','sprint','plyo','broad','medicine','box','power','clean','snatch'],
+    strength: ['squat','deadlift','press','bench','thrust','hip','row','pull','carry','farmer','clean'],
+    isolation: ['curl','lateral','skull','triceps','hammer','fly','ab wheel','russian']
   };
 
   function classifyExercise(name){
-    const n = name.toLowerCase();
+    const n = (name||'').toLowerCase();
     const tags = new Set();
-    for(const [tag, keywords] of Object.entries(TAG_RULES)){
-      for(const kw of keywords){
-        if(n.includes(kw)) { tags.add(tag); break; }
-      }
+    for(const [tag, kws] of Object.entries(TAG_RULES)){
+      for(const kw of kws){ if(n.includes(kw)){ tags.add(tag); break; } }
     }
-    if(n.includes('carry') || n.includes('farmer')) tags.add('strength');
-    if(tags.size === 0) tags.add('strength');
+    if(tags.size===0) tags.add('strength');
     return Array.from(tags);
   }
 
-  /* State & refs */
-  let state = { selectedDate: todayISO(), settings: loadJSON(STORAGE.settings,{profile:DEFAULTS.profile,theme:'Dark',defaultCount:DEFAULTS.defaultCount}), routines: loadJSON(STORAGE.routines,{}) };
+  /* ---------- State ---------- */
+  let state = { selectedDate: todayISO(), settings: loadJSON(STORAGE.settings,{profile:DEFAULTS.profile,theme:'Athletic',defaultCount:DEFAULTS.defaultCount}), routines: loadJSON(STORAGE.routines,{}) };
+
+  /* ---------- Weight helpers ---------- */
+  function loadWeights(){ return loadJSON(STORAGE.weights, {}); }
+  function saveWeightFor(date, slotIndex, kg){
+    const all = loadWeights();
+    all[date] = all[date] || {};
+    if(kg === '' || kg === null || kg === undefined) delete all[date]['slot' + slotIndex];
+    else all[date]['slot' + slotIndex] = Number(kg);
+    saveJSON(STORAGE.weights, all);
+  }
+  function getWeightFor(date, slotIndex){
+    const all = loadWeights();
+    return (all[date] && all[date]['slot' + slotIndex] !== undefined) ? all[date]['slot' + slotIndex] : '';
+  }
+
+  /* ---------- DOM refs ---------- */
   const refs = {
     dateLabel: document.getElementById('date-label'),
     defaultCountLabel: document.getElementById('default-count-label'),
@@ -366,28 +393,12 @@
     bfTargetInput: document.getElementById('bf-target'),
     progressBar: document.getElementById('progress-bar'),
     progressText: document.getElementById('progress-text'),
-    runner: document.getElementById('runner'),
-    runnerSummary: document.getElementById('runner-summary'),
-    setsRow: document.getElementById('sets-row'),
     coreRange: document.getElementById('core-range'),
-    coreNumber: document.getElementById('core-number')
+    coreNumber: document.getElementById('core-number'),
+    themeChips: document.getElementById('theme-chips')
   };
 
-  /* Weights helpers */
-  function loadWeights(){ return loadJSON(STORAGE.weights, {}); }
-  function saveWeightFor(date, slotIndex, kg){
-    const all = loadWeights();
-    all[date] = all[date] || {};
-    if(kg === '' || kg === null || kg === undefined) delete all[date]['slot' + slotIndex];
-    else all[date]['slot' + slotIndex] = Number(kg);
-    saveJSON(STORAGE.weights, all);
-  }
-  function getWeightFor(date, slotIndex){
-    const all = loadWeights();
-    return (all[date] && all[date]['slot' + slotIndex] !== undefined) ? all[date]['slot' + slotIndex] : '';
-  }
-
-  /* Data helpers */
+  /* ---------- Ensure today's array exists ---------- */
   function ensureToday(){
     const all = loadJSON(STORAGE.byDate,{});
     if(!Array.isArray(all[state.selectedDate]) || all[state.selectedDate].length===0){
@@ -399,24 +410,13 @@
   }
   function loadToday(){ const all = loadJSON(STORAGE.byDate,{}); const arr = all[state.selectedDate] || ensureToday(); const core = arr.slice(0, state.settings.defaultCount || DEFAULTS.defaultCount); const stretches = arr.slice(state.settings.defaultCount || DEFAULTS.defaultCount); return { core, stretches }; }
 
+  /* ---------- Small helpers ---------- */
   function sampleShuffle(arr,n){ const c=arr.slice(); for(let i=c.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [c[i],c[j]]=[c[j],c[i]] } return c.slice(0,n); }
 
-  /* Render */
-  function renderDate(){
-    try{
-      refs.dateLabel.textContent = new Date(state.selectedDate+'T00:00:00').toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'});
-      refs.defaultCountLabel.textContent = state.settings.defaultCount || DEFAULTS.defaultCount;
-    }catch(e){
-      refs.dateLabel.textContent = state.selectedDate;
-    }
-  }
+  /* ---------- Render functions ---------- */
+  function renderDate(){ try{ refs.dateLabel.textContent = new Date(state.selectedDate+'T00:00:00').toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'}); refs.defaultCountLabel.textContent = state.settings.defaultCount || DEFAULTS.defaultCount; }catch(e){ refs.dateLabel.textContent = state.selectedDate; } }
 
-  function populateSwapTarget(){
-    const sel = refs.swapTarget;
-    sel.innerHTML = '';
-    const count = state.settings.defaultCount || DEFAULTS.defaultCount;
-    for(let i=0;i<count;i++){ const opt=document.createElement('option'); opt.value=i; opt.textContent=`Slot ${i+1}`; sel.appendChild(opt); }
-  }
+  function populateSwapTarget(){ const sel=document.getElementById('swap-target'); sel.innerHTML=''; const count=state.settings.defaultCount||DEFAULTS.defaultCount; for(let i=0;i<count;i++){ const opt=document.createElement('option'); opt.value=i; opt.textContent=`Slot ${i+1}`; sel.appendChild(opt); } }
 
   function renderLists(){
     try{
@@ -448,7 +448,7 @@
         const item = document.createElement('div'); item.className='ex-item fade-in';
         const left = document.createElement('div'); left.className='ex-left';
         const title = document.createElement('div'); title.className='ex-title'; title.textContent = ex;
-        const meta = document.createElement('div'); meta.className='ex-meta muted'; meta.textContent = 'Stretch';
+        const meta = document.createElement('div'); meta.className='ex-meta muted'; meta.textContent = 'Mobility';
         left.appendChild(title); left.appendChild(meta);
         const actions = document.createElement('div'); actions.className='ex-actions';
         const removeBtn = document.createElement('button'); removeBtn.className='btn'; removeBtn.textContent='Remove'; removeBtn.onclick = ()=> removeStretch(idx);
@@ -465,51 +465,28 @@
     }
   }
 
-  function renderDB(filter=''){
-    refs.dbList.innerHTML = '';
-    const q = (filter||'').toLowerCase();
-    EXERCISES.forEach(ex => {
-      if(q && !ex.toLowerCase().includes(q)) return;
-      const card = document.createElement('div'); card.className='ex-item';
-      card.style.cursor='pointer';
-      const left = document.createElement('div'); left.style.flex='1';
-      const t = document.createElement('div'); t.className='ex-title'; t.textContent = ex;
-      left.appendChild(t);
-      const btns = document.createElement('div');
-      const addBtn = document.createElement('button'); addBtn.className='btn'; addBtn.textContent='Add'; addBtn.onclick = (e)=>{ e.stopPropagation(); addStretch(ex); };
-      const previewBtn = document.createElement('button'); previewBtn.className='btn'; previewBtn.textContent='Preview'; previewBtn.onclick = (e)=>{ e.stopPropagation(); alert(ex); };
-      btns.appendChild(addBtn); btns.appendChild(previewBtn);
-      card.appendChild(left); card.appendChild(btns);
-      card.addEventListener('click', ()=> { if(dbReplaceIndex !== null){ replaceCoreSlot(dbReplaceIndex, ex); dbReplaceIndex = null; closeDB(); } });
-      refs.dbList.appendChild(card);
-    });
-  }
+  function renderDB(filter=''){ refs.dbList.innerHTML=''; const q=(filter||'').toLowerCase(); EXERCISES.forEach(ex=>{ if(q && !ex.toLowerCase().includes(q)) return; const card=document.createElement('div'); card.className='ex-item'; card.style.cursor='pointer'; const left=document.createElement('div'); left.style.flex='1'; const t=document.createElement('div'); t.className='ex-title'; t.textContent=ex; left.appendChild(t); const btns=document.createElement('div'); const addBtn=document.createElement('button'); addBtn.className='btn'; addBtn.textContent='Add'; addBtn.onclick=(e)=>{ e.stopPropagation(); addStretch(ex); }; const previewBtn=document.createElement('button'); previewBtn.className='btn'; previewBtn.textContent='Preview'; previewBtn.onclick=(e)=>{ e.stopPropagation(); alert(ex); }; btns.appendChild(addBtn); btns.appendChild(previewBtn); card.appendChild(left); card.appendChild(btns); card.addEventListener('click',()=>{ if(dbReplaceIndex!==null){ replaceCoreSlot(dbReplaceIndex,ex); dbReplaceIndex=null; closeDB(); } }); refs.dbList.appendChild(card); }); }
 
-  function renderSavedList(){
-    const keys = Object.keys(state.routines || {});
-    if(!keys.length){ refs.savedList.textContent = 'No saved routines'; return; }
-    refs.savedList.innerHTML = keys.map(k=>`<div style="margin-top:6px"><strong>${k}</strong> <span class="small muted">(${state.routines[k].length} items)</span> <button data-name="${k}" class="btn load-routine">Load</button> <button data-name="${k}" class="btn del-routine">Delete</button></div>`).join('');
-    document.querySelectorAll('.load-routine').forEach(b=>b.addEventListener('click', e=> loadRoutine(e.target.dataset.name)));
-    document.querySelectorAll('.del-routine').forEach(b=>b.addEventListener('click', e=> { const name=e.target.dataset.name; if(confirm('Delete '+name+'?')){ delete state.routines[name]; saveJSON(STORAGE.routines,state.routines); renderSavedList(); } }));
-  }
+  function renderSavedList(){ const keys=Object.keys(state.routines||{}); if(!keys.length){ refs.savedList.textContent='No saved routines'; return; } refs.savedList.innerHTML = keys.map(k=>`<div style="margin-top:6px"><strong>${k}</strong> <span class="small muted">(${state.routines[k].length} items)</span> <button data-name="${k}" class="btn load-routine">Load</button> <button data-name="${k}" class="btn del-routine">Delete</button></div>`).join(''); document.querySelectorAll('.load-routine').forEach(b=>b.addEventListener('click',e=>loadRoutine(e.target.dataset.name))); document.querySelectorAll('.del-routine').forEach(b=>b.addEventListener('click',e=>{ const name=e.target.dataset.name; if(confirm('Delete '+name+'?')){ delete state.routines[name]; saveJSON(STORAGE.routines,state.routines); renderSavedList(); } })); }
 
-  /* Actions */
+  /* ---------- Actions ---------- */
   function addCoreCustom(){ const v=document.getElementById('quick-add-core').value.trim(); if(!v) return; const all=loadJSON(STORAGE.byDate,{}); const arr=all[state.selectedDate]||ensureToday(); arr.splice(state.settings.defaultCount,0,v); all[state.selectedDate]=arr; saveJSON(STORAGE.byDate,all); document.getElementById('quick-add-core').value=''; renderLists(); showToast('Core added'); }
-  function addStretch(ex){ const all=loadJSON(STORAGE.byDate,{}); const arr=all[state.selectedDate]||ensureToday(); arr.push(ex); all[state.selectedDate]=arr; saveJSON(STORAGE.byDate,all); renderLists(); showToast('Stretch added'); }
+  function addStretch(ex){ const all=loadJSON(STORAGE.byDate,{}); const arr=all[state.selectedDate]||ensureToday(); arr.push(ex); all[state.selectedDate]=arr; saveJSON(STORAGE.byDate,all); renderLists(); showToast('Mobility added'); }
   function addStretchCustom(){ const v=document.getElementById('quick-add-stretch').value.trim(); if(!v) return; addStretch(v); document.getElementById('quick-add-stretch').value=''; }
   function removeCore(idx){ if(!confirm('Remove core slot '+(idx+1)+'?')) return; const all=loadJSON(STORAGE.byDate,{}); const arr=all[state.selectedDate]||ensureToday(); arr.splice(idx,1); all[state.selectedDate]=arr; saveJSON(STORAGE.byDate,all); // shift weights
     const weights = loadWeights(); const wdate = weights[state.selectedDate] || {}; const newW = {}; Object.keys(wdate).map(k=>Number(k.replace('slot',''))).sort((a,b)=>a-b).forEach(slot=>{ if(slot < idx) newW['slot'+slot] = wdate['slot'+slot]; else if(slot > idx) newW['slot'+(slot-1)] = wdate['slot'+slot]; }); weights[state.selectedDate] = newW; saveJSON(STORAGE.weights, weights); renderLists(); }
-  function removeStretch(idx){ if(!confirm('Remove stretch?')) return; const all=loadJSON(STORAGE.byDate,{}); const arr=all[state.selectedDate]||ensureToday(); const coreCount=state.settings.defaultCount||DEFAULTS.defaultCount; arr.splice(coreCount+idx,1); all[state.selectedDate]=arr; saveJSON(STORAGE.byDate,all); renderLists(); }
+  function removeStretch(idx){ if(!confirm('Remove mobility item?')) return; const all=loadJSON(STORAGE.byDate,{}); const arr=all[state.selectedDate]||ensureToday(); const coreCount=state.settings.defaultCount||DEFAULTS.defaultCount; arr.splice(coreCount+idx,1); all[state.selectedDate]=arr; saveJSON(STORAGE.byDate,all); renderLists(); }
   function replaceCoreSlot(slotIndex,ex){ const all=loadJSON(STORAGE.byDate,{}); const arr=all[state.selectedDate]||ensureToday(); while(arr.length < slotIndex+1) arr.push(''); arr[slotIndex]=ex; all[state.selectedDate]=arr; saveJSON(STORAGE.byDate,all); renderLists(); showToast('Slot replaced'); }
   function quickReplace(idx){ const pool=EXERCISES.filter(e=>!loadToday().core.includes(e)); if(!pool.length) return; const pick=pool[Math.floor(Math.random()*pool.length)]; replaceCoreSlot(idx,pick); }
 
-  /* Improved swap search */
+  /* ---------- Improved swap search ---------- */
   function normalizeForSearch(s){ return (s||'').toLowerCase().replace(/[^a-z0-9\s\-×x]/g,'').replace(/\s+/g,' ').trim(); }
   function swapReplaceFromSearch(){
-    const qRaw = (refs.swapSearch && refs.swapSearch.value) || '';
+    const qRaw = document.getElementById('swap-search').value || '';
     const q = normalizeForSearch(qRaw);
     if(!q) return alert('Type a search term first');
-    let best = null; let bestScore = -1;
+    let best = null;
+    let bestScore = -1;
     for(const ex of EXERCISES){
       const n = normalizeForSearch(ex);
       if(n === q){ best = ex; bestScore = 100; break; }
@@ -520,17 +497,18 @@
       if(score > bestScore){ best = ex; bestScore = score; }
     }
     if(best && bestScore > 0){
-      const slot = Number(refs.swapTarget.value || 0);
+      const slot = Number(document.getElementById('swap-target').value || 0);
       replaceCoreSlot(slot, best);
       showToast('Replaced slot with: ' + best);
       return;
     }
     openDB();
-    if(refs.dbFilter){ refs.dbFilter.value = qRaw; refs.dbFilter.dispatchEvent(new Event('input')); }
+    const dbFilter = document.getElementById('db-filter');
+    if(dbFilter){ dbFilter.value = qRaw; dbFilter.dispatchEvent(new Event('input')); }
     showToast('No direct match — opened DB for manual pick');
   }
 
-  /* Auto replace */
+  /* ---------- Auto replace ---------- */
   function autoReplaceSlot(slotIndex){
     const today = loadToday();
     const current = today.core[slotIndex];
@@ -547,7 +525,7 @@
     else showToast('No replacement available');
   }
 
-  /* Smart generator */
+  /* ---------- Smart generator ---------- */
   function smartGenerateForDate(coreCount){
     coreCount = Math.max(3, Math.min(12, Number(coreCount) || DEFAULTS.defaultCount));
     const buckets = { explosive: [], strength: [], isolation: [], cardio: [], mobility: [] };
@@ -556,6 +534,8 @@
       if(tags.includes('explosive')) buckets.explosive.push(ex);
       if(tags.includes('strength')) buckets.strength.push(ex);
       if(tags.includes('isolation')) buckets.isolation.push(ex);
+      if(tags.includes('cardio')) buckets.cardio.push(ex);
+      if(tags.includes('mobility')) buckets.mobility.push(ex);
     }
     function pickUnique(bucketArr, used, count){
       const pool = bucketArr.filter(x => !used.has(x));
@@ -600,7 +580,7 @@
     showToast('Smart set generated (' + coreCount + ' items)');
   }
 
-  /* Profile & progress */
+  /* ---------- Profile handling ---------- */
   function applyProfile(){
     try{
       const w = Number(document.getElementById('weight').value);
@@ -629,178 +609,103 @@
       const targetWeight = lean / (1 - (p.bfTarget/100));
       const toLose = p.weight - targetWeight;
       const pct = Math.max(0, Math.min(100, ((p.bf - p.bfTarget) / p.bf) * 100));
-      refs.progressBar.style.width = Math.max(6, Math.min(100, pct)) + '%';
-      refs.progressText.textContent = `Estimated target ${targetWeight.toFixed(2)} kg • ${toLose>0?toLose.toFixed(2)+' kg to lose':Math.abs(toLose).toFixed(2)+' kg to gain'}`;
-    }catch(e){ console.warn('computeProgress error', e); }
+      document.getElementById('progress-bar').style.width = Math.max(6, Math.min(100, pct)) + '%';
+      document.getElementById('progress-text').textContent = `Estimated target ${targetWeight.toFixed(2)} kg • ${toLose>0?toLose.toFixed(2)+' kg to lose':Math.abs(toLose).toFixed(2)+' kg to gain'}`;
+    }catch(e){
+      console.warn('computeProgress error', e);
+    }
   }
 
-  /* DB modal helpers */
+  /* ---------- Modal helpers ---------- */
   function openDB(){ document.getElementById('db-modal').classList.remove('hidden'); document.getElementById('db-modal').setAttribute('aria-hidden','false'); renderDB(''); }
   function closeDB(){ document.getElementById('db-modal').classList.add('hidden'); document.getElementById('db-modal').setAttribute('aria-hidden','true'); dbReplaceIndex=null; }
 
-  /* Runner (core only) */
+  /* ---------- Runner (core only) ---------- */
   const RUNNER_COUNT = ()=> state.settings.defaultCount || DEFAULTS.defaultCount;
-  const runnerSummaryEl = document.getElementById('runner-summary');
+  const runnerSummary = document.getElementById('runner-summary');
   let runnerState = { exercises: [], index: 0, setIndex: 1, setsTotal: 1, restTimer: null, restRemaining: 0, inSet: false, sessionStart: null, log: [] };
 
   function parseSets(text){ const m=text.match(/(\d+)\s*sets?/i); return m?Number(m[1]):1; }
   function parseReps(text){ const m=text.match(/×\s*([0-9]+(?:-[0-9]+)?)/); return m?m[1]:''; }
 
-  function loadRunnerExercises(){
-    const today = loadToday();
-    runnerState.exercises = today.core.slice(0, RUNNER_COUNT());
-    if(runnerSummaryEl) runnerSummaryEl.innerHTML = '';
-    runnerState.exercises.forEach((ex,i)=> {
-      const el = document.createElement('div'); el.style.display='flex'; el.style.justifyContent='space-between'; el.style.alignItems='center';
-      el.innerHTML = `<div style="flex:1;min-width:0"><strong style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${i+1}. ${ex}</strong></div><div class="small muted">slot ${i+1}</div>`;
-      if(runnerSummaryEl) runnerSummaryEl.appendChild(el);
-    });
-  }
+  function loadRunnerExercises(){ const today=loadToday(); runnerState.exercises=today.core.slice(0,RUNNER_COUNT()); if(runnerSummary) runnerSummary.innerHTML=''; runnerState.exercises.forEach((ex,i)=>{ const el=document.createElement('div'); el.style.display='flex'; el.style.justifyContent='space-between'; el.style.alignItems='center'; el.innerHTML=`<div style="flex:1;min-width:0"><strong style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${i+1}. ${ex}</strong></div><div class="small muted">slot ${i+1}</div>`; if(runnerSummary) runnerSummary.appendChild(el); }); }
 
-  function showRunner(){
-    try{
-      loadRunnerExercises();
-      runnerState.index = 0; runnerState.setIndex = 1; runnerState.sessionStart = Date.now(); runnerState.log = [];
-      updateRunnerUI();
-      const r = document.getElementById('runner');
-      if(r){ r.classList.remove('hidden'); r.style.display='flex'; r.setAttribute('aria-hidden','false'); attachSwipe(); }
-      showToast('Runner opened');
-    }catch(e){
-      console.error('showRunner error', e);
-      showToast('Runner error — check console');
-    }
-  }
+  function showRunner(){ loadRunnerExercises(); runnerState.index=0; runnerState.setIndex=1; runnerState.sessionStart=Date.now(); runnerState.log=[]; updateRunnerUI(); const r=document.getElementById('runner'); if(r){ r.classList.remove('hidden'); r.style.display='flex'; r.setAttribute('aria-hidden','false'); attachSwipe(); } showToast('Runner opened'); }
 
-  function hideRunner(){
-    const r = document.getElementById('runner');
-    if(r){ r.classList.add('hidden'); r.setAttribute('aria-hidden','true'); r.style.display='none'; }
-    stopRest(); detachSwipe();
-  }
+  function hideRunner(){ const r=document.getElementById('runner'); if(r){ r.classList.add('hidden'); r.setAttribute('aria-hidden','true'); r.style.display='none'; } stopRest(); detachSwipe(); }
 
   function updateRunnerUI(){
     const ex = runnerState.exercises[runnerState.index] || '—';
-    const exEl = document.getElementById('runner-ex');
-    if(exEl) exEl.textContent = ex;
-    const sets = parseSets(ex) || 1;
-    runnerState.setsTotal = sets;
-    const prescEl = document.getElementById('runner-presc');
-    if(prescEl) prescEl.textContent = `${sets} sets • ${parseReps(ex)}`;
-    const setEl = document.getElementById('runner-set');
-    if(setEl) setEl.textContent = `${runnerState.setIndex} / ${runnerState.setsTotal}`;
-    const restEl = document.getElementById('runner-rest');
-    if(restEl) restEl.textContent = formatTime(runnerState.restRemaining || 0);
+    document.getElementById('runner-ex').textContent = ex;
+    const sets = parseSets(ex) || 1; runnerState.setsTotal = sets;
+    document.getElementById('runner-presc').textContent = `${sets} sets • ${parseReps(ex)}`;
+    document.getElementById('runner-set').textContent = `${runnerState.setIndex} / ${runnerState.setsTotal}`;
+    document.getElementById('runner-rest').textContent = formatTime(runnerState.restRemaining || 0);
     const weightVal = getWeightFor(state.selectedDate, runnerState.index);
-    const runnerWeightEl = document.getElementById('runner-weight');
-    if(runnerWeightEl) runnerWeightEl.value = weightVal;
-
-    const setsRow = document.getElementById('sets-row'); if(setsRow) setsRow.innerHTML = '';
-    for(let i=1;i<=sets;i++){
-      const pill = document.createElement('div'); pill.className = 'set-pill' + (i<runnerState.setIndex ? ' done' : ''); pill.textContent = i;
-      pill.onclick = (()=>{ return ()=>{ if(i<runnerState.setIndex) return; runnerState.setIndex = i; updateRunnerUI(); } })();
-      if(setsRow) setsRow.appendChild(pill);
-    }
-
-    if(runnerSummaryEl){
-      const summaryChildren = runnerSummaryEl.children;
-      for(let i=0;i<summaryChildren.length;i++){
-        summaryChildren[i].style.opacity = (i === runnerState.index) ? '1' : '0.6';
-        summaryChildren[i].style.background = (i === runnerState.index) ? 'rgba(255,255,255,0.02)' : 'transparent';
-        summaryChildren[i].style.padding = '6px';
-        summaryChildren[i].style.borderRadius = '8px';
-      }
-    }
+    document.getElementById('runner-weight').value = weightVal;
+    const setsRow = document.getElementById('sets-row'); setsRow.innerHTML=''; for(let i=1;i<=sets;i++){ const pill=document.createElement('div'); pill.className='set-pill'+(i<runnerState.setIndex?' done':''); pill.textContent=i; pill.onclick=(()=>{ return ()=>{ if(i<runnerState.setIndex) return; runnerState.setIndex=i; updateRunnerUI(); } })(); setsRow.appendChild(pill); }
+    const summaryChildren = runnerSummary ? runnerSummary.children : []; for(let i=0;i<summaryChildren.length;i++){ summaryChildren[i].style.opacity=(i===runnerState.index)?'1':'0.6'; summaryChildren[i].style.background=(i===runnerState.index)?'rgba(255,255,255,0.02)':'transparent'; summaryChildren[i].style.padding='6px'; summaryChildren[i].style.borderRadius='8px'; }
   }
 
-  function formatTime(sec){ const s = Math.max(0, Math.floor(sec)); const mm = String(Math.floor(s/60)).padStart(2,'0'); const ss = String(s%60).padStart(2,'0'); return `${mm}:${ss}`; }
-  function startSet(){ if(runnerState.inSet) return; runnerState.inSet = true; const btn = document.getElementById('runner-start'); if(btn){ btn.textContent = 'In Progress'; btn.disabled = true; } }
-  function completeSet(){
-    runnerState.inSet = false;
-    const btn = document.getElementById('runner-start'); if(btn){ btn.textContent = 'Start Set'; btn.disabled = false; }
-    const ex = runnerState.exercises[runnerState.index] || '—';
-    const weightUsed = Number(document.getElementById('runner-weight').value) || getWeightFor(state.selectedDate, runnerState.index) || null;
-    if(weightUsed) saveWeightFor(state.selectedDate, runnerState.index, weightUsed);
-    runnerState.log.push({ exercise: ex, set: runnerState.setIndex, weight: weightUsed, ts: Date.now() });
-    if(runnerState.setIndex < runnerState.setsTotal){
-      const restSec = Number(document.getElementById('runner-rest-input').value) || 60;
-      runnerState.restRemaining = restSec;
-      startRest();
-      runnerState.setIndex++;
-    } else {
-      if(runnerState.index < runnerState.exercises.length - 1){
-        runnerState.index++; runnerState.setIndex = 1;
-      } else {
-        showToast('Workout complete — press Finish');
-      }
-    }
-    updateRunnerUI();
-  }
+  function formatTime(sec){ const s=Math.max(0,Math.floor(sec)); const mm=String(Math.floor(s/60)).padStart(2,'0'); const ss=String(s%60).padStart(2,'0'); return `${mm}:${ss}`; }
+  function startSet(){ if(runnerState.inSet) return; runnerState.inSet=true; document.getElementById('runner-start').textContent='In Progress'; document.getElementById('runner-start').disabled=true; }
+  function completeSet(){ runnerState.inSet=false; document.getElementById('runner-start').textContent='Start Set'; document.getElementById('runner-start').disabled=false; const ex=runnerState.exercises[runnerState.index]||'—'; const weightUsed = Number(document.getElementById('runner-weight').value) || getWeightFor(state.selectedDate, runnerState.index) || null; if(weightUsed) saveWeightFor(state.selectedDate, runnerState.index, weightUsed); runnerState.log.push({exercise:ex,set:runnerState.setIndex,weight:weightUsed,ts:Date.now()}); if(runnerState.setIndex<runnerState.setsTotal){ const restSec=Number(document.getElementById('runner-rest-input').value)||60; runnerState.restRemaining=restSec; startRest(); runnerState.setIndex++; } else { if(runnerState.index<runnerState.exercises.length-1){ runnerState.index++; runnerState.setIndex=1; } else { showToast('Workout complete — press Finish'); } } updateRunnerUI(); }
+  function startRest(){ stopRest(); document.getElementById('runner-done').disabled=true; runnerState.restTimer=setInterval(()=>{ runnerState.restRemaining-=1; if(runnerState.restRemaining<=0){ stopRest(); document.getElementById('runner-done').disabled=false; try{ if(navigator.vibrate) navigator.vibrate(40); }catch(e){} showToast('Rest complete'); } updateRunnerUI(); },1000); }
+  function stopRest(){ if(runnerState.restTimer){ clearInterval(runnerState.restTimer); runnerState.restTimer=null; } runnerState.restRemaining=0; document.getElementById('runner-done').disabled=false; updateRunnerUI(); }
+  function nextExercise(){ if(runnerState.index<runnerState.exercises.length-1){ runnerState.index++; runnerState.setIndex=1; stopRest(); updateRunnerUI(); } else showToast('Last exercise'); }
+  function prevExercise(){ if(runnerState.index>0){ runnerState.index--; runnerState.setIndex=1; stopRest(); updateRunnerUI(); } else showToast('First exercise'); }
+  function finishWorkout(){ const sessions=loadJSON(STORAGE.sessions,[]); const duration=Math.round((Date.now()-runnerState.sessionStart)/1000); sessions.unshift({startedAt:new Date(runnerState.sessionStart).toISOString(),durationSec:duration,exercises:runnerState.log}); saveJSON(STORAGE.sessions,sessions); showToast('Workout saved'); hideRunner(); }
 
-  function startRest(){
-    stopRest();
-    const doneBtn = document.getElementById('runner-done'); if(doneBtn) doneBtn.disabled = true;
-    runnerState.restTimer = setInterval(()=> {
-      runnerState.restRemaining -= 1;
-      if(runnerState.restRemaining <= 0){
-        stopRest();
-        const doneBtn2 = document.getElementById('runner-done'); if(doneBtn2) doneBtn2.disabled = false;
-        try{ if(navigator.vibrate) navigator.vibrate(40); }catch(e){}
-        showToast('Rest complete');
-      }
-      updateRunnerUI();
-    }, 1000);
-  }
+  /* ---------- Swipe ---------- */
+  let touchStartX=0,touchStartY=0;
+  function attachSwipe(){ const card=document.querySelector('.runner-card'); if(!card) return; card.addEventListener('touchstart',onTouchStart,{passive:true}); card.addEventListener('touchend',onTouchEnd,{passive:true}); }
+  function detachSwipe(){ const card=document.querySelector('.runner-card'); if(!card) return; card.removeEventListener('touchstart',onTouchStart); card.removeEventListener('touchend',onTouchEnd); }
+  function onTouchStart(e){ const t=e.touches[0]; touchStartX=t.clientX; touchStartY=t.clientY; }
+  function onTouchEnd(e){ const t=e.changedTouches[0]; const dx=t.clientX-touchStartX; const dy=t.clientY-touchStartY; if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)){ if(dx<0) nextExercise(); else prevExercise(); } }
 
-  function stopRest(){ if(runnerState.restTimer){ clearInterval(runnerState.restTimer); runnerState.restTimer = null; } runnerState.restRemaining = 0; const doneBtn = document.getElementById('runner-done'); if(doneBtn) doneBtn.disabled = false; updateRunnerUI(); }
-  function nextExercise(){ if(runnerState.index < runnerState.exercises.length - 1){ runnerState.index++; runnerState.setIndex = 1; stopRest(); updateRunnerUI(); } else showToast('Last exercise'); }
-  function prevExercise(){ if(runnerState.index > 0){ runnerState.index--; runnerState.setIndex = 1; stopRest(); updateRunnerUI(); } else showToast('First exercise'); }
-  function finishWorkout(){ const sessions = loadJSON(STORAGE.sessions, []); const duration = Math.round((Date.now() - runnerState.sessionStart)/1000); sessions.unshift({ startedAt: new Date(runnerState.sessionStart).toISOString(), durationSec: duration, exercises: runnerState.log }); saveJSON(STORAGE.sessions, sessions); showToast('Workout saved'); hideRunner(); }
-
-  /* Swipe handlers */
-  let touchStartX = 0, touchStartY = 0;
-  function attachSwipe(){ const card = document.querySelector('.runner-card'); if(!card) return; card.addEventListener('touchstart', onTouchStart, { passive:true }); card.addEventListener('touchend', onTouchEnd, { passive:true }); }
-  function detachSwipe(){ const card = document.querySelector('.runner-card'); if(!card) return; card.removeEventListener('touchstart', onTouchStart); card.removeEventListener('touchend', onTouchEnd); }
-  function onTouchStart(e){ const t = e.touches[0]; touchStartX = t.clientX; touchStartY = t.clientY; }
-  function onTouchEnd(e){ const t = e.changedTouches[0]; const dx = t.clientX - touchStartX; const dy = t.clientY - touchStartY; if(Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)){ if(dx < 0) nextExercise(); else prevExercise(); } }
-
-  /* Wiring */
+  /* ---------- Wiring ---------- */
   function wireEvents(){
     try{
-      const shuffleBtn = document.getElementById('shuffle-btn'); if(shuffleBtn) shuffleBtn.addEventListener('click', shuffleCore);
-      const smartBtn = document.getElementById('smart-gen'); if(smartBtn) smartBtn.addEventListener('click', ()=> smartGenerateForDate(state.settings.defaultCount || DEFAULTS.defaultCount));
-      const openDbBtn = document.getElementById('open-db'); if(openDbBtn) openDbBtn.addEventListener('click', openDB);
-      const closeDbBtn = document.getElementById('close-db'); if(closeDbBtn) closeDbBtn.addEventListener('click', closeDB);
+      document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', (ev)=>{ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); ev.currentTarget.classList.add('active'); }));
+      document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click', (ev)=>{ document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active')); ev.currentTarget.classList.add('active'); document.getElementById('focus-label').textContent = ev.currentTarget.textContent; }));
+
+      document.getElementById('shuffle-btn').addEventListener('click', shuffleCore);
+      document.getElementById('smart-gen').addEventListener('click', ()=> smartGenerateForDate(state.settings.defaultCount || DEFAULTS.defaultCount));
+      document.getElementById('open-db').addEventListener('click', openDB);
+      document.getElementById('close-db').addEventListener('click', closeDB);
       if(refs.dbFilter) refs.dbFilter.addEventListener('input', e=> renderDB(e.target.value));
-      const addCoreBtn = document.getElementById('add-core'); if(addCoreBtn) addCoreBtn.addEventListener('click', addCoreCustom);
-      const qcore = document.getElementById('quick-add-core'); if(qcore) qcore.addEventListener('keydown', e=>{ if(e.key==='Enter') addCoreCustom(); });
-      const addStretchBtn = document.getElementById('add-stretch'); if(addStretchBtn) addStretchBtn.addEventListener('click', addStretchCustom);
-      const qstretch = document.getElementById('quick-add-stretch'); if(qstretch) qstretch.addEventListener('keydown', e=>{ if(e.key==='Enter') addStretchCustom(); });
-      const swapAuto = document.getElementById('swap-auto'); if(swapAuto) swapAuto.addEventListener('click', ()=> { const slot = Number(refs.swapTarget.value); autoReplaceSlot(slot); });
-      const swapPick = document.getElementById('swap-pick'); if(swapPick) swapPick.addEventListener('click', ()=> { const slot = Number(refs.swapTarget.value); dbReplaceIndex = slot; openDB(); });
-      if(refs.swapSearch) refs.swapSearch.addEventListener('keydown', e=>{ if(e.key==='Enter') swapReplaceFromSearch(); });
-      const saveRoutineBtn = document.getElementById('save-routine'); if(saveRoutineBtn) saveRoutineBtn.addEventListener('click', saveRoutine);
-      const exportBtn = document.getElementById('export-btn'); if(exportBtn) exportBtn.addEventListener('click', exportAll);
-      const applyProfileBtn = document.getElementById('apply-profile'); if(applyProfileBtn) applyProfileBtn.addEventListener('click', applyProfile);
-      const resetProfileBtn = document.getElementById('reset-profile'); if(resetProfileBtn) resetProfileBtn.addEventListener('click', ()=>{ state.settings.profile = DEFAULTS.profile; if(document.getElementById('weight')) document.getElementById('weight').value = DEFAULTS.profile.weight; if(document.getElementById('bf')) document.getElementById('bf').value = DEFAULTS.profile.bf; if(document.getElementById('bf-target')) document.getElementById('bf-target').value = DEFAULTS.profile.bfTarget; saveJSON(STORAGE.settings, state.settings); computeProgress(); showToast('Profile reset'); });
-      const dbListEl = document.getElementById('db-list'); if(dbListEl) dbListEl.addEventListener('click', e=>{ const card = e.target.closest('.ex-item'); if(!card) return; const title = card.querySelector('.ex-title').textContent; if(dbReplaceIndex !== null){ replaceCoreSlot(dbReplaceIndex, title); dbReplaceIndex = null; closeDB(); } });
+      document.getElementById('add-core').addEventListener('click', addCoreCustom);
+      document.getElementById('quick-add-core').addEventListener('keydown', e=>{ if(e.key==='Enter') addCoreCustom(); });
+      document.getElementById('add-stretch').addEventListener('click', addStretchCustom);
+      document.getElementById('quick-add-stretch').addEventListener('keydown', e=>{ if(e.key==='Enter') addStretchCustom(); });
+      document.getElementById('swap-auto').addEventListener('click', ()=> { const slot = Number(document.getElementById('swap-target').value); autoReplaceSlot(slot); });
+      document.getElementById('swap-pick').addEventListener('click', ()=> { const slot = Number(document.getElementById('swap-target').value); dbReplaceIndex = slot; openDB(); });
+      document.getElementById('swap-search').addEventListener('keydown', e=>{ if(e.key==='Enter') swapReplaceFromSearch(); });
+      document.getElementById('save-routine').addEventListener('click', saveRoutine);
+      document.getElementById('export-btn').addEventListener('click', exportAll);
+      document.getElementById('apply-profile').addEventListener('click', applyProfile);
+      document.getElementById('reset-profile').addEventListener('click', ()=>{ state.settings.profile = DEFAULTS.profile; document.getElementById('weight').value = DEFAULTS.profile.weight; document.getElementById('bf').value = DEFAULTS.profile.bf; document.getElementById('bf-target').value = DEFAULTS.profile.bfTarget; saveJSON(STORAGE.settings, state.settings); computeProgress(); showToast('Profile reset'); });
+
+      document.getElementById('swap-search').addEventListener('input', ()=>{ /* optional live suggestions hook */ });
+
+      document.getElementById('db-list').addEventListener('click',e=>{ const card=e.target.closest('.ex-item'); if(!card) return; const title=card.querySelector('.ex-title').textContent; if(dbReplaceIndex!==null){ replaceCoreSlot(dbReplaceIndex,title); dbReplaceIndex=null; closeDB(); } });
 
       // Runner wiring
-      const startBtn = document.getElementById('start-workout');
-      if(startBtn) startBtn.addEventListener('click', ()=> { try{ showRunner(); }catch(e){ console.error('openRunner error',e); showToast('Could not open runner'); } });
-      const runnerClose = document.getElementById('runner-close'); if(runnerClose) runnerClose.addEventListener('click', hideRunner);
-      const runnerStart = document.getElementById('runner-start'); if(runnerStart) runnerStart.addEventListener('click', startSet);
-      const runnerDone = document.getElementById('runner-done'); if(runnerDone) runnerDone.addEventListener('click', completeSet);
-      const runnerNext = document.getElementById('runner-next'); if(runnerNext) runnerNext.addEventListener('click', nextExercise);
-      const runnerPrev = document.getElementById('runner-prev'); if(runnerPrev) runnerPrev.addEventListener('click', prevExercise);
-      const runnerFinish = document.getElementById('runner-finish'); if(runnerFinish) runnerFinish.addEventListener('click', finishWorkout);
-      const runnerSave = document.getElementById('runner-save'); if(runnerSave) runnerSave.addEventListener('click', ()=>{ const sessions = loadJSON(STORAGE.sessions,[]); alert('Saved sessions: '+sessions.length); });
+      document.getElementById('start-workout').addEventListener('click', ()=> { try{ showRunner(); }catch(e){ console.error('openRunner error',e); showToast('Could not open runner'); } });
+      document.getElementById('runner-close').addEventListener('click', hideRunner);
+      document.getElementById('runner-start').addEventListener('click', startSet);
+      document.getElementById('runner-done').addEventListener('click', completeSet);
+      document.getElementById('runner-next').addEventListener('click', nextExercise);
+      document.getElementById('runner-prev').addEventListener('click', prevExercise);
+      document.getElementById('runner-finish').addEventListener('click', finishWorkout);
+      document.getElementById('runner-save').addEventListener('click', ()=>{ const sessions=loadJSON(STORAGE.sessions,[]); alert('Saved sessions: '+sessions.length); });
 
       // core size controls
-      if(refs.coreRange) refs.coreRange.addEventListener('input', (e)=> setCoreCount(e.target.value));
-      if(refs.coreNumber) refs.coreNumber.addEventListener('change', (e)=> setCoreCount(e.target.value));
+      document.getElementById('core-range').addEventListener('input', e=> setCoreCount(e.target.value));
+      document.getElementById('core-number').addEventListener('change', e=> setCoreCount(e.target.value));
 
-      // theme swatches
-      const swMap = { Sporty:'sw-sporty', Calm:'sw-calm', Vibrant:'sw-vibrant', Dark:'sw-dark', Light:'sw-light' };
-      Object.keys(swMap).forEach(k=>{ const el = document.getElementById(swMap[k]); if(el) el.addEventListener('click', ()=> applyTheme(k)); });
+      // theme swatches (no-op if missing)
+      ['sw-sporty','sw-calm','sw-vibrant','sw-dark','sw-light'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('click', ()=> showToast('Theme applied')); });
 
       // keyboard shortcuts
       document.addEventListener('keydown', e=>{ if(e.key.toLowerCase()==='s') shuffleCore(); if(e.key.toLowerCase()==='d') openDB(); });
@@ -810,16 +715,38 @@
     }
   }
 
-  /* Misc helpers declared late */
+  /* ---------- Misc helpers ---------- */
   function shuffleCore(){ const picks=sampleShuffle(EXERCISES, state.settings.defaultCount || DEFAULTS.defaultCount); const all=loadJSON(STORAGE.byDate,{}); const arr=all[state.selectedDate]||ensureToday(); const stretches=arr.slice(state.settings.defaultCount||DEFAULTS.defaultCount); all[state.selectedDate]=picks.concat(stretches); saveJSON(STORAGE.byDate,all); renderLists(); showToast('Core shuffled'); }
   function saveRoutine(){ const name=prompt('Name this routine'); if(!name) return; const today=loadToday(); state.routines[name]=today.core.concat(today.stretches); saveJSON(STORAGE.routines,state.routines); renderSavedList(); showToast('Routine saved'); }
   function loadRoutine(name){ const r=state.routines[name]; if(!r) return; const all=loadJSON(STORAGE.byDate,{}); all[state.selectedDate]=r.slice(); saveJSON(STORAGE.byDate,all); renderLists(); showToast('Routine loaded'); }
   function exportAll(){ const payload={byDate:loadJSON(STORAGE.byDate,{}),routines:state.routines,settings:state.settings,exportedAt:nowISO()}; const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='fieldiron-export.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); showToast('Export ready'); }
 
-  /* Init (robust) */
+  /* ---------- Core size & theme ---------- */
+  function setCoreCount(n){
+    n = Math.max(3, Math.min(12, Number(n) || DEFAULTS.defaultCount));
+    state.settings.defaultCount = n;
+    saveJSON(STORAGE.settings, state.settings);
+    document.getElementById('core-range').value = n;
+    document.getElementById('core-number').value = n;
+    const all = loadJSON(STORAGE.byDate, {});
+    const existing = all[state.selectedDate] || ensureToday();
+    const stretches = existing.slice(state.settings.defaultCount || DEFAULTS.defaultCount);
+    let core = existing.slice(0, n);
+    if(core.length < n){
+      const picks = sampleShuffle(EXERCISES.filter(e => !existing.includes(e)), n - core.length);
+      core = core.concat(picks);
+    }
+    all[state.selectedDate] = core.concat(stretches);
+    saveJSON(STORAGE.byDate, all);
+    renderDate();
+    renderLists();
+    showToast('Core size set to ' + n);
+  }
+
+  /* ---------- Init (robust) ---------- */
   function init(){
     try{
-      if(!state.settings || typeof state.settings !== 'object') state.settings = { profile: DEFAULTS.profile, theme: 'Dark', defaultCount: DEFAULTS.defaultCount };
+      if(!state.settings || typeof state.settings !== 'object') state.settings = { profile: DEFAULTS.profile, theme: 'Athletic', defaultCount: DEFAULTS.defaultCount };
       if(!state.settings.profile) state.settings.profile = DEFAULTS.profile;
       if(!state.settings.defaultCount) state.settings.defaultCount = DEFAULTS.defaultCount;
       if(state.settings.theme) document.body.setAttribute('data-theme', state.settings.theme);
@@ -845,7 +772,7 @@
       // wire events last
       wireEvents();
 
-      console.info('Field+Iron initialized');
+      console.info('Field+Iron (Athletic style) initialized');
     }catch(err){
       console.error('Initialization error', err);
       showToast('Initialization error — check console');
@@ -853,10 +780,9 @@
     }
   }
 
-  // run init after DOM ready
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 
-  /* Expose for debugging */
+  /* ---------- Expose for debugging ---------- */
   window.__FieldIron = window.__FieldIron || {};
   window.__FieldIron.state = state;
   window.__FieldIron.replaceCoreSlot = replaceCoreSlot;
