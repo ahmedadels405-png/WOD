@@ -24,7 +24,6 @@
       margin: 0 auto;
     }
 
-    /* Header */
     .header {
       display: flex;
       justify-content: space-between;
@@ -54,7 +53,6 @@
       font-weight: 500;
     }
 
-    /* Stats bar */
     .stats-row {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -77,7 +75,6 @@
       margin-top: 6px;
     }
 
-    /* Main grid */
     .main-grid {
       display: grid;
       grid-template-columns: 1fr 320px;
@@ -89,7 +86,6 @@
       }
     }
 
-    /* Cards */
     .card {
       background: rgba(18, 22, 28, 0.8);
       backdrop-filter: blur(4px);
@@ -119,7 +115,6 @@
       color: #ff8c5a;
     }
 
-    /* Exercise items */
     .ex-list {
       display: flex;
       flex-direction: column;
@@ -191,8 +186,12 @@
       background: rgba(220,53,69,0.15);
       border-color: rgba(220,53,69,0.3);
     }
+    .btn:hover {
+      transform: scale(0.97);
+      opacity: 0.9;
+    }
 
-    input, select {
+    input {
       background: rgba(0,0,0,0.4);
       border: 1px solid rgba(255,255,255,0.1);
       padding: 8px 12px;
@@ -218,14 +217,13 @@
       border-radius: 20px;
     }
 
-    /* Modal */
     .modal {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0,0,0,0.9);
+      background: rgba(0,0,0,0.95);
       backdrop-filter: blur(12px);
       display: flex;
       align-items: center;
@@ -281,7 +279,6 @@
 <body>
 <div class="container">
   
-  <!-- Header -->
   <div class="header">
     <div>
       <h1>⚡ IGNITE</h1>
@@ -290,7 +287,6 @@
     <div class="date" id="dateDisplay"></div>
   </div>
 
-  <!-- Stats -->
   <div class="stats-row">
     <div class="stat-card">
       <div class="stat-label">🔥 CALORIE BURN</div>
@@ -301,35 +297,29 @@
       <div class="stat-value" id="explosiveScore">0</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">🎯 FAT LOSS</div>
+      <div class="stat-label">🎯 BODY FAT</div>
       <div class="stat-value" id="fatPercent">0%</div>
       <div class="progress-bar"><div class="progress-fill" id="fatFill"></div></div>
     </div>
   </div>
 
-  <!-- Main Grid -->
   <div class="main-grid">
-    <!-- LEFT COLUMN -->
     <div>
-      <!-- Workout Card -->
       <div class="card">
         <div class="card-header">
-          <h2>💥 TODAY'S WORKOUT</h2>
-          <div class="badge" id="workoutBadge">Compound + Isolation</div>
+          <h2>💥 TODAY'S WORKOUT (5 EXERCISES)</h2>
+          <div class="badge" id="workoutBadge">4 Compound + 1 Isolation</div>
         </div>
         
-        <!-- Theme selector -->
         <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-          <button class="btn theme-btn active" data-theme="explosive">⚡ Explosive</button>
+          <button class="btn theme-btn" data-theme="explosive">⚡ Explosive</button>
           <button class="btn theme-btn" data-theme="fatloss">🔥 Fat Loss</button>
           <button class="btn theme-btn" data-theme="strength">💪 Strength</button>
-          <button class="btn btn-primary" id="smartGenBtn">✨ Smart Generate</button>
+          <button class="btn btn-primary" id="smartGenBtn">✨ Generate New</button>
         </div>
 
-        <!-- Exercise List (5 items) -->
         <div id="exerciseList" class="ex-list"></div>
 
-        <!-- Add custom -->
         <div class="flex-between gap-2 mt-3">
           <input type="text" id="customExInput" placeholder="Add custom exercise..." style="flex:1">
           <button class="btn" id="addCustomBtn">+ Add</button>
@@ -337,7 +327,6 @@
         </div>
       </div>
 
-      <!-- Mobility Card (3 items) -->
       <div class="card">
         <div class="card-header">
           <h2>🧘 MOBILITY (3)</h2>
@@ -347,9 +336,7 @@
       </div>
     </div>
 
-    <!-- RIGHT COLUMN -->
     <div>
-      <!-- Profile Card -->
       <div class="card">
         <div class="card-header">
           <h2>📊 BODY METRICS</h2>
@@ -358,17 +345,15 @@
           <div class="mb-2"><label class="text-muted">Weight (kg)</label><input type="number" id="weightInput" step="0.5" style="width:100%; margin-top:4px"></div>
           <div class="mb-2"><label class="text-muted">Body Fat %</label><input type="number" id="bfInput" step="0.5" style="width:100%; margin-top:4px"></div>
           <div class="mb-2"><label class="text-muted">Target BF %</label><input type="number" id="targetBfInput" step="0.5" style="width:100%; margin-top:4px"></div>
-          <button class="btn btn-primary" id="updateMetricsBtn" style="width:100%">Update Progress</button>
+          <button class="btn btn-primary" id="updateMetricsBtn" style="width:100%">Update</button>
         </div>
       </div>
 
-      <!-- Actions Card -->
       <div class="card">
         <div class="card-header">
           <h2>🎮 QUICK ACTIONS</h2>
         </div>
         <div style="display: flex; flex-direction: column; gap: 10px;">
-          <button class="btn" id="shuffleBtn">🔄 Regenerate Workout</button>
           <button class="btn btn-primary" id="startWorkoutBtn">🚀 START WORKOUT</button>
         </div>
         <div class="text-muted mt-3">📁 SAVED ROUTINES</div>
@@ -378,7 +363,6 @@
   </div>
 </div>
 
-<!-- Database Modal -->
 <div id="dbModal" class="modal">
   <div class="modal-content">
     <div class="flex-between">
@@ -390,17 +374,15 @@
   </div>
 </div>
 
-<!-- Toast -->
 <div id="toast" class="toast"></div>
 
 <script>
   (function() {
     // ========== EXERCISE DATABASE ==========
-    // Compound + Explosive + Isolation focus
     const EXERCISE_DB = [
-      // Compound / Explosive (high calorie, fat burning)
+      // Compound / Explosive (high calorie)
       { name: "Power Clean", type: "explosive", compound: true, intensity: 9, calsPerMin: 12 },
-      { name: "Thruster (Squat + Press)", type: "explosive", compound: true, intensity: 9, calsPerMin: 11 },
+      { name: "Thruster", type: "explosive", compound: true, intensity: 9, calsPerMin: 11 },
       { name: "Deadlift", type: "strength", compound: true, intensity: 8, calsPerMin: 9 },
       { name: "Back Squat", type: "strength", compound: true, intensity: 8, calsPerMin: 8 },
       { name: "Barbell Row", type: "strength", compound: true, intensity: 7, calsPerMin: 7 },
@@ -414,22 +396,25 @@
       { name: "Romanian Deadlift", type: "strength", compound: true, intensity: 7, calsPerMin: 7 },
       { name: "Pull-up", type: "strength", compound: true, intensity: 7, calsPerMin: 7 },
       { name: "Dip", type: "strength", compound: true, intensity: 7, calsPerMin: 7 },
-      // Isolation (near end of workout)
+      { name: "Lunge Jump", type: "explosive", compound: true, intensity: 8, calsPerMin: 11 },
+      { name: "Medicine Ball Slam", type: "explosive", compound: true, intensity: 8, calsPerMin: 10 },
+      // Isolation (near end)
       { name: "Barbell Curl", type: "isolation", compound: false, intensity: 5, calsPerMin: 5 },
       { name: "Triceps Extension", type: "isolation", compound: false, intensity: 5, calsPerMin: 5 },
       { name: "Lateral Raise", type: "isolation", compound: false, intensity: 5, calsPerMin: 5 },
       { name: "Leg Curl", type: "isolation", compound: false, intensity: 5, calsPerMin: 5 },
       { name: "Leg Extension", type: "isolation", compound: false, intensity: 5, calsPerMin: 5 },
       { name: "Calf Raise", type: "isolation", compound: false, intensity: 4, calsPerMin: 4 },
-      { name: "Face Pull", type: "isolation", compound: false, intensity: 5, calsPerMin: 5 }
+      { name: "Face Pull", type: "isolation", compound: false, intensity: 5, calsPerMin: 5 },
+      { name: "Skull Crusher", type: "isolation", compound: false, intensity: 5, calsPerMin: 5 }
     ];
 
     const DEFAULT_MOBILITY = ["Deep Squat Hold", "Cat-Cow Stretch", "World's Greatest Stretch"];
 
     // ========== STATE ==========
     let state = {
-      exercises: [],      // 5 exercises (4 compound + 1 isolation near end)
-      mobility: [...DEFAULT_MOBILITY],
+      exercises: [],
+      mobility: [],
       profile: { weight: 80, bf: 18, targetBf: 12 },
       routines: {},
       currentTheme: "explosive"
@@ -452,22 +437,28 @@
       if (data) {
         try {
           const p = JSON.parse(data);
-          state.exercises = p.exercises || [];
-          state.mobility = p.mobility || [...DEFAULT_MOBILITY];
-          state.profile = p.profile || { weight: 80, bf: 18, targetBf: 12 };
-          state.routines = p.routines || {};
+          if (p.exercises && p.exercises.length === 5) state.exercises = p.exercises;
+          if (p.mobility && p.mobility.length === 3) state.mobility = p.mobility;
+          if (p.profile) state.profile = p.profile;
+          if (p.routines) state.routines = p.routines;
         } catch(e) {}
       }
-      if (!state.exercises.length || state.exercises.length !== 5) {
+      // If no valid exercises, generate
+      if (state.exercises.length !== 5) {
         generateSmartWorkout();
+      }
+      if (state.mobility.length !== 3) {
+        state.mobility = [...DEFAULT_MOBILITY];
       }
     }
 
-    // ========== SMART GENERATION (5 exercises: 4 compound + 1 isolation near end) ==========
+    // ========== SMART GENERATION ==========
     function generateSmartWorkout() {
+      console.log("Generating workout with theme:", state.currentTheme);
+      
       const theme = state.currentTheme;
       
-      // Filter based on theme
+      // Filter compound exercises based on theme
       let compoundPool = [];
       let isolationPool = EXERCISE_DB.filter(e => e.type === "isolation");
       
@@ -479,30 +470,33 @@
         compoundPool = EXERCISE_DB.filter(e => e.compound);
       }
       
-      // Ensure we have enough
-      if (compoundPool.length < 4) compoundPool = EXERCISE_DB.filter(e => e.compound);
-      if (isolationPool.length === 0) isolationPool = EXERCISE_DB.filter(e => e.type === "isolation");
+      // Fallback if not enough
+      if (compoundPool.length < 4) {
+        compoundPool = EXERCISE_DB.filter(e => e.compound);
+      }
+      if (isolationPool.length === 0) {
+        isolationPool = EXERCISE_DB.filter(e => e.type === "isolation");
+      }
       
-      // Shuffle compound pool
+      // Shuffle
       for (let i = compoundPool.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [compoundPool[i], compoundPool[j]] = [compoundPool[j], compoundPool[i]];
       }
       
-      // Pick 4 unique compound exercises
+      // Pick 4 unique compounds
       const compounds = compoundPool.slice(0, 4);
       
-      // Pick 1 isolation exercise
+      // Pick 1 isolation
       const isolation = isolationPool[Math.floor(Math.random() * isolationPool.length)];
       
-      // Build workout: 4 compounds + 1 isolation at the end
+      // Build workout
       state.exercises = compounds.map(ex => ({
         ...ex,
         sets: ex.type === "explosive" ? 4 : 3,
         reps: ex.type === "explosive" ? "6-8" : "8-10"
       }));
       
-      // Add isolation as 5th exercise
       state.exercises.push({
         ...isolation,
         sets: 3,
@@ -512,7 +506,7 @@
       saveToLocal();
       renderWorkout();
       updateStats();
-      showToast(`🔥 ${theme.toUpperCase()} workout generated!`, 1500);
+      showToast(`🔥 ${theme.toUpperCase()} workout ready!`, 1500);
     }
 
     // ========== REPLACE EXERCISE ==========
@@ -530,7 +524,6 @@
       }
     }
 
-    // Auto-pick: intelligently replace based on type (keep compound/isolation balance)
     function autoReplaceExercise(index) {
       const current = state.exercises[index];
       let pool = [];
@@ -538,7 +531,6 @@
       if (current.type === "isolation") {
         pool = EXERCISE_DB.filter(e => e.type === "isolation" && e.name !== current.name);
       } else {
-        // For compound slots, prefer same theme but any compound
         pool = EXERCISE_DB.filter(e => e.compound && e.name !== current.name);
       }
       
@@ -548,10 +540,15 @@
       replaceExercise(index, randomEx);
     }
 
-    // ========== RENDER UI ==========
+    // ========== RENDER ==========
     function renderWorkout() {
       const container = document.getElementById("exerciseList");
       if (!container) return;
+      
+      if (!state.exercises || state.exercises.length === 0) {
+        container.innerHTML = '<div class="text-muted">Click "Generate New" to start</div>';
+        return;
+      }
       
       container.innerHTML = state.exercises.map((ex, idx) => `
         <div class="ex-item">
@@ -570,7 +567,6 @@
         </div>
       `).join("");
       
-      // Attach events
       document.querySelectorAll(".auto-replace").forEach(btn => {
         btn.addEventListener("click", (e) => {
           const idx = parseInt(btn.dataset.index);
@@ -663,7 +659,7 @@
         </div>
       `).join("");
       
-      document.querySelectorAll(".select-exercise").forEach((btn, i) => {
+      document.querySelectorAll(".select-exercise").forEach((btn) => {
         btn.addEventListener("click", () => {
           const exData = JSON.parse(btn.closest(".ex-item").dataset.ex);
           if (pendingReplaceIndex !== null) {
@@ -673,10 +669,17 @@
           }
         });
       });
+      
+      const searchInput = document.getElementById("dbSearch");
+      if (searchInput) {
+        searchInput.oninput = (e) => renderDbList(e.target.value);
+      }
     }
 
-    // ========== STATS & PROFILE ==========
+    // ========== STATS ==========
     function updateStats() {
+      if (!state.exercises.length) return;
+      
       const explosiveCount = state.exercises.filter(e => e.type === "explosive").length;
       const score = Math.min(100, 40 + (explosiveCount * 12));
       document.getElementById("explosiveScore").innerText = score;
@@ -710,6 +713,10 @@
 
     // ========== ROUTINES ==========
     function saveRoutine() {
+      if (!state.exercises.length) {
+        showToast("No workout to save");
+        return;
+      }
       const name = prompt("Name this routine:", `Routine ${Object.keys(state.routines).length + 1}`);
       if (name) {
         state.routines[name] = JSON.parse(JSON.stringify(state.exercises));
@@ -758,76 +765,71 @@
     }
 
     // ========== WORKOUT RUNNER ==========
-    let runnerActive = false;
     let currentExIdx = 0;
     let currentSetNum = 1;
+    let runnerDiv = null;
     
     function startWorkout() {
-      if (state.exercises.length === 0) {
+      if (!state.exercises.length) {
         showToast("No exercises! Generate first.");
         return;
       }
       currentExIdx = 0;
       currentSetNum = 1;
-      runnerActive = true;
-      updateRunnerUI();
+      showRunner();
     }
     
-    function updateRunnerUI() {
+    function showRunner() {
+      if (runnerDiv) runnerDiv.remove();
+      
       const ex = state.exercises[currentExIdx];
       if (!ex) return;
       
-      const runnerHtml = `
-        <div style="position: fixed; bottom: 0; left: 0; right: 0; background: #12161c; border-top: 2px solid #ff6b35; padding: 24px; z-index: 2000; max-height: 80vh; overflow-y: auto;">
-          <div class="flex-between" style="margin-bottom: 20px;">
-            <h3>🏋️ WORKOUT</h3>
-            <button class="btn" id="closeRunnerBtn">Close</button>
-          </div>
-          <div style="text-align: center; margin-bottom: 24px;">
-            <div style="font-size: 26px; font-weight: 800;">${ex.name}</div>
-            <div class="text-muted">${ex.type.toUpperCase()} · ${ex.sets} sets × ${ex.reps} reps</div>
-          </div>
-          <div class="flex-between" style="margin: 16px 0;">
-            <span>Set ${currentSetNum} / ${ex.sets}</span>
-            <span>⚡ Rest 45s</span>
-          </div>
-          <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-            <button class="btn btn-primary" id="completeSetBtn">✅ Complete Set</button>
-            <button class="btn" id="nextExBtn">➡️ Next Exercise</button>
-            <button class="btn" id="prevExBtn">⬅️ Prev</button>
-          </div>
-          <div class="text-muted" style="margin-top: 20px; text-align: center;">Complete all sets to advance</div>
+      runnerDiv = document.createElement("div");
+      runnerDiv.id = "runnerPanel";
+      runnerDiv.style.cssText = "position: fixed; bottom: 0; left: 0; right: 0; background: #12161c; border-top: 3px solid #ff6b35; padding: 24px; z-index: 2000; max-height: 80vh; overflow-y: auto;";
+      runnerDiv.innerHTML = `
+        <div class="flex-between" style="margin-bottom: 20px;">
+          <h3>🏋️ WORKOUT IN PROGRESS</h3>
+          <button class="btn" id="closeRunnerBtn">Close</button>
         </div>
+        <div style="text-align: center; margin-bottom: 24px;">
+          <div style="font-size: 26px; font-weight: 800;">${ex.name}</div>
+          <div class="text-muted">${ex.type.toUpperCase()} · ${ex.sets} sets × ${ex.reps} reps</div>
+        </div>
+        <div class="flex-between" style="margin: 16px 0;">
+          <span>Set ${currentSetNum} / ${ex.sets}</span>
+          <span>⚡ Rest 45s between sets</span>
+        </div>
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+          <button class="btn btn-primary" id="completeSetBtn">✅ Complete Set</button>
+          <button class="btn" id="nextExBtn">➡️ Next Exercise</button>
+          <button class="btn" id="prevExBtn">⬅️ Previous</button>
+        </div>
+        <div class="text-muted" style="margin-top: 20px; text-align: center;">Complete all sets to move to next exercise</div>
       `;
-      
-      let existing = document.getElementById("runnerPanel");
-      if (existing) existing.remove();
-      
-      const div = document.createElement("div");
-      div.id = "runnerPanel";
-      div.innerHTML = runnerHtml;
-      document.body.appendChild(div);
+      document.body.appendChild(runnerDiv);
       
       document.getElementById("closeRunnerBtn")?.addEventListener("click", () => {
-        div.remove();
-        runnerActive = false;
+        runnerDiv.remove();
+        runnerDiv = null;
       });
       
       document.getElementById("completeSetBtn")?.addEventListener("click", () => {
         if (currentSetNum < ex.sets) {
           currentSetNum++;
           showToast(`Set ${currentSetNum-1} done! Rest 45s`);
-          updateRunnerUI();
+          showRunner();
         } else {
           if (currentExIdx + 1 < state.exercises.length) {
             currentExIdx++;
             currentSetNum = 1;
             showToast(`Next: ${state.exercises[currentExIdx].name}`);
-            updateRunnerUI();
+            showRunner();
           } else {
             showToast("🏆 WORKOUT COMPLETE! Amazing job.");
-            div.remove();
-            runnerActive = false;
+            runnerDiv.remove();
+            runnerDiv = null;
           }
         }
       });
@@ -836,16 +838,16 @@
         if (currentExIdx + 1 < state.exercises.length) {
           currentExIdx++;
           currentSetNum = 1;
-          updateRunnerUI();
-        } else showToast("Last exercise");
+          showRunner();
+        } else showToast("Already at last exercise");
       });
       
       document.getElementById("prevExBtn")?.addEventListener("click", () => {
         if (currentExIdx > 0) {
           currentExIdx--;
           currentSetNum = 1;
-          updateRunnerUI();
-        } else showToast("First exercise");
+          showRunner();
+        } else showToast("Already at first exercise");
       });
     }
 
@@ -859,21 +861,21 @@
 
     // ========== INIT ==========
     function init() {
+      console.log("Initializing app...");
+      
+      // Set date
+      document.getElementById("dateDisplay").innerText = new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+      
+      // Load data
       loadFromLocal();
+      
+      // Render everything
       renderWorkout();
       renderMobility();
       updateStats();
       renderSavedRoutines();
-      document.getElementById("dateDisplay").innerText = new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
       
       // Theme buttons
       document.querySelectorAll(".theme-btn").forEach(btn => {
         btn.addEventListener("click", () => {
-          document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-          state.currentTheme = btn.dataset.theme;
-          generateSmartWorkout();
-        });
-      });
-      
-      document.getElementById("smartGenBtn").addEventListener("click", generate
+          document.querySelectorAll(".theme-btn").forEach(b =>
