@@ -3,96 +3,68 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Field+Iron — Final Build</title>
+<title>Field+Iron — Smart Selection</title>
 <meta name="theme-color" content="#071018">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  /* ---------- Visual system (font tuned to your preferred UI) ---------- */
   :root{
-    --bg:#07121a;
-    --card:#0b1720;
-    --muted:#9fb3c8;
-    --text:#e9f3f8;
-    --accent:#2f9bff;
-    --accent-2:#00d4a6;
-    --glass:rgba(255,255,255,0.04);
-    --radius:14px;
-    --ui:200ms cubic-bezier(.2,.9,.2,1);
-    --safe-top:env(safe-area-inset-top);
-    --safe-bottom:env(safe-area-inset-bottom);
-    --max-width:980px;
+    --bg:#07121a; --card:#0b1720; --muted:#9fb3c8; --text:#e9f3f8;
+    --accent:#2f9bff; --accent-2:#00d4a6; --glass:rgba(255,255,255,0.04);
+    --radius:14px; --ui:200ms cubic-bezier(.2,.9,.2,1);
+    --safe-top:env(safe-area-inset-top); --safe-bottom:env(safe-area-inset-bottom); --max-width:980px;
   }
-
-  /* System font stack tuned to match the AthleticLog style you showed */
   html,body{
-    height:100%;
-    margin:0;
-    font-family: -apple-system, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Inter, Arial, sans-serif;
-    background:linear-gradient(180deg,var(--bg),#041018);
-    color:var(--text);
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-    box-sizing:border-box;
+    height:100%;margin:0;font-family:-apple-system,"SF Pro Text","SF Pro Display","Segoe UI",Roboto,"Helvetica Neue",Inter,Arial,sans-serif;
+    background:linear-gradient(180deg,var(--bg),#041018);color:var(--text);-webkit-font-smoothing:antialiased;box-sizing:border-box;
   }
   *{box-sizing:border-box}
-
-  /* App layout */
   .app{max-width:var(--max-width);margin:0 auto;padding:calc(14px + var(--safe-top)) 16px calc(96px + var(--safe-bottom));display:flex;flex-direction:column;gap:14px;min-height:100vh;}
   header{display:flex;align-items:center;gap:12px;padding:6px 6px;border-radius:12px}
   .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(90deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:18px;box-shadow:0 8px 30px rgba(47,155,255,0.08)}
   .brand{display:flex;flex-direction:column}
-  .brand h1{margin:0;font-size:18px;letter-spacing:-0.2px}
+  .brand h1{margin:0;font-size:18px}
   .brand p{margin:0;color:var(--muted);font-size:13px}
-
   .top-tabs{display:flex;gap:8px;background:transparent;padding:6px;border-radius:12px}
   .tab{padding:8px 12px;border-radius:999px;font-weight:700;font-size:13px;color:var(--muted);background:transparent;border:1px solid transparent;cursor:pointer}
-  .tab.active{background:linear-gradient(90deg,var(--accent),#4fb3ff);color:#fff;box-shadow:0 8px 30px rgba(47,155,255,0.08)}
-
+  .tab.active{background:linear-gradient(90deg,var(--accent),#4fb3ff);color:#fff}
   main{display:grid;grid-template-columns:1fr 360px;gap:14px;align-items:start}
   @media (max-width:980px){ main{grid-template-columns:1fr} .right-col{order:2} .left-col{order:1} }
-
   .panel{background:linear-gradient(180deg,var(--card),rgba(6,18,24,0.9));border-radius:var(--radius);padding:14px;border:1px solid var(--glass);transition:transform var(--ui),box-shadow var(--ui);box-shadow:0 8px 24px rgba(2,12,20,0.28)}
   .panel:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(2,12,20,0.36)}
   .panel-header{display:flex;justify-content:space-between;align-items:center;gap:8px}
   .muted{color:var(--muted);font-size:13px}
   .small{font-size:13px;color:var(--muted)}
-
   .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
   .chip{padding:8px 12px;border-radius:999px;background:rgba(255,255,255,0.02);color:var(--muted);font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.02)}
-  .chip.active{background:linear-gradient(90deg,var(--accent),#4fb3ff);color:#fff;box-shadow:0 8px 30px rgba(47,155,255,0.06)}
-
+  .chip.active{background:linear-gradient(90deg,var(--accent),#4fb3ff);color:#fff}
   .ex-list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
-  .ex-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.02);transition:transform 260ms,var(--ui)}
+  .ex-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.02)}
   .ex-left{flex:1;min-width:0}
   .ex-title{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px}
   .ex-meta{color:var(--muted);font-size:13px;margin-top:6px}
   .ex-actions{display:flex;gap:8px;align-items:center}
   .weight-input{width:84px;padding:8px;border-radius:10px;border:1px solid var(--glass);background:transparent;color:var(--text);text-align:center}
-
   .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .btn{height:44px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--text);font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
   .btn-primary{background:linear-gradient(90deg,var(--accent),#4fb3ff);border:none;color:#fff;box-shadow:0 10px 30px rgba(47,155,255,0.08);transition:transform 160ms ease}
   .btn-primary:active{transform:translateY(1px) scale(0.997)}
-
   .sticky-start{position:fixed;left:16px;right:16px;bottom:calc(14px + var(--safe-bottom));display:flex;justify-content:center;z-index:999;pointer-events:auto}
   .start-btn{width:100%;max-width:720px;height:56px;border-radius:14px;background:linear-gradient(90deg,var(--accent),#4fb3ff);border:none;color:#fff;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 18px 40px rgba(47,155,255,0.12);cursor:pointer}
-
   .runner{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6));z-index:10000;padding:12px}
   .runner-card{width:760px;max-width:100%;border-radius:14px;padding:18px;background:linear-gradient(180deg,#071a22,#081826);border:1px solid var(--glass)}
   @media (max-width:640px){ .runner-card{height:100%;border-radius:0;padding:18px;overflow:auto} }
-
   .sets-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
   .set-pill{min-width:44px;height:44px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;font-weight:700;background:transparent}
   .set-pill.done{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:none;box-shadow:0 8px 20px rgba(0,0,0,0.25)}
-
   .theme-swatches{display:flex;gap:8px;align-items:center;margin-top:10px}
   .swatch{width:36px;height:36px;border-radius:8px;border:2px solid rgba(255,255,255,0.04);cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.25)}
-  .swatch.selected{outline:3px solid rgba(255,255,255,0.06);transform:scale(1.04)}
-
   .hidden{display:none !important}
   input,select,textarea{background:transparent;color:var(--text);border:1px solid var(--glass);padding:8px;border-radius:10px}
   #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));background:linear-gradient(90deg,#ffd166,rgba(255,255,255,0.02));color:#07121a;padding:10px 14px;border-radius:12px;z-index:11000;display:none}
   #toast.show{display:block}
+  /* Smart selection control */
+  .smart-controls{display:flex;gap:8px;align-items:center;margin-top:12px}
+  .smart-note{color:var(--muted);font-size:13px}
 </style>
 </head>
 <body data-theme="Athletic">
@@ -101,11 +73,9 @@
       <div class="logo">FI</div>
       <div class="brand">
         <h1>Field+Iron</h1>
-        <p class="small">Smart Selection • Weights • Polished UI</p>
+        <p class="small">Smart Selection • Theme mix</p>
       </div>
-
       <div style="flex:1"></div>
-
       <div class="top-tabs" role="tablist" aria-label="Main tabs">
         <button class="tab active" data-tab="schedule">Schedule</button>
         <button class="tab" data-tab="history">History</button>
@@ -122,7 +92,6 @@
               <div style="font-weight:900;font-size:20px" id="date-label">Loading…</div>
               <div class="small muted" id="routine-name">Random set</div>
             </div>
-
             <div style="text-align:right">
               <div class="small">Focus</div>
               <div style="font-weight:900;font-size:18px" id="focus-label">push</div>
@@ -136,6 +105,12 @@
             <div class="chip" data-theme="legs">legs</div>
             <div class="chip" data-theme="core">core</div>
             <div class="chip" data-theme="explosive">explosive</div>
+          </div>
+
+          <div class="smart-controls">
+            <div class="smart-note">Smart Generate will create a single mixed set: explosive + strength + isolation near the end.</div>
+            <div style="flex:1"></div>
+            <button id="smart-gen" class="btn-primary btn">Smart Generate</button>
           </div>
 
           <div class="ex-list" id="core-list" aria-live="polite"></div>
@@ -183,7 +158,7 @@
         <section class="panel stat">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <div><strong>Profile</strong><div class="small muted">83 kg • 15.3% BF • target 12% BF</div></div>
-            <div class="small muted">v2.2</div>
+            <div class="small muted">v3.0</div>
           </div>
 
           <div style="margin-top:10px">
@@ -242,12 +217,10 @@
     </footer>
   </div>
 
-  <!-- Sticky Start -->
   <div class="sticky-start" id="sticky-start">
     <button id="start-workout" class="start-btn">🚀 Start Workout</button>
   </div>
 
-  <!-- DB modal -->
   <div id="db-modal" class="modal hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Exercise database">
     <div class="modal-card">
       <div style="display:flex;justify-content:space-between;align-items:center">
@@ -261,7 +234,6 @@
     </div>
   </div>
 
-  <!-- Runner overlay -->
   <div id="runner" class="runner hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Workout runner">
     <div class="runner-card">
       <div style="display:flex;justify-content:space-between;align-items:center">
@@ -322,7 +294,7 @@
 (() => {
   'use strict';
 
-  /* ---------- Utilities ---------- */
+  /* Utilities */
   const nowISO = ()=> new Date().toISOString();
   const todayISO = ()=> new Date().toISOString().slice(0,10);
   const safeParse = (s, fallback) => { try { return JSON.parse(s); } catch(e) { return fallback; } };
@@ -330,11 +302,11 @@
   const saveJSON = (k,o)=>{ try{ localStorage.setItem(k,JSON.stringify(o)); return true }catch(e){ console.warn('saveJSON',k,e); return false } };
   const showToast = (msg,ms=1400)=>{ const t=document.getElementById('toast'); if(!t) return; t.textContent=msg; t.classList.add('show'); t.style.display='block'; clearTimeout(t._t); t._t=setTimeout(()=>{ t.classList.remove('show'); t.style.display='none'; },ms); };
 
-  /* ---------- Storage keys & defaults ---------- */
-  const STORAGE = { byDate: 'fi.byDate.final', routines: 'fi.routines.final', settings: 'fi.settings.final', sessions: 'fi.sessions.final', weights: 'fi.weights.final' };
+  /* Storage & defaults */
+  const STORAGE = { byDate: 'fi.byDate.smart', routines: 'fi.routines.smart', settings: 'fi.settings.smart', sessions: 'fi.sessions.smart', weights: 'fi.weights.smart' };
   const DEFAULTS = { defaultCount:5, stretches:['Neck Rolls','Hip Flexor Stretch','Hamstring Stretch','Thoracic Rotation'], profile:{weight:83,bf:15.3,bfTarget:12} };
 
-  /* ---------- Exercise DB ---------- */
+  /* DB */
   const EXERCISES = [
     "Goblet Squat — 3 sets × 10","Back Squat — 5 sets × 5","Front Squat — 4 sets × 6","Romanian Deadlift — 4 sets × 8",
     "Conventional Deadlift — 5 sets × 3","Kettlebell Swing — 4 sets × 12","Box Jump — 5 sets × 5","Sprint Intervals — 8 rounds × 20s",
@@ -344,7 +316,6 @@
     "Barbell Curl — 4 sets × 8","Skull Crusher — 3 sets × 10","Farmer Carry — 4 sets × 40m","Sled Sprint — 6 rounds × 15m"
   ];
 
-  /* ---------- Tag rules ---------- */
   const TAG_RULES = {
     explosive: ['jump','sprint','plyo','broad','medicine','box','power','clean','snatch','sprint intervals','sled sprint'],
     strength: ['squat','deadlift','press','bench','thrust','hip','row','pull','carry','farmer','clean','snatch'],
@@ -361,7 +332,7 @@
     return Array.from(tags);
   }
 
-  /* ---------- State & refs ---------- */
+  /* State & refs */
   let state = { selectedDate: todayISO(), settings: loadJSON(STORAGE.settings,{profile:DEFAULTS.profile,theme:'Athletic',defaultCount:DEFAULTS.defaultCount}), routines: loadJSON(STORAGE.routines,{}) };
   const refs = {
     dateLabel: document.getElementById('date-label'),
@@ -383,7 +354,7 @@
     themeChips: document.getElementById('theme-chips')
   };
 
-  /* ---------- Weights helpers ---------- */
+  /* Weights */
   function loadWeights(){ return loadJSON(STORAGE.weights, {}); }
   function saveWeightFor(date, slotIndex, kg){
     const all = loadWeights();
@@ -397,7 +368,7 @@
     return (all[date] && all[date]['slot' + slotIndex] !== undefined) ? all[date]['slot' + slotIndex] : '';
   }
 
-  /* ---------- Data helpers ---------- */
+  /* Data helpers */
   function ensureToday(){
     const all = loadJSON(STORAGE.byDate,{});
     if(!Array.isArray(all[state.selectedDate]) || all[state.selectedDate].length===0){
@@ -408,25 +379,18 @@
     return all[state.selectedDate];
   }
   function loadToday(){ const all = loadJSON(STORAGE.byDate,{}); const arr = all[state.selectedDate] || ensureToday(); const core = arr.slice(0, state.settings.defaultCount || DEFAULTS.defaultCount); const stretches = arr.slice(state.settings.defaultCount || DEFAULTS.defaultCount); return { core, stretches }; }
-
   function sampleShuffle(arr,n){ const c=arr.slice(); for(let i=c.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [c[i],c[j]]=[c[j],c[i]] } return c.slice(0,n); }
 
-  /* ---------- Render ---------- */
+  /* Render */
   function renderDate(){ try{ refs.dateLabel.textContent = new Date(state.selectedDate+'T00:00:00').toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'}); }catch(e){ refs.dateLabel.textContent = state.selectedDate; } }
-
-  function populateSwapTarget(){
-    const sel = refs.swapTarget;
-    sel.innerHTML = '';
-    const count = state.settings.defaultCount || DEFAULTS.defaultCount;
-    for(let i=0;i<count;i++){ const opt=document.createElement('option'); opt.value=i; opt.textContent=`Slot ${i+1}`; sel.appendChild(opt); }
-  }
+  function populateSwapTarget(){ const sel = refs.swapTarget; sel.innerHTML = ''; const count = state.settings.defaultCount || DEFAULTS.defaultCount; for(let i=0;i<count;i++){ const opt=document.createElement('option'); opt.value=i; opt.textContent=`Slot ${i+1}`; sel.appendChild(opt); } }
 
   function renderLists(){
     try{
       const today = loadToday();
       refs.coreList.innerHTML = '';
       today.core.forEach((ex, idx) => {
-        const item = document.createElement('div'); item.className='ex-item fade-in';
+        const item = document.createElement('div'); item.className='ex-item';
         const left = document.createElement('div'); left.className='ex-left';
         const title = document.createElement('div'); title.className='ex-title'; title.textContent = ex;
         const meta = document.createElement('div'); meta.className='ex-meta muted'; meta.textContent = `Core • slot ${idx+1}`;
@@ -448,7 +412,7 @@
 
       refs.stretchList.innerHTML = '';
       today.stretches.forEach((ex, idx) => {
-        const item = document.createElement('div'); item.className='ex-item fade-in';
+        const item = document.createElement('div'); item.className='ex-item';
         const left = document.createElement('div'); left.className='ex-left';
         const title = document.createElement('div'); title.className='ex-title'; title.textContent = ex;
         const meta = document.createElement('div'); meta.className='ex-meta muted'; meta.textContent = 'Mobility';
@@ -496,7 +460,7 @@
     document.querySelectorAll('.del-routine').forEach(b=>b.addEventListener('click', e=> { const name=e.target.dataset.name; if(confirm('Delete '+name+'?')){ delete state.routines[name]; saveJSON(STORAGE.routines,state.routines); renderSavedList(); } }));
   }
 
-  /* ---------- Actions ---------- */
+  /* Actions */
   function addCoreCustom(){ const v=document.getElementById('quick-add-core').value.trim(); if(!v) return; const all=loadJSON(STORAGE.byDate,{}); const arr=all[state.selectedDate]||ensureToday(); arr.splice(state.settings.defaultCount,0,v); all[state.selectedDate]=arr; saveJSON(STORAGE.byDate,all); document.getElementById('quick-add-core').value=''; renderLists(); showToast('Core added'); }
   function addStretch(ex){ const all=loadJSON(STORAGE.byDate,{}); const arr=all[state.selectedDate]||ensureToday(); arr.push(ex); all[state.selectedDate]=arr; saveJSON(STORAGE.byDate,all); renderLists(); showToast('Mobility added'); }
   function addStretchCustom(){ const v=document.getElementById('quick-add-stretch').value.trim(); if(!v) return; addStretch(v); document.getElementById('quick-add-stretch').value=''; }
@@ -506,10 +470,10 @@
   function replaceCoreSlot(slotIndex,ex){ const all=loadJSON(STORAGE.byDate,{}); const arr=all[state.selectedDate]||ensureToday(); while(arr.length < slotIndex+1) arr.push(''); arr[slotIndex]=ex; all[state.selectedDate]=arr; saveJSON(STORAGE.byDate,all); renderLists(); showToast('Slot replaced'); }
   function quickReplace(idx){ const pool=EXERCISES.filter(e=>!loadToday().core.includes(e)); if(!pool.length) return; const pick=pool[Math.floor(Math.random()*pool.length)]; replaceCoreSlot(idx,pick); }
 
-  /* ---------- Improved swap search ---------- */
+  /* Swap search */
   function normalizeForSearch(s){ return (s||'').toLowerCase().replace(/[^a-z0-9\s\-×x]/g,'').replace(/\s+/g,' ').trim(); }
   function swapReplaceFromSearch(){
-    const qRaw = (refs.swapSearch && refs.swapSearch.value) || '';
+    const qRaw = (document.getElementById('swap-search') && document.getElementById('swap-search').value) || '';
     const q = normalizeForSearch(qRaw);
     if(!q) return alert('Type a search term first');
     let best = null; let bestScore = -1;
@@ -523,17 +487,17 @@
       if(score > bestScore){ best = ex; bestScore = score; }
     }
     if(best && bestScore > 0){
-      const slot = Number(refs.swapTarget.value || 0);
+      const slot = Number(document.getElementById('swap-target').value || 0);
       replaceCoreSlot(slot, best);
       showToast('Replaced slot with: ' + best);
       return;
     }
     openDB();
-    if(refs.dbFilter){ refs.dbFilter.value = qRaw; refs.dbFilter.dispatchEvent(new Event('input')); }
+    if(document.getElementById('db-filter')){ document.getElementById('db-filter').value = qRaw; document.getElementById('db-filter').dispatchEvent(new Event('input')); }
     showToast('No direct match — opened DB for manual pick');
   }
 
-  /* ---------- Auto replace ---------- */
+  /* Auto replace */
   function autoReplaceSlot(slotIndex){
     const today = loadToday();
     const current = today.core[slotIndex];
@@ -550,9 +514,16 @@
     else showToast('No replacement available');
   }
 
-  /* ---------- Smart generator (improved) ---------- */
-  function smartGenerateImproved(coreCount){
+  /* Smart generator that respects active theme chips and produces a single mixed set */
+  function smartGenerateFromThemes(coreCount){
     coreCount = Math.max(3, Math.min(12, Number(coreCount) || DEFAULTS.defaultCount));
+    // read active themes
+    const chips = Array.from(document.querySelectorAll('.chip'));
+    const active = chips.filter(c => c.classList.contains('active')).map(c => c.dataset.theme);
+    // if none active, default to 'core'
+    if(active.length === 0) active.push('core');
+
+    // build buckets by tag and by theme mapping
     const buckets = { explosive: [], strength: [], isolation: [], misc: [] };
     EXERCISES.forEach(ex => {
       const tags = classifyExercise(ex);
@@ -562,13 +533,46 @@
       else buckets.misc.push(ex);
     });
 
-    const result = [];
-    const used = new Set();
+    // theme influence: map theme -> desired ratio of explosive/strength/isolation
+    // push -> more strength/press; pull -> strength/row; legs -> strength; explosive -> explosive bias; core -> mixed
+    const themeWeights = { explosive: {explosive:0.6,strength:0.3,isolation:0.1},
+                           push:      {explosive:0.25,strength:0.6,isolation:0.15},
+                           pull:      {explosive:0.2,strength:0.6,isolation:0.2},
+                           legs:      {explosive:0.3,strength:0.6,isolation:0.1},
+                           core:      {explosive:0.25,strength:0.5,isolation:0.25} };
+
+    // aggregate weights from active themes
+    const agg = {explosive:0,strength:0,isolation:0};
+    active.forEach(t => {
+      const w = themeWeights[t] || themeWeights.core;
+      agg.explosive += w.explosive;
+      agg.strength += w.strength;
+      agg.isolation += w.isolation;
+    });
+    // normalize
+    const total = agg.explosive + agg.strength + agg.isolation;
+    agg.explosive /= total; agg.strength /= total; agg.isolation /= total;
+
+    // decide counts: ensure at least 1 explosive and 1 strength; isolation reserved near end if possible
     const isolationSlot = (buckets.isolation.length > 0 && coreCount >= 4) ? 1 : 0;
     const mainSlots = coreCount - isolationSlot;
-    const explosiveCount = Math.max(1, Math.round(mainSlots * 0.35));
-    const strengthCount = Math.max(1, mainSlots - explosiveCount);
 
+    // compute counts from ratios (rounding with floor then distribute remainder)
+    let explosiveCount = Math.max(1, Math.round(mainSlots * agg.explosive));
+    let strengthCount = Math.max(1, Math.round(mainSlots * agg.strength));
+    // adjust to fit mainSlots
+    let sum = explosiveCount + strengthCount;
+    if(sum > mainSlots){
+      // reduce the larger one
+      if(explosiveCount > strengthCount) explosiveCount -= (sum - mainSlots);
+      else strengthCount -= (sum - mainSlots);
+    } else if(sum < mainSlots){
+      // add to strength by default
+      strengthCount += (mainSlots - sum);
+    }
+
+    // helper pick unique
+    const used = new Set();
     function pickFrom(arr, n){
       const pool = arr.filter(x => !used.has(x));
       const picks = [];
@@ -580,15 +584,21 @@
       return picks;
     }
 
+    const result = [];
+    // pick strength first (bias heavy)
     result.push(...pickFrom(buckets.strength, strengthCount));
+    // then explosive
     result.push(...pickFrom(buckets.explosive, explosiveCount));
+    // fill remaining main slots from misc/remaining
     while(result.length < mainSlots){
       const fill = pickFrom(buckets.strength.concat(buckets.explosive, buckets.misc), 1);
       if(!fill.length) break;
       result.push(fill[0]);
     }
+    // shuffle lightly to avoid rigid order but keep composition
     result.sort(()=>Math.random()-0.5);
 
+    // add isolation near the end
     if(isolationSlot){
       const iso = pickFrom(buckets.isolation, 1);
       if(iso.length) result.push(iso[0]);
@@ -598,6 +608,7 @@
       }
     }
 
+    // persist while keeping stretches
     const all = loadJSON(STORAGE.byDate, {});
     const existing = all[state.selectedDate] || ensureToday();
     const stretches = existing.slice(state.settings.defaultCount || DEFAULTS.defaultCount);
@@ -607,7 +618,7 @@
     showToast('Smart set generated (' + coreCount + ' items)');
   }
 
-  /* ---------- Profile & progress ---------- */
+  /* Profile */
   function applyProfile(){
     try{
       const w = Number(document.getElementById('weight').value);
@@ -628,7 +639,6 @@
       showToast('Profile save failed');
     }
   }
-
   function computeProgress(){
     try{
       const p = state.settings.profile || DEFAULTS.profile;
@@ -641,11 +651,11 @@
     }catch(e){ console.warn('computeProgress error', e); }
   }
 
-  /* ---------- Modal helpers ---------- */
+  /* Modal helpers */
   function openDB(){ document.getElementById('db-modal').classList.remove('hidden'); document.getElementById('db-modal').setAttribute('aria-hidden','false'); renderDB(''); }
   function closeDB(){ document.getElementById('db-modal').classList.add('hidden'); document.getElementById('db-modal').setAttribute('aria-hidden','true'); dbReplaceIndex=null; }
 
-  /* ---------- Runner (core only) ---------- */
+  /* Runner */
   const RUNNER_COUNT = ()=> state.settings.defaultCount || DEFAULTS.defaultCount;
   const runnerSummary = document.getElementById('runner-summary');
   let runnerState = { exercises: [], index: 0, setIndex: 1, setsTotal: 1, restTimer: null, restRemaining: 0, inSet: false, sessionStart: null, log: [] };
@@ -673,7 +683,6 @@
       showToast('Runner error — check console');
     }
   }
-
   function hideRunner(){ const r=document.getElementById('runner'); if(r){ r.classList.add('hidden'); r.setAttribute('aria-hidden','true'); r.style.display='none'; } stopRest(); detachSwipe(); }
 
   function updateRunnerUI(){
@@ -723,69 +732,65 @@
     }
     updateRunnerUI();
   }
-
   function startRest(){ stopRest(); const doneBtn = document.getElementById('runner-done'); if(doneBtn) doneBtn.disabled = true; runnerState.restTimer = setInterval(()=>{ runnerState.restRemaining -= 1; if(runnerState.restRemaining <= 0){ stopRest(); const doneBtn2 = document.getElementById('runner-done'); if(doneBtn2) doneBtn2.disabled = false; try{ if(navigator.vibrate) navigator.vibrate(40); }catch(e){} showToast('Rest complete'); } updateRunnerUI(); }, 1000); }
   function stopRest(){ if(runnerState.restTimer){ clearInterval(runnerState.restTimer); runnerState.restTimer = null; } runnerState.restRemaining = 0; const doneBtn = document.getElementById('runner-done'); if(doneBtn) doneBtn.disabled = false; updateRunnerUI(); }
   function nextExercise(){ if(runnerState.index < runnerState.exercises.length - 1){ runnerState.index++; runnerState.setIndex = 1; stopRest(); updateRunnerUI(); } else showToast('Last exercise'); }
   function prevExercise(){ if(runnerState.index > 0){ runnerState.index--; runnerState.setIndex = 1; stopRest(); updateRunnerUI(); } else showToast('First exercise'); }
   function finishWorkout(){ const sessions = loadJSON(STORAGE.sessions, []); const duration = Math.round((Date.now() - runnerState.sessionStart)/1000); sessions.unshift({ startedAt: new Date(runnerState.sessionStart).toISOString(), durationSec: duration, exercises: runnerState.log }); saveJSON(STORAGE.sessions, sessions); showToast('Workout saved'); hideRunner(); }
 
-  /* ---------- Swipe ---------- */
+  /* Swipe */
   let touchStartX=0,touchStartY=0;
   function attachSwipe(){ const card=document.querySelector('.runner-card'); if(!card) return; card.addEventListener('touchstart',onTouchStart,{passive:true}); card.addEventListener('touchend',onTouchEnd,{passive:true}); }
   function detachSwipe(){ const card=document.querySelector('.runner-card'); if(!card) return; card.removeEventListener('touchstart',onTouchStart); card.removeEventListener('touchend',onTouchEnd); }
   function onTouchStart(e){ const t=e.touches[0]; touchStartX=t.clientX; touchStartY=t.clientY; }
   function onTouchEnd(e){ const t=e.changedTouches[0]; const dx=t.clientX-touchStartX; const dy=t.clientY-touchStartY; if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)){ if(dx<0) nextExercise(); else prevExercise(); } }
 
-  /* ---------- Wiring ---------- */
+  /* Wiring */
   function wireEvents(){
     try{
       document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', (ev)=>{ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); ev.currentTarget.classList.add('active'); }));
-      document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click', (ev)=>{ document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active')); ev.currentTarget.classList.add('active'); document.getElementById('focus-label').textContent = ev.currentTarget.textContent; }));
+      document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click', (ev)=>{ ev.currentTarget.classList.toggle('active'); document.getElementById('focus-label').textContent = Array.from(document.querySelectorAll('.chip.active')).map(x=>x.textContent).join(', ') || 'core'; }));
 
-      const shuffleBtn = document.getElementById('shuffle-btn'); if(shuffleBtn) shuffleBtn.addEventListener('click', shuffleCore);
-      const smartBtn = document.getElementById('smart-gen'); if(smartBtn) smartBtn.addEventListener('click', ()=> smartGenerateImproved(state.settings.defaultCount || DEFAULTS.defaultCount));
-      const openDbBtn = document.getElementById('open-db'); if(openDbBtn) openDbBtn.addEventListener('click', openDB);
-      const closeDbBtn = document.getElementById('close-db'); if(closeDbBtn) closeDbBtn.addEventListener('click', closeDB);
-      if(refs.dbFilter) refs.dbFilter.addEventListener('input', e=> renderDB(e.target.value));
-      const addCoreBtn = document.getElementById('add-core'); if(addCoreBtn) addCoreBtn.addEventListener('click', addCoreCustom);
+      // Smart generate uses active chips
+      const smartBtn = document.getElementById('smart-gen'); if(smartBtn) smartBtn.addEventListener('click', ()=> smartGenerateFromThemes(state.settings.defaultCount || DEFAULTS.defaultCount));
+
+      document.getElementById('add-core').addEventListener('click', addCoreCustom);
       const qcore = document.getElementById('quick-add-core'); if(qcore) qcore.addEventListener('keydown', e=>{ if(e.key==='Enter') addCoreCustom(); });
-      const addStretchBtn = document.getElementById('add-stretch'); if(addStretchBtn) addStretchBtn.addEventListener('click', addStretchCustom);
+      document.getElementById('add-stretch').addEventListener('click', addStretchCustom);
       const qstretch = document.getElementById('quick-add-stretch'); if(qstretch) qstretch.addEventListener('keydown', e=>{ if(e.key==='Enter') addStretchCustom(); });
-      const swapAuto = document.getElementById('swap-auto'); if(swapAuto) swapAuto.addEventListener('click', ()=> { const slot = Number(document.getElementById('swap-target').value); autoReplaceSlot(slot); });
-      const swapPick = document.getElementById('swap-pick'); if(swapPick) swapPick.addEventListener('click', ()=> { const slot = Number(document.getElementById('swap-target').value); dbReplaceIndex = slot; openDB(); });
-      if(refs.swapSearch) refs.swapSearch.addEventListener('keydown', e=>{ if(e.key==='Enter') swapReplaceFromSearch(); });
-      const saveRoutineBtn = document.getElementById('save-routine'); if(saveRoutineBtn) saveRoutineBtn.addEventListener('click', saveRoutine);
-      const exportBtn = document.getElementById('export-btn'); if(exportBtn) exportBtn.addEventListener('click', exportAll);
-      const applyProfileBtn = document.getElementById('apply-profile'); if(applyProfileBtn) applyProfileBtn.addEventListener('click', applyProfile);
-      const resetProfileBtn = document.getElementById('reset-profile'); if(resetProfileBtn) resetProfileBtn.addEventListener('click', ()=>{ state.settings.profile = DEFAULTS.profile; if(document.getElementById('weight')) document.getElementById('weight').value = DEFAULTS.profile.weight; if(document.getElementById('bf')) document.getElementById('bf').value = DEFAULTS.profile.bf; if(document.getElementById('bf-target')) document.getElementById('bf-target').value = DEFAULTS.profile.bfTarget; saveJSON(STORAGE.settings, state.settings); computeProgress(); showToast('Profile reset'); });
 
-      const dbListEl = document.getElementById('db-list'); if(dbListEl) dbListEl.addEventListener('click', e=>{ const card = e.target.closest('.ex-item'); if(!card) return; const title = card.querySelector('.ex-title').textContent; if(dbReplaceIndex !== null){ replaceCoreSlot(dbReplaceIndex, title); dbReplaceIndex = null; closeDB(); } });
+      document.getElementById('swap-auto').addEventListener('click', ()=> { const slot = Number(document.getElementById('swap-target').value); autoReplaceSlot(slot); });
+      document.getElementById('swap-pick').addEventListener('click', ()=> { const slot = Number(document.getElementById('swap-target').value); dbReplaceIndex = slot; openDB(); });
+      document.getElementById('swap-search').addEventListener('keydown', e=>{ if(e.key==='Enter') swapReplaceFromSearch(); });
 
-      // Runner wiring
+      document.getElementById('save-routine').addEventListener('click', saveRoutine);
+      document.getElementById('export-btn')?.addEventListener('click', exportAll);
+      document.getElementById('apply-profile').addEventListener('click', applyProfile);
+      document.getElementById('reset-profile').addEventListener('click', ()=>{ state.settings.profile = DEFAULTS.profile; if(document.getElementById('weight')) document.getElementById('weight').value = DEFAULTS.profile.weight; if(document.getElementById('bf')) document.getElementById('bf').value = DEFAULTS.profile.bf; if(document.getElementById('bf-target')) document.getElementById('bf-target').value = DEFAULTS.profile.bfTarget; saveJSON(STORAGE.settings, state.settings); computeProgress(); showToast('Profile reset'); });
+
+      document.getElementById('db-list')?.addEventListener('click', e=>{ const card=e.target.closest('.ex-item'); if(!card) return; const title=card.querySelector('.ex-title').textContent; if(dbReplaceIndex!==null){ replaceCoreSlot(dbReplaceIndex,title); dbReplaceIndex=null; closeDB(); } });
+
+      // Start workout robust wiring
       const startBtn = document.getElementById('start-workout');
       if(startBtn){
-        // remove old listeners safely
         try{ startBtn.replaceWith(startBtn.cloneNode(true)); }catch(e){}
         const newStart = document.getElementById('start-workout');
         if(newStart) newStart.addEventListener('click', ()=> { try{ showRunner(); }catch(e){ console.error('openRunner error',e); showToast('Could not open runner'); } });
       }
-      const runnerClose = document.getElementById('runner-close'); if(runnerClose) runnerClose.addEventListener('click', hideRunner);
-      const runnerStart = document.getElementById('runner-start'); if(runnerStart) runnerStart.addEventListener('click', startSet);
-      const runnerDone = document.getElementById('runner-done'); if(runnerDone) runnerDone.addEventListener('click', completeSet);
-      const runnerNext = document.getElementById('runner-next'); if(runnerNext) runnerNext.addEventListener('click', nextExercise);
-      const runnerPrev = document.getElementById('runner-prev'); if(runnerPrev) runnerPrev.addEventListener('click', prevExercise);
-      const runnerFinish = document.getElementById('runner-finish'); if(runnerFinish) runnerFinish.addEventListener('click', finishWorkout);
-      const runnerSave = document.getElementById('runner-save'); if(runnerSave) runnerSave.addEventListener('click', ()=>{ const sessions=loadJSON(STORAGE.sessions,[]); alert('Saved sessions: '+sessions.length); });
 
-      // core size controls
+      document.getElementById('runner-close').addEventListener('click', hideRunner);
+      document.getElementById('runner-start').addEventListener('click', startSet);
+      document.getElementById('runner-done').addEventListener('click', completeSet);
+      document.getElementById('runner-next').addEventListener('click', nextExercise);
+      document.getElementById('runner-prev').addEventListener('click', prevExercise);
+      document.getElementById('runner-finish').addEventListener('click', finishWorkout);
+      document.getElementById('runner-save').addEventListener('click', ()=>{ const sessions=loadJSON(STORAGE.sessions,[]); alert('Saved sessions: '+sessions.length); });
+
       if(refs.coreRange) refs.coreRange.addEventListener('input', (e)=> setCoreCount(e.target.value));
       if(refs.coreNumber) refs.coreNumber.addEventListener('change', (e)=> setCoreCount(e.target.value));
 
-      // theme swatches
       ['sw-sporty','sw-calm','sw-vibrant','sw-dark','sw-light'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('click', ()=> showToast('Theme applied')); });
 
-      // keyboard shortcuts
       document.addEventListener('keydown', e=>{ if(e.key.toLowerCase()==='s') shuffleCore(); if(e.key.toLowerCase()==='d') openDB(); });
     }catch(e){
       console.error('wireEvents error', e);
@@ -793,7 +798,7 @@
     }
   }
 
-  /* ---------- Misc helpers ---------- */
+  /* Misc helpers */
   function shuffleCore(){ const picks=sampleShuffle(EXERCISES, state.settings.defaultCount || DEFAULTS.defaultCount); const all=loadJSON(STORAGE.byDate,{}); const arr=all[state.selectedDate]||ensureToday(); const stretches=arr.slice(state.settings.defaultCount||DEFAULTS.defaultCount); all[state.selectedDate]=picks.concat(stretches); saveJSON(STORAGE.byDate,all); renderLists(); showToast('Core shuffled'); }
   function saveRoutine(){ const name=prompt('Name this routine'); if(!name) return; const today=loadToday(); state.routines[name]=today.core.concat(today.stretches); saveJSON(STORAGE.routines,state.routines); renderSavedList(); showToast('Routine saved'); }
   function loadRoutine(name){ const r=state.routines[name]; if(!r) return; const all=loadJSON(STORAGE.byDate,{}); all[state.selectedDate]=r.slice(); saveJSON(STORAGE.byDate,all); renderLists(); showToast('Routine loaded'); }
@@ -820,7 +825,7 @@
     showToast('Core size set to ' + n);
   }
 
-  /* ---------- Init (robust) ---------- */
+  /* Init */
   function init(){
     try{
       if(!state.settings || typeof state.settings !== 'object') state.settings = { profile: DEFAULTS.profile, theme: 'Athletic', defaultCount: DEFAULTS.defaultCount };
@@ -845,7 +850,6 @@
 
       wireEvents();
 
-      // safety: if date label still "Loading…" after 600ms, force render
       setTimeout(()=>{ const d=document.getElementById('date-label'); if(d && /loading/i.test(d.textContent||'')){ try{ renderDate(); renderLists(); }catch(e){ console.warn('unstick failed',e); } } }, 600);
 
       console.info('Field+Iron initialized');
@@ -858,16 +862,12 @@
 
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 
-  /* ---------- Expose for debugging ---------- */
+  /* Expose for debugging */
   window.__FieldIron = window.__FieldIron || {};
   window.__FieldIron.state = state;
-  window.__FieldIron.replaceCoreSlot = replaceCoreSlot;
-  window.__FieldIron.autoReplaceSlot = autoReplaceSlot;
-  window.__FieldIron.smartGenerateForDate = smartGenerateImproved;
-  window.__FieldIron.swapReplaceFromSearch = swapReplaceFromSearch;
+  window.__FieldIron.smartGenerateFromThemes = smartGenerateFromThemes;
 
   let dbReplaceIndex = null;
-
   window.addEventListener('error', function(ev){ console.error('Captured error', ev.error || ev.message); try{ showToast('Error: '+String(ev.message || ev.error).slice(0,80), 3000); }catch(e){} });
   window.addEventListener('unhandledrejection', function(ev){ console.error('Unhandled rejection', ev.reason); try{ showToast('Error: '+String(ev.reason).slice(0,80), 3000); }catch(e){} });
 
