@@ -318,7 +318,10 @@
           <button class="btn btn-primary" id="smartGenBtn">✨ Generate New</button>
         </div>
 
-        <div id="exerciseList" class="ex-list"></div>
+        <div id="exerciseList" class="ex-list">
+          <!-- Exercises will appear here -->
+          <div class="text-muted" style="text-align: center; padding: 20px;">Loading workout...</div>
+        </div>
 
         <div class="flex-between gap-2 mt-3">
           <input type="text" id="customExInput" placeholder="Add custom exercise..." style="flex:1">
@@ -342,9 +345,9 @@
           <h2>📊 BODY METRICS</h2>
         </div>
         <div>
-          <div class="mb-2"><label class="text-muted">Weight (kg)</label><input type="number" id="weightInput" step="0.5" style="width:100%; margin-top:4px"></div>
-          <div class="mb-2"><label class="text-muted">Body Fat %</label><input type="number" id="bfInput" step="0.5" style="width:100%; margin-top:4px"></div>
-          <div class="mb-2"><label class="text-muted">Target BF %</label><input type="number" id="targetBfInput" step="0.5" style="width:100%; margin-top:4px"></div>
+          <div class="mb-2"><label class="text-muted">Weight (kg)</label><input type="number" id="weightInput" step="0.5" value="80" style="width:100%; margin-top:4px"></div>
+          <div class="mb-2"><label class="text-muted">Body Fat %</label><input type="number" id="bfInput" step="0.5" value="18" style="width:100%; margin-top:4px"></div>
+          <div class="mb-2"><label class="text-muted">Target BF %</label><input type="number" id="targetBfInput" step="0.5" value="12" style="width:100%; margin-top:4px"></div>
           <button class="btn btn-primary" id="updateMetricsBtn" style="width:100%">Update</button>
         </div>
       </div>
@@ -380,55 +383,49 @@
   (function() {
     // ========== EXERCISE DATABASE ==========
     const EXERCISE_DB = [
-      // Compound / Explosive (high calorie)
-      { name: "Power Clean", type: "explosive", compound: true, intensity: 9, calsPerMin: 12 },
-      { name: "Thruster", type: "explosive", compound: true, intensity: 9, calsPerMin: 11 },
-      { name: "Deadlift", type: "strength", compound: true, intensity: 8, calsPerMin: 9 },
-      { name: "Back Squat", type: "strength", compound: true, intensity: 8, calsPerMin: 8 },
-      { name: "Barbell Row", type: "strength", compound: true, intensity: 7, calsPerMin: 7 },
-      { name: "Bench Press", type: "strength", compound: true, intensity: 7, calsPerMin: 7 },
-      { name: "Push Press", type: "explosive", compound: true, intensity: 8, calsPerMin: 10 },
-      { name: "Kettlebell Swing", type: "explosive", compound: true, intensity: 8, calsPerMin: 11 },
-      { name: "Box Jump", type: "explosive", compound: false, intensity: 9, calsPerMin: 12 },
-      { name: "Burpee", type: "fatloss", compound: true, intensity: 10, calsPerMin: 14 },
-      { name: "Clean & Jerk", type: "explosive", compound: true, intensity: 10, calsPerMin: 13 },
-      { name: "Front Squat", type: "strength", compound: true, intensity: 8, calsPerMin: 8 },
-      { name: "Romanian Deadlift", type: "strength", compound: true, intensity: 7, calsPerMin: 7 },
-      { name: "Pull-up", type: "strength", compound: true, intensity: 7, calsPerMin: 7 },
-      { name: "Dip", type: "strength", compound: true, intensity: 7, calsPerMin: 7 },
-      { name: "Lunge Jump", type: "explosive", compound: true, intensity: 8, calsPerMin: 11 },
-      { name: "Medicine Ball Slam", type: "explosive", compound: true, intensity: 8, calsPerMin: 10 },
-      // Isolation (near end)
-      { name: "Barbell Curl", type: "isolation", compound: false, intensity: 5, calsPerMin: 5 },
-      { name: "Triceps Extension", type: "isolation", compound: false, intensity: 5, calsPerMin: 5 },
-      { name: "Lateral Raise", type: "isolation", compound: false, intensity: 5, calsPerMin: 5 },
-      { name: "Leg Curl", type: "isolation", compound: false, intensity: 5, calsPerMin: 5 },
-      { name: "Leg Extension", type: "isolation", compound: false, intensity: 5, calsPerMin: 5 },
-      { name: "Calf Raise", type: "isolation", compound: false, intensity: 4, calsPerMin: 4 },
-      { name: "Face Pull", type: "isolation", compound: false, intensity: 5, calsPerMin: 5 },
-      { name: "Skull Crusher", type: "isolation", compound: false, intensity: 5, calsPerMin: 5 }
+      { name: "Power Clean", type: "explosive", compound: true, calsPerMin: 12, sets: 4, reps: "6-8" },
+      { name: "Thruster", type: "explosive", compound: true, calsPerMin: 11, sets: 4, reps: "8-10" },
+      { name: "Deadlift", type: "strength", compound: true, calsPerMin: 9, sets: 3, reps: "8-10" },
+      { name: "Back Squat", type: "strength", compound: true, calsPerMin: 8, sets: 3, reps: "8-10" },
+      { name: "Barbell Row", type: "strength", compound: true, calsPerMin: 7, sets: 3, reps: "8-10" },
+      { name: "Bench Press", type: "strength", compound: true, calsPerMin: 7, sets: 3, reps: "8-10" },
+      { name: "Push Press", type: "explosive", compound: true, calsPerMin: 10, sets: 4, reps: "6-8" },
+      { name: "Kettlebell Swing", type: "explosive", compound: true, calsPerMin: 11, sets: 4, reps: "12-15" },
+      { name: "Box Jump", type: "explosive", compound: false, calsPerMin: 12, sets: 4, reps: "5-6" },
+      { name: "Burpee", type: "fatloss", compound: true, calsPerMin: 14, sets: 3, reps: "10-12" },
+      { name: "Clean & Jerk", type: "explosive", compound: true, calsPerMin: 13, sets: 4, reps: "5-6" },
+      { name: "Front Squat", type: "strength", compound: true, calsPerMin: 8, sets: 3, reps: "8-10" },
+      { name: "Romanian Deadlift", type: "strength", compound: true, calsPerMin: 7, sets: 3, reps: "10-12" },
+      { name: "Pull-up", type: "strength", compound: true, calsPerMin: 7, sets: 3, reps: "6-8" },
+      { name: "Dip", type: "strength", compound: true, calsPerMin: 7, sets: 3, reps: "8-10" },
+      { name: "Lunge Jump", type: "explosive", compound: true, calsPerMin: 11, sets: 4, reps: "8-10" },
+      { name: "Medicine Ball Slam", type: "explosive", compound: true, calsPerMin: 10, sets: 4, reps: "10-12" },
+      { name: "Barbell Curl", type: "isolation", compound: false, calsPerMin: 5, sets: 3, reps: "10-12" },
+      { name: "Triceps Extension", type: "isolation", compound: false, calsPerMin: 5, sets: 3, reps: "10-12" },
+      { name: "Lateral Raise", type: "isolation", compound: false, calsPerMin: 5, sets: 3, reps: "12-15" },
+      { name: "Leg Curl", type: "isolation", compound: false, calsPerMin: 5, sets: 3, reps: "10-12" },
+      { name: "Leg Extension", type: "isolation", compound: false, calsPerMin: 5, sets: 3, reps: "10-12" },
+      { name: "Calf Raise", type: "isolation", compound: false, calsPerMin: 4, sets: 3, reps: "15-20" },
+      { name: "Face Pull", type: "isolation", compound: false, calsPerMin: 5, sets: 3, reps: "12-15" }
     ];
 
     const DEFAULT_MOBILITY = ["Deep Squat Hold", "Cat-Cow Stretch", "World's Greatest Stretch"];
 
     // ========== STATE ==========
-    let state = {
-      exercises: [],
-      mobility: [],
-      profile: { weight: 80, bf: 18, targetBf: 12 },
-      routines: {},
-      currentTheme: "explosive"
-    };
-
+    let exercises = [];
+    let mobility = [...DEFAULT_MOBILITY];
+    let profile = { weight: 80, bf: 18, targetBf: 12 };
+    let routines = {};
+    let currentTheme = "explosive";
     let pendingReplaceIndex = null;
 
     // ========== STORAGE ==========
     function saveToLocal() {
       localStorage.setItem("ignite_data", JSON.stringify({
-        exercises: state.exercises,
-        mobility: state.mobility,
-        profile: state.profile,
-        routines: state.routines
+        exercises: exercises,
+        mobility: mobility,
+        profile: profile,
+        routines: routines
       }));
     }
 
@@ -437,34 +434,25 @@
       if (data) {
         try {
           const p = JSON.parse(data);
-          if (p.exercises && p.exercises.length === 5) state.exercises = p.exercises;
-          if (p.mobility && p.mobility.length === 3) state.mobility = p.mobility;
-          if (p.profile) state.profile = p.profile;
-          if (p.routines) state.routines = p.routines;
-        } catch(e) {}
-      }
-      // If no valid exercises, generate
-      if (state.exercises.length !== 5) {
-        generateSmartWorkout();
-      }
-      if (state.mobility.length !== 3) {
-        state.mobility = [...DEFAULT_MOBILITY];
+          if (p.exercises && p.exercises.length === 5) exercises = p.exercises;
+          if (p.mobility && p.mobility.length === 3) mobility = p.mobility;
+          if (p.profile) profile = p.profile;
+          if (p.routines) routines = p.routines;
+        } catch(e) { console.log("Parse error", e); }
       }
     }
 
-    // ========== SMART GENERATION ==========
-    function generateSmartWorkout() {
-      console.log("Generating workout with theme:", state.currentTheme);
-      
-      const theme = state.currentTheme;
+    // ========== GENERATE WORKOUT (ALWAYS 5 EXERCISES) ==========
+    function generateWorkout() {
+      console.log("Generating workout with theme:", currentTheme);
       
       // Filter compound exercises based on theme
       let compoundPool = [];
-      let isolationPool = EXERCISE_DB.filter(e => e.type === "isolation");
+      const isolationPool = EXERCISE_DB.filter(e => e.type === "isolation");
       
-      if (theme === "explosive") {
+      if (currentTheme === "explosive") {
         compoundPool = EXERCISE_DB.filter(e => e.compound && (e.type === "explosive" || e.type === "fatloss"));
-      } else if (theme === "fatloss") {
+      } else if (currentTheme === "fatloss") {
         compoundPool = EXERCISE_DB.filter(e => e.compound && (e.type === "fatloss" || e.type === "explosive"));
       } else {
         compoundPool = EXERCISE_DB.filter(e => e.compound);
@@ -474,11 +462,8 @@
       if (compoundPool.length < 4) {
         compoundPool = EXERCISE_DB.filter(e => e.compound);
       }
-      if (isolationPool.length === 0) {
-        isolationPool = EXERCISE_DB.filter(e => e.type === "isolation");
-      }
       
-      // Shuffle
+      // Shuffle compound pool
       for (let i = compoundPool.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [compoundPool[i], compoundPool[j]] = [compoundPool[j], compoundPool[i]];
@@ -491,32 +476,19 @@
       const isolation = isolationPool[Math.floor(Math.random() * isolationPool.length)];
       
       // Build workout
-      state.exercises = compounds.map(ex => ({
-        ...ex,
-        sets: ex.type === "explosive" ? 4 : 3,
-        reps: ex.type === "explosive" ? "6-8" : "8-10"
-      }));
-      
-      state.exercises.push({
-        ...isolation,
-        sets: 3,
-        reps: "10-12"
-      });
+      exercises = compounds.map(ex => ({ ...ex }));
+      exercises.push({ ...isolation });
       
       saveToLocal();
       renderWorkout();
       updateStats();
-      showToast(`🔥 ${theme.toUpperCase()} workout ready!`, 1500);
+      showToast(`🔥 ${currentTheme.toUpperCase()} workout ready!`, 1500);
     }
 
-    // ========== REPLACE EXERCISE ==========
+    // ========== REPLACE FUNCTIONS ==========
     function replaceExercise(index, newExercise) {
-      if (index >= 0 && index < state.exercises.length) {
-        state.exercises[index] = {
-          ...newExercise,
-          sets: newExercise.type === "explosive" ? 4 : (newExercise.type === "isolation" ? 3 : 3),
-          reps: newExercise.type === "explosive" ? "6-8" : (newExercise.type === "isolation" ? "10-12" : "8-10")
-        };
+      if (index >= 0 && index < exercises.length) {
+        exercises[index] = { ...newExercise };
         saveToLocal();
         renderWorkout();
         updateStats();
@@ -525,7 +497,7 @@
     }
 
     function autoReplaceExercise(index) {
-      const current = state.exercises[index];
+      const current = exercises[index];
       let pool = [];
       
       if (current.type === "isolation") {
@@ -540,17 +512,17 @@
       replaceExercise(index, randomEx);
     }
 
-    // ========== RENDER ==========
+    // ========== RENDER WORKOUT ==========
     function renderWorkout() {
       const container = document.getElementById("exerciseList");
       if (!container) return;
       
-      if (!state.exercises || state.exercises.length === 0) {
-        container.innerHTML = '<div class="text-muted">Click "Generate New" to start</div>';
+      if (!exercises || exercises.length === 0) {
+        container.innerHTML = '<div class="text-muted" style="text-align: center; padding: 20px;">Click "Generate New" to start</div>';
         return;
       }
       
-      container.innerHTML = state.exercises.map((ex, idx) => `
+      container.innerHTML = exercises.map((ex, idx) => `
         <div class="ex-item">
           <div class="ex-info">
             <div class="ex-name">${ex.name}</div>
@@ -567,15 +539,17 @@
         </div>
       `).join("");
       
+      // Attach auto-replace events
       document.querySelectorAll(".auto-replace").forEach(btn => {
-        btn.addEventListener("click", (e) => {
+        btn.addEventListener("click", () => {
           const idx = parseInt(btn.dataset.index);
           autoReplaceExercise(idx);
         });
       });
       
+      // Attach manual swap events
       document.querySelectorAll(".manual-replace").forEach(btn => {
-        btn.addEventListener("click", (e) => {
+        btn.addEventListener("click", () => {
           const idx = parseInt(btn.dataset.index);
           pendingReplaceIndex = idx;
           renderDbList("");
@@ -584,11 +558,12 @@
       });
     }
 
+    // ========== RENDER MOBILITY ==========
     function renderMobility() {
       const container = document.getElementById("mobilityList");
       if (!container) return;
       
-      container.innerHTML = state.mobility.map((item, idx) => `
+      container.innerHTML = mobility.map((item, idx) => `
         <div class="ex-item">
           <div class="ex-info">
             <div class="ex-name">🧘 ${item}</div>
@@ -602,7 +577,7 @@
       document.querySelectorAll(".remove-mobility").forEach(btn => {
         btn.addEventListener("click", () => {
           const idx = parseInt(btn.dataset.idx);
-          state.mobility.splice(idx, 1);
+          mobility.splice(idx, 1);
           saveToLocal();
           renderMobility();
           showToast("Mobility removed");
@@ -613,7 +588,7 @@
     function addMobility() {
       const name = prompt("Enter mobility/stretch name:");
       if (name && name.trim()) {
-        state.mobility.push(name.trim());
+        mobility.push(name.trim());
         saveToLocal();
         renderMobility();
         showToast(`Added: ${name}`);
@@ -629,12 +604,13 @@
         name: name,
         type: "strength",
         compound: true,
-        intensity: 6,
-        calsPerMin: 7
+        calsPerMin: 7,
+        sets: 3,
+        reps: "8-10"
       };
       
-      state.exercises.push(newEx);
-      if (state.exercises.length > 5) state.exercises.shift();
+      exercises.push(newEx);
+      if (exercises.length > 5) exercises.shift();
       saveToLocal();
       renderWorkout();
       updateStats();
@@ -678,34 +654,34 @@
 
     // ========== STATS ==========
     function updateStats() {
-      if (!state.exercises.length) return;
+      if (!exercises.length) return;
       
-      const explosiveCount = state.exercises.filter(e => e.type === "explosive").length;
+      const explosiveCount = exercises.filter(e => e.type === "explosive").length;
       const score = Math.min(100, 40 + (explosiveCount * 12));
       document.getElementById("explosiveScore").innerText = score;
       
-      const totalCals = state.exercises.reduce((sum, ex) => sum + (ex.calsPerMin * 4), 0);
+      const totalCals = exercises.reduce((sum, ex) => sum + (ex.calsPerMin * 4), 0);
       document.getElementById("calorieEstimate").innerText = `~${totalCals}`;
       
-      const currentBf = state.profile.bf;
-      const target = state.profile.targetBf;
+      const currentBf = profile.bf;
+      const target = profile.targetBf;
       const startBf = Math.max(target + 12, currentBf);
       const progress = Math.min(100, Math.max(0, ((startBf - currentBf) / (startBf - target)) * 100));
       document.getElementById("fatPercent").innerHTML = `${currentBf}%`;
       document.getElementById("fatFill").style.width = `${progress}%`;
       
-      document.getElementById("weightInput").value = state.profile.weight;
-      document.getElementById("bfInput").value = state.profile.bf;
-      document.getElementById("targetBfInput").value = state.profile.targetBf;
+      document.getElementById("weightInput").value = profile.weight;
+      document.getElementById("bfInput").value = profile.bf;
+      document.getElementById("targetBfInput").value = profile.targetBf;
     }
     
     function updateMetrics() {
       const w = parseFloat(document.getElementById("weightInput").value);
       const bf = parseFloat(document.getElementById("bfInput").value);
       const target = parseFloat(document.getElementById("targetBfInput").value);
-      if (!isNaN(w)) state.profile.weight = w;
-      if (!isNaN(bf)) state.profile.bf = bf;
-      if (!isNaN(target)) state.profile.targetBf = target;
+      if (!isNaN(w)) profile.weight = w;
+      if (!isNaN(bf)) profile.bf = bf;
+      if (!isNaN(target)) profile.targetBf = target;
       saveToLocal();
       updateStats();
       showToast("Metrics updated");
@@ -713,13 +689,13 @@
 
     // ========== ROUTINES ==========
     function saveRoutine() {
-      if (!state.exercises.length) {
+      if (!exercises.length) {
         showToast("No workout to save");
         return;
       }
-      const name = prompt("Name this routine:", `Routine ${Object.keys(state.routines).length + 1}`);
+      const name = prompt("Name this routine:", `Routine ${Object.keys(routines).length + 1}`);
       if (name) {
-        state.routines[name] = JSON.parse(JSON.stringify(state.exercises));
+        routines[name] = JSON.parse(JSON.stringify(exercises));
         saveToLocal();
         renderSavedRoutines();
         showToast(`Saved "${name}"`);
@@ -728,7 +704,7 @@
     
     function renderSavedRoutines() {
       const container = document.getElementById("savedRoutinesList");
-      const names = Object.keys(state.routines);
+      const names = Object.keys(routines);
       if (names.length === 0) {
         container.innerHTML = "<div class='text-muted'>No saved routines</div>";
         return;
@@ -746,7 +722,7 @@
       document.querySelectorAll(".load-routine").forEach(btn => {
         btn.addEventListener("click", () => {
           const name = btn.dataset.name;
-          state.exercises = JSON.parse(JSON.stringify(state.routines[name]));
+          exercises = JSON.parse(JSON.stringify(routines[name]));
           saveToLocal();
           renderWorkout();
           updateStats();
@@ -756,7 +732,7 @@
       document.querySelectorAll(".del-routine").forEach(btn => {
         btn.addEventListener("click", () => {
           const name = btn.dataset.name;
-          delete state.routines[name];
+          delete routines[name];
           saveToLocal();
           renderSavedRoutines();
           showToast(`Deleted "${name}"`);
@@ -770,7 +746,7 @@
     let runnerDiv = null;
     
     function startWorkout() {
-      if (!state.exercises.length) {
+      if (!exercises.length) {
         showToast("No exercises! Generate first.");
         return;
       }
@@ -782,7 +758,7 @@
     function showRunner() {
       if (runnerDiv) runnerDiv.remove();
       
-      const ex = state.exercises[currentExIdx];
+      const ex = exercises[currentExIdx];
       if (!ex) return;
       
       runnerDiv = document.createElement("div");
@@ -821,10 +797,10 @@
           showToast(`Set ${currentSetNum-1} done! Rest 45s`);
           showRunner();
         } else {
-          if (currentExIdx + 1 < state.exercises.length) {
+          if (currentExIdx + 1 < exercises.length) {
             currentExIdx++;
             currentSetNum = 1;
-            showToast(`Next: ${state.exercises[currentExIdx].name}`);
+            showToast(`Next: ${exercises[currentExIdx].name}`);
             showRunner();
           } else {
             showToast("🏆 WORKOUT COMPLETE! Amazing job.");
@@ -835,7 +811,7 @@
       });
       
       document.getElementById("nextExBtn")?.addEventListener("click", () => {
-        if (currentExIdx + 1 < state.exercises.length) {
+        if (currentExIdx + 1 < exercises.length) {
           currentExIdx++;
           currentSetNum = 1;
           showRunner();
@@ -859,18 +835,24 @@
       setTimeout(() => toast.classList.remove("show"), duration);
     }
 
-    // ========== INIT ==========
+    // ========== INITIALIZATION ==========
     function init() {
       console.log("Initializing app...");
       
       // Set date
       document.getElementById("dateDisplay").innerText = new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
       
-      // Load data
+      // Load saved data
       loadFromLocal();
       
+      // Generate workout if empty
+      if (exercises.length !== 5) {
+        generateWorkout();
+      } else {
+        renderWorkout();
+      }
+      
       // Render everything
-      renderWorkout();
       renderMobility();
       updateStats();
       renderSavedRoutines();
@@ -878,4 +860,7 @@
       // Theme buttons
       document.querySelectorAll(".theme-btn").forEach(btn => {
         btn.addEventListener("click", () => {
-          document.querySelectorAll(".theme-btn").forEach(b =>
+          document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("btn-primary"));
+          btn.classList.add("btn-primary");
+          currentTheme = btn.dataset.theme;
+          generateWorkout();
