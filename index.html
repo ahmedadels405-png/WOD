@@ -53,27 +53,57 @@
             border-radius: 12px;
             padding: 15px;
             margin-bottom: 10px;
+        }
+
+        .exercise-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             flex-wrap: wrap;
             gap: 10px;
+            margin-bottom: 10px;
         }
 
         .exercise-name {
             font-weight: bold;
             font-size: 16px;
-            margin-bottom: 5px;
         }
 
         .exercise-details {
             font-size: 12px;
             color: #ff8c5a;
+            margin-top: 4px;
+        }
+
+        .exercise-weight-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #3a3f4a;
+        }
+
+        .weight-input {
+            background: #0a0c10;
+            border: 1px solid #3a3f4a;
+            padding: 8px 12px;
+            border-radius: 12px;
+            color: white;
+            width: 90px;
+            font-size: 14px;
+        }
+
+        .weight-label {
+            font-size: 12px;
+            color: #888;
         }
 
         .btn-group {
             display: flex;
             gap: 8px;
+            align-items: center;
         }
 
         button {
@@ -91,6 +121,11 @@
         button.primary {
             background: linear-gradient(135deg, #ff6b35, #f7b05e);
             color: #0a0c10;
+        }
+
+        button.small {
+            padding: 6px 12px;
+            font-size: 11px;
         }
 
         button:hover {
@@ -200,6 +235,21 @@
             gap: 10px;
             margin-top: 15px;
         }
+
+        .weight-history {
+            font-size: 10px;
+            color: #ff8c5a;
+            margin-left: 5px;
+        }
+
+        select {
+            background: #0a0c10;
+            border: 1px solid #3a3f4a;
+            padding: 8px 12px;
+            border-radius: 12px;
+            color: white;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -266,7 +316,7 @@
         <div class="flex-row">
             <input type="text" id="customExercise" placeholder="Add custom exercise...">
             <button id="btnAdd">+ Add</button>
-            <button id="btnSave">💾 Save</button>
+            <button id="btnSave">💾 Save Routine</button>
         </div>
     </div>
 
@@ -327,6 +377,9 @@
     let currentTheme = "explosive";
     let savedRoutines = {};
     
+    // WEIGHT TRACKING - stores weight per exercise per day
+    let weightLogs = {};
+    
     // BODY METRICS STATE
     let bodyMetrics = {
         weight: 80,
@@ -340,6 +393,50 @@
         toast.textContent = msg;
         toast.classList.add("show");
         setTimeout(() => toast.classList.remove("show"), 2000);
+    }
+
+    // Get today's date string
+    function getToday() {
+        return new Date().toISOString().split('T')[0];
+    }
+
+    // Load/Save Weight Logs
+    function loadWeightLogs() {
+        const saved = localStorage.getItem("ignite_weight_logs");
+        if (saved) {
+            try {
+                weightLogs = JSON.parse(saved);
+            } catch(e) {}
+        }
+    }
+
+    function saveWeightLogs() {
+        localStorage.setItem("ignite_weight_logs", JSON.stringify(weightLogs));
+    }
+
+    function getWeightForExercise(exerciseName) {
+        const today = getToday();
+        if (!weightLogs[today]) return "";
+        if (!weightLogs[today][exerciseName]) return "";
+        return weightLogs[today][exerciseName];
+    }
+
+    function setWeightForExercise(exerciseName, weight) {
+        const today = getToday();
+        if (!weightLogs[today]) weightLogs[today] = {};
+        weightLogs[today][exerciseName] = weight;
+        saveWeightLogs();
+    }
+
+    function getLastWeight(exerciseName) {
+        // Get most recent weight from last 30 days
+        const dates = Object.keys(weightLogs).sort().reverse();
+        for (let date of dates) {
+            if (weightLogs[date][exerciseName]) {
+                return weightLogs[date][exerciseName];
+            }
+        }
+        return null;
     }
 
     // Load/Save Metrics
@@ -383,10 +480,8 @@
     }
 
     function updateMetricsDisplay() {
-        // Update stat card
         document.getElementById("bodyfatDisplay").textContent = bodyMetrics.bodyfat + "%";
         
-        // Update progress bar
         const current = bodyMetrics.bodyfat;
         const target = bodyMetrics.targetBodyfat;
         const start = Math.max(target + 15, current);
@@ -415,7 +510,6 @@
             compoundPool = [...COMPOUND_EXERCISES];
         }
         
-        // Shuffle
         for (let i = compoundPool.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [compoundPool[i], compoundPool[j]] = [compoundPool[j], compoundPool[i]];
@@ -431,7 +525,7 @@
         showToast(`🔥 ${currentTheme.toUpperCase()} workout generated!`);
     }
 
-    // Render workout list
+    // Render workout list with weight inputs
     function renderWorkout() {
         const container = document.getElementById("workoutList");
         if (!container) return;
@@ -445,20 +539,63 @@
         for (let i = 0; i < currentWorkout.length; i++) {
             const ex = currentWorkout[i];
             const typeLabel = i < 4 ? "⚡ COMPOUND" : "🎯 ISOLATION";
+            const savedWeight = getWeightForExercise(ex.name);
+            const lastWeight = getLastWeight(ex.name);
+            const lastWeightText = lastWeight ? ` (last: ${lastWeight} kg)` : "";
+            
             html += `
                 <div class="exercise-item">
-                    <div>
-                        <div class="exercise-name">${ex.name}</div>
-                        <div class="exercise-details">${ex.sets} sets × ${ex.reps} reps · ${ex.type.toUpperCase()} · ${typeLabel}</div>
+                    <div class="exercise-header">
+                        <div>
+                            <div class="exercise-name">${ex.name}</div>
+                            <div class="exercise-details">${ex.sets} sets × ${ex.reps} reps · ${ex.type.toUpperCase()} · ${typeLabel}</div>
+                        </div>
+                        <div class="btn-group">
+                            <button class="auto-replace" data-index="${i}">🤖 Auto</button>
+                            <button class="manual-replace" data-index="${i}">🔄 Swap</button>
+                        </div>
                     </div>
-                    <div class="btn-group">
-                        <button class="auto-replace" data-index="${i}">🤖 Auto</button>
-                        <button class="manual-replace" data-index="${i}">🔄 Swap</button>
+                    <div class="exercise-weight-section">
+                        <span class="weight-label">🏋️ Weight used (kg):</span>
+                        <input type="number" class="weight-input" id="weight_${i}" data-exname="${ex.name}" step="2.5" value="${savedWeight}" placeholder="kg">
+                        <span class="weight-history">${lastWeightText}</span>
+                        <button class="small save-weight" data-index="${i}">Save</button>
                     </div>
                 </div>
             `;
         }
         container.innerHTML = html;
+        
+        // Save weight buttons
+        document.querySelectorAll(".save-weight").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const idx = parseInt(btn.dataset.index);
+                const input = document.getElementById(`weight_${idx}`);
+                const weight = input.value;
+                const exerciseName = currentWorkout[idx].name;
+                if (weight) {
+                    setWeightForExercise(exerciseName, weight);
+                    showToast(`Saved ${weight} kg for ${exerciseName}`);
+                    // Update the last weight display
+                    renderWorkout();
+                } else {
+                    showToast("Enter a weight first");
+                }
+            });
+        });
+        
+        // Auto-save when weight input changes
+        document.querySelectorAll(".weight-input").forEach(input => {
+            input.addEventListener("change", (e) => {
+                const idx = parseInt(input.id.split('_')[1]);
+                const weight = input.value;
+                const exerciseName = currentWorkout[idx].name;
+                if (weight) {
+                    setWeightForExercise(exerciseName, weight);
+                    showToast(`Auto-saved ${weight} kg for ${exerciseName}`);
+                }
+            });
+        });
         
         // Auto replace buttons
         document.querySelectorAll(".auto-replace").forEach(btn => {
@@ -537,7 +674,7 @@
         let html = "";
         for (let i = 0; i < mobilityList.length; i++) {
             html += `
-                <div class="exercise-item">
+                <div class="exercise-item" style="display: flex; justify-content: space-between; align-items: center;">
                     <div class="exercise-name">🧘 ${mobilityList[i]}</div>
                     <button class="remove-mobility" data-idx="${i}">✖️</button>
                 </div>
@@ -648,9 +785,10 @@
         }
     }
 
-    // Workout runner
+    // Workout runner with weight tracking
     let runnerIndex = 0;
     let runnerSet = 1;
+    let runnerWeights = {};
     
     function startWorkout() {
         if (currentWorkout.length === 0) {
@@ -659,6 +797,7 @@
         }
         runnerIndex = 0;
         runnerSet = 1;
+        runnerWeights = {};
         showRunner();
     }
     
@@ -666,11 +805,17 @@
         const ex = currentWorkout[runnerIndex];
         if (!ex) return;
         
+        const savedWeight = getWeightForExercise(ex.name);
+        
         const html = `
-            <div id="runnerOverlay" style="position: fixed; bottom: 0; left: 0; right: 0; background: #1a1e24; border-top: 3px solid #ff6b35; padding: 30px; z-index: 1000;">
+            <div id="runnerOverlay" style="position: fixed; bottom: 0; left: 0; right: 0; background: #1a1e24; border-top: 3px solid #ff6b35; padding: 30px; z-index: 1000; max-height: 80vh; overflow-y: auto;">
                 <div style="text-align: center; margin-bottom: 20px;">
                     <div style="font-size: 28px; font-weight: bold;">${ex.name}</div>
                     <div style="color: #ff8c5a; margin-top: 5px;">${ex.type.toUpperCase()} · ${ex.sets} sets × ${ex.reps} reps</div>
+                </div>
+                <div style="margin: 15px 0;">
+                    <label style="color: #888; font-size: 14px;">🏋️ Weight for this exercise (kg):</label>
+                    <input type="number" id="runnerWeight" step="2.5" value="${savedWeight}" style="width: 100%; padding: 12px; margin-top: 5px; background: #0a0c10; border: 1px solid #3a3f4a; border-radius: 12px; color: white; font-size: 16px;">
                 </div>
                 <div style="text-align: center; margin: 20px 0;">
                     <div style="font-size: 48px; font-weight: bold;">Set ${runnerSet} / ${ex.sets}</div>
@@ -690,6 +835,13 @@
         document.body.insertAdjacentHTML('beforeend', html);
         
         document.getElementById("runnerComplete").onclick = () => {
+            // Save weight when completing first set
+            const weightInput = document.getElementById("runnerWeight");
+            if (weightInput && weightInput.value && runnerSet === 1) {
+                setWeightForExercise(ex.name, weightInput.value);
+                showToast(`Saved ${weightInput.value} kg for ${ex.name}`);
+            }
+            
             if (runnerSet < ex.sets) {
                 runnerSet++;
                 showRunner();
@@ -732,11 +884,10 @@
 
     // INIT
     function init() {
-        // Load saved data
+        loadWeightLogs();
         loadMetrics();
         loadSavedRoutines();
         
-        // Load saved workout if exists
         const savedWorkout = localStorage.getItem("ignite_workout");
         if (savedWorkout) {
             try {
@@ -744,7 +895,6 @@
             } catch(e) {}
         }
         
-        // Set theme buttons
         document.getElementById("btnExplosive").onclick = () => {
             currentTheme = "explosive";
             generateWorkout();
@@ -765,7 +915,6 @@
         document.getElementById("saveMetricsBtn").onclick = () => saveMetrics();
         document.getElementById("resetMetricsBtn").onclick = () => resetMetrics();
         
-        // Generate initial workout if empty
         if (currentWorkout.length === 0) {
             generateWorkout();
         } else {
@@ -776,19 +925,9 @@
         renderMobility();
     }
     
-    // Save workout when changed
-    function saveWorkoutToLocal() {
-        localStorage.setItem("ignite_workout", JSON.stringify(currentWorkout));
-    }
-    
-    // Override save
-    const origReplace = autoReplace;
-    window.autoReplace = autoReplace;
-    
-    // Add save on workout change
     setInterval(() => {
         localStorage.setItem("ignite_workout", JSON.stringify(currentWorkout));
-    }, 1000);
+    }, 3000);
     
     init();
 </script>
